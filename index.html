@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prajapati Ekta Group</title>
+    
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#1E5AA8">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <!-- Google Fonts - Anek Devanagari (Light to Medium, no thick bold weight) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons Outlined -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        riverBlue: '#1E5AA8',
+                        natureGreen: '#2E7D32',
+                        sandBeige: '#F5E6C8',
+                        lightGray: '#F5F7FA',
+                        softRed: '#E53935',
+                    },
+                    fontFamily: {
+                        sans: ['"Anek Devanagari"'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Anek Devanagari';
+            font-weight: 400;
+            background-color: #F5E6C8; /* sandBeige */
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Thick fonts avoidance */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 500 !important;
+        }
+        .bold-override {
+            font-weight: 500 !important;
+        }
+        /* Hide scrollbars but keep functionality */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        /* Water ripple animation */
+        @keyframes ripple {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.02); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-ripple {
+            animation: ripple 0.5s ease-out;
+        }
+        /* Page active styling */
+        .page-view:not(.active) {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Top App Header (Centered, Taller Design) -->
+    <header class="bg-white sticky top-0 z-40 shadow-sm border-b border-sandBeige/20 pt-6 pb-4 px-4 flex-shrink-0">
+        <div class="max-w-md mx-auto flex flex-col items-center relative">
+            <!-- Sync Indicator (Absolute positioned top-left) -->
+            <div class="absolute left-0 top-2">
+                <span id="syncIndicator" class="text-natureGreen animate-pulse hidden">
+                    <span class="material-icons-outlined text-[26px]">sync</span>
+                </span>
+            </div>
+            
+            <!-- Login/Profile Button (Absolute positioned top-right) -->
+            <div class="absolute right-0 top-2">
+                <button id="headerAuthBtn" class="flex items-center justify-center p-2 rounded-full hover:bg-lightGray text-riverBlue transition-colors">
+                    <span class="material-icons-outlined text-[26px]">login</span>
+                </button>
+            </div>
+
+            <!-- Logo -->
+            <img src="logo.png" alt="Logo" class="w-16 h-16 object-contain rounded-full border border-sandBeige shadow-sm mb-2">
+            
+            <!-- Title -->
+            <h1 class="text-2xl text-riverBlue font-medium tracking-wide text-center">प्रजापति एकता ग्रुप</h1>
+            
+            <!-- Tagline -->
+            <p class="text-sm text-natureGreen font-medium mt-1 text-center">“एकता में शक्ति, सेवा में समर्पण”</p>
+        </div>
+    </header>
+
+    <!-- Main Container (Mobile-First Limit) -->
+    <main class="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pt-4 pb-24">
+        
+        <!-- ================= PAGE 1: DASHBOARD ================= -->
+        <section id="page-dashboard" class="page-view active animate-ripple flex-1 flex flex-col pt-2">
+            
+            <!-- Dashboard Summary Cards -->
+            <div class="grid grid-cols-2 gap-3 mt-2">
+                <!-- Total Cash Donation (3D ATM Card Style) -->
+                <div class="bg-gradient-to-br from-[#1E5AA8] via-[#2D73CE] to-[#103E79] p-5 rounded-2xl shadow-[0_10px_25px_rgba(30,90,168,0.22)] border border-white/10 relative overflow-hidden col-span-2 flex flex-col justify-between h-48 text-white">
+                    <!-- Glass Shine Layer -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <!-- Top Row -->
+                    <div class="flex justify-between items-start z-10">
+                        <div>
+                            <span class="text-[9px] uppercase tracking-widest opacity-80 block font-semibold">नकद दान कार्ड • CASH CARD</span>
+                            <span class="text-xs font-medium block mt-0.5">💰 कुल नकद दान</span>
+                        </div>
+                        <!-- EMV Chip -->
+                        <div class="w-9 h-6.5 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-500 rounded-md border border-amber-600/30 flex items-center justify-center overflow-hidden shadow-inner">
+                            <div class="grid grid-cols-3 gap-0.5 w-full h-full p-1 opacity-75">
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-b border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-amber-800/30"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Row: Amount with 3D shadow effect -->
+                    <div class="my-3 z-10">
+                        <div class="text-4xl font-bold tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] text-white" id="dashTotalCash">₹0</div>
+                    </div>
+
+                    <!-- Bottom Row -->
+                    <div class="flex justify-between items-end z-10 pt-1.5 border-t border-white/10">
+                        <div>
+                            <span class="text-[8px] uppercase tracking-wider opacity-60 block">Card Holder</span>
+                            <span class="text-[11px] font-semibold tracking-wide">🌿 प्रजापति एकता ग्रुप</span>
+                        </div>
+                        <span class="text-[10px] font-bold tracking-widest bg-white/10 px-2 py-0.5 rounded uppercase">PLATINUM</span>
+                    </div>
+                </div>
+
+                <!-- Total Goods Value (3D Mini Card - Green) -->
+                <div class="bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] p-4 flex flex-col justify-between h-36 rounded-2xl shadow-[0_8px_20px_rgba(46,125,50,0.22)] border border-white/10 relative overflow-hidden text-white">
+                    <!-- Glass Shine Layer -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
+                    
+                    <!-- Top Row -->
+                    <div class="flex justify-between items-start z-10">
+                        <div>
+                            <span class="text-[8px] uppercase tracking-wider opacity-75 block font-semibold">GOODS • सामग्री</span>
+                            <span class="text-[10px] font-medium block mt-0.5">🏗️ कुल सामग्री मूल्य</span>
+                        </div>
+                        <!-- Mini Gold EMV Chip -->
+                        <div class="w-7 h-5 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-500 rounded-sm border border-amber-600/30 flex items-center justify-center overflow-hidden shadow-inner">
+                            <div class="grid grid-cols-3 gap-0.5 w-full h-full p-0.5 opacity-75">
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-b border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-amber-800/30"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Row: Amount -->
+                    <div class="my-1.5 z-10">
+                        <div class="text-2xl font-bold tracking-wide drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.45)] text-white" id="dashTotalGoods">₹0</div>
+                    </div>
+
+                    <!-- Bottom Row -->
+                    <div class="flex justify-between items-end z-10 pt-1 border-t border-white/10">
+                        <span class="text-[9px] font-medium tracking-wide opacity-80">🌿 प्रजापति एकता</span>
+                        <span class="material-icons-outlined text-white/80 text-sm">inventory_2</span>
+                    </div>
+                </div>
+
+                <!-- Total Expense (3D Mini Card - Red) -->
+                <div class="bg-gradient-to-br from-[#E53935] to-[#B71C1C] p-4 flex flex-col justify-between h-36 rounded-2xl shadow-[0_8px_20px_rgba(229,57,53,0.22)] border border-white/10 relative overflow-hidden text-white">
+                    <!-- Glass Shine Layer -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
+                    
+                    <!-- Top Row -->
+                    <div class="flex justify-between items-start z-10">
+                        <div>
+                            <span class="text-[8px] uppercase tracking-wider opacity-75 block font-semibold">EXPENSE • खर्च</span>
+                            <span class="text-[10px] font-medium block mt-0.5">💸 कुल खर्च</span>
+                        </div>
+                        <!-- Mini Gold EMV Chip -->
+                        <div class="w-7 h-5 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-500 rounded-sm border border-amber-600/30 flex items-center justify-center overflow-hidden shadow-inner">
+                            <div class="grid grid-cols-3 gap-0.5 w-full h-full p-0.5 opacity-75">
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-b border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-amber-800/30"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Row: Amount -->
+                    <div class="my-1.5 z-10">
+                        <div class="text-2xl font-bold tracking-wide drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.45)] text-white" id="dashTotalExpense">₹0</div>
+                    </div>
+
+                    <!-- Bottom Row -->
+                    <div class="flex justify-between items-end z-10 pt-1 border-t border-white/10">
+                        <span class="text-[9px] font-medium tracking-wide opacity-80">🌿 प्रजापति एकता</span>
+                        <span class="material-icons-outlined text-white/80 text-sm">payments</span>
+                    </div>
+                </div>
+
+                <!-- Current Balance (3D ATM Card Style - Emerald) -->
+                <div class="bg-gradient-to-br from-[#105E3D] via-[#1E7C53] to-[#0A3D26] p-5 rounded-2xl shadow-[0_10px_25px_rgba(16,94,61,0.22)] border border-white/10 relative overflow-hidden col-span-2 flex flex-col justify-between h-48 text-white">
+                    <!-- Glass Shine Layer -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <!-- Top Row -->
+                    <div class="flex justify-between items-start z-10">
+                        <div>
+                            <span class="text-[9px] uppercase tracking-widest opacity-80 block font-semibold">शेष राशि कार्ड • BALANCE CARD</span>
+                            <span class="text-xs font-medium block mt-0.5">💰 वर्तमान शेष राशि</span>
+                        </div>
+                        <!-- EMV Chip -->
+                        <div class="w-9 h-6.5 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-500 rounded-md border border-amber-600/30 flex items-center justify-center overflow-hidden shadow-inner">
+                            <div class="grid grid-cols-3 gap-0.5 w-full h-full p-1 opacity-75">
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-r border-b border-amber-800/30"></div>
+                                <div class="border-b border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-r border-amber-800/30"></div>
+                                <div class="border-amber-800/30"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Row: Amount with 3D shadow effect -->
+                    <div class="my-3 z-10">
+                        <div class="text-4xl font-bold tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] text-white" id="dashCurrentBalance">₹0</div>
+                    </div>
+
+                    <!-- Bottom Row -->
+                    <div class="flex justify-between items-end z-10 pt-1.5 border-t border-white/10">
+                        <div>
+                            <span class="text-[8px] uppercase tracking-wider opacity-60 block">Card Holder</span>
+                            <span class="text-[11px] font-semibold tracking-wide">🌿 प्रजापति एकता ग्रुप</span>
+                        </div>
+                        <span class="text-[10px] font-bold tracking-widest bg-white/10 px-2 py-0.5 rounded uppercase">SAVINGS</span>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+
+        <!-- ================= PAGE 2: MEMBERS ================= -->
+        <section id="page-members" class="page-view animate-ripple flex-1 flex flex-col overflow-hidden pb-36">
+            <!-- Members List Card -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 flex-1 flex flex-col overflow-hidden mb-0">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-lightGray flex-shrink-0">
+                    <h3 class="text-md text-riverBlue font-medium flex items-center gap-2">
+                        <span class="material-icons-outlined">people</span>
+                        👥 सदस्य सूची (Members List)
+                    </h3>
+                    <span class="text-xs text-slate-500 font-medium" id="tabMembersCountText">कुल सदस्य: 0</span>
+                </div>
+
+                <!-- List Container -->
+                <div class="space-y-3 overflow-y-auto pr-1 flex-1" id="tabMembersListContainer">
+                    <!-- Data will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Sticky Search Bar at the bottom of Members Tab, aligned above Bottom Navigation -->
+            <div class="fixed bottom-[88px] left-4 right-4 z-40 max-w-sm mx-auto pointer-events-auto animate-ripple">
+                <div class="relative flex items-center bg-white rounded-2xl border border-sandBeige/50 px-4 py-3 shadow-[0_4px_25px_rgba(0,0,0,0.12)]">
+                    <span class="material-icons-outlined text-slate-400 text-lg mr-2">search</span>
+                    <input type="text" id="universalSearchInput" placeholder="सदस्य खोजें (Search)..." class="w-full bg-transparent border-none outline-none text-xs text-slate-700 placeholder-slate-400">
+                    <button id="voiceSearchBtn" type="button" class="text-slate-400 hover:text-riverBlue flex items-center justify-center p-1.5 rounded-full hover:bg-slate-100 transition-colors ml-1" title="आवाज़ से खोजें (Voice Search)">
+                        <span class="material-icons-outlined text-lg">mic</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 3: REPORTS ================= -->
+        <section id="page-reports" class="page-view animate-ripple">
+                                 <!-- Filter Row -->
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <!-- Year Filter -->
+                <div>
+                    <label class="block text-[10px] font-medium text-slate-600 mb-1">वर्ष (Year)</label>
+                    <div class="relative custom-dropdown" id="dropdownFilterYearContainer">
+                        <button type="button" id="dropdownFilterYearBtn" data-selected-value="all" class="w-full bg-white border border-sandBeige/50 text-left rounded-xl px-2 py-2 text-[11px] flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none shadow-sm">
+                            <span class="flex items-center gap-1" id="dropdownFilterYearValue">📅 सभी</span>
+                            <span class="material-icons-outlined text-[10px] text-slate-400">expand_more</span>
+                        </button>
+                        <div id="dropdownFilterYearList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-50 overflow-hidden max-h-48 overflow-y-auto">
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="all">📅 सभी</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer" data-value="2024">2024</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer" data-value="2025">2025</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer" data-value="2026">2026</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer" data-value="2027">2027</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Month Filter -->
+                <div>
+                    <label class="block text-[10px] font-medium text-slate-600 mb-1">महीना (Month)</label>
+                    <div class="relative custom-dropdown" id="dropdownFilterMonthContainer">
+                        <button type="button" id="dropdownFilterMonthBtn" data-selected-value="all" class="w-full bg-white border border-sandBeige/50 text-left rounded-xl px-2 py-2 text-[11px] flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none shadow-sm">
+                            <span class="flex items-center gap-1" id="dropdownFilterMonthValue">🗓️ सभी</span>
+                            <span class="material-icons-outlined text-[10px] text-slate-400">expand_more</span>
+                        </button>
+                        <div id="dropdownFilterMonthList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-50 overflow-hidden max-h-48 overflow-y-auto">
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="all">🗓️ सभी</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="01">जनवरी</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="02">फरवरी</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="03">मार्च</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="04">अप्रैल</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="05">मई</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="06">जून</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="07">जुलाई</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="08">अगस्त</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="09">सितंबर</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="10">अक्टूबर</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="11">नवंबर</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="12">दिसंबर</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type Filter -->
+                <div>
+                    <label class="block text-[10px] font-medium text-slate-600 mb-1">प्रकार (Type)</label>
+                    <div class="relative custom-dropdown" id="dropdownFilterTypeContainer">
+                        <button type="button" id="dropdownFilterTypeBtn" data-selected-value="all" class="w-full bg-white border border-sandBeige/50 text-left rounded-xl px-2 py-2 text-[11px] flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none shadow-sm">
+                            <span class="flex items-center gap-1" id="dropdownFilterTypeValue">🔄 सभी</span>
+                            <span class="material-icons-outlined text-[10px] text-slate-400">expand_more</span>
+                        </button>
+                        <div id="dropdownFilterTypeList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-50 overflow-hidden">
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="all">🔄 सभी</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="income">💰 आय (Income)</div>
+                            <div class="px-2.5 py-2 text-[11px] hover:bg-sandBeige/20 cursor-pointer flex items-center gap-1" data-value="expense">💸 खर्च (Expense)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Summary Cards Grid -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <!-- Total Expense Filtered -->
+                <div class="bg-gradient-to-br from-[#E53935] to-[#B71C1C] p-4 flex flex-col justify-between h-28 rounded-2xl shadow-sm border border-white/10 text-white">
+                    <div>
+                        <span class="text-[9px] uppercase tracking-wider opacity-75 block font-semibold">EXPENSE • खर्च</span>
+                        <span class="text-xs font-medium block mt-0.5">💸 कुल खर्च</span>
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold tracking-wide drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" id="reportTotalExpenseFiltered">₹0.00</div>
+                    </div>
+                </div>
+
+                <!-- Current Balance Overall -->
+                <div class="bg-gradient-to-br from-[#105E3D] via-[#1E7C53] to-[#0A3D26] p-4 flex flex-col justify-between h-28 rounded-2xl shadow-sm border border-white/10 text-white">
+                    <div>
+                        <span class="text-[9px] uppercase tracking-widest opacity-80 block font-semibold">BALANCE • शेष राशि</span>
+                        <span class="text-xs font-medium block mt-0.5">💰 कुल शेष राशि</span>
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold tracking-wide drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" id="reportCurrentBalance">₹0.00</div>
+                    </div>
+                </div>
+
+                <!-- Status/Period Text -->
+                <div class="col-span-2 text-center text-xs text-slate-500 font-medium bg-white py-2 px-4 rounded-xl border border-sandBeige/20 shadow-sm" id="filterStatusText">
+                    अवधि: सभी समय
+                </div>
+            </div>
+
+            <!-- Transaction History Container -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-lightGray">
+                    <div class="flex flex-col">
+                        <h3 class="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                            <span class="material-icons-outlined text-riverBlue text-lg">history</span>
+                            📜 लेनदेन इतिहास (Transaction History)
+                        </h3>
+                        <span class="text-[10px] text-slate-500 font-medium mt-0.5" id="totalTransactionsCount">कुल प्रविष्टियां: 0</span>
+                    </div>
+                    
+                    <!-- Small Relocated Export Buttons -->
+                    <div class="flex items-center gap-2">
+                        <button id="pdfExportBtn" title="PDF डाउनलोड करें" class="w-8 h-8 rounded-lg border border-riverBlue text-riverBlue hover:bg-riverBlue/5 flex items-center justify-center transition-colors shadow-sm">
+                            <span class="material-icons-outlined text-base">picture_as_pdf</span>
+                        </button>
+                        <button id="whatsappShareBtn" title="WhatsApp पर साझा करें" class="w-8 h-8 rounded-lg bg-natureGreen text-white hover:bg-natureGreen/95 flex items-center justify-center transition-colors shadow-sm">
+                            <span class="material-icons-outlined text-base">send</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- List UI -->
+                <div class="space-y-3 max-h-[400px] overflow-y-auto pr-1" id="transactionsList">
+                    <!-- Data will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Add Expense Button (Floating Card Style above bottom nav) -->
+            <div class="fixed bottom-24 left-4 right-4 z-40 pointer-events-none">
+                <div class="max-w-sm mx-auto pointer-events-auto">
+                    <button id="addExpenseFab" class="w-full bg-softRed text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-softRed/95 transition-colors flex items-center justify-center gap-2 shadow-md">
+                        <span class="material-icons-outlined text-lg">payments</span>
+                        नया खर्च जोड़ें (Add Expense)
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+
+        <!-- ================= PAGE 5: SETTINGS ================= -->
+        <section id="page-settings" class="page-view animate-ripple pb-16">
+            
+            <!-- User Status Card -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6">
+                <h3 class="text-md text-slate-700 font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
+                    <span class="material-icons-outlined text-riverBlue">person</span>
+                    प्रोफाइल विवरण (Profile Details)
+                </h3>
+                <div class="space-y-3 text-sm text-slate-600" id="profileDetailsContainer">
+                    <!-- Loaded dynamically -->
+                    <div class="text-center text-slate-400 py-2 text-xs">आप वर्तमान में लॉगिन नहीं हैं।</div>
+                </div>
+                
+                <!-- Logout button (Placed inside card) -->
+                <button id="logoutBtn" class="w-full mt-4 bg-softRed/10 text-softRed border border-softRed/20 rounded-xl py-2.5 text-sm font-medium hover:bg-softRed/25 transition-colors flex items-center justify-center gap-2 hidden">
+                    <span class="material-icons-outlined">logout</span>
+                    लॉगआउट करें
+                </button>
+            </div>
+
+            <!-- Members Management Section (Moved under settings) -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6">
+                <h3 class="text-md text-riverBlue font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
+                    <span class="material-icons-outlined">people</span>
+                    👥 सदस्य सूची एवं प्रबंधन (Members Directory)
+                </h3>
+                
+                <!-- Add Member Collapsible Form under Settings (Visible to logged-in users) -->
+                <div class="bg-lightGray/50 p-4 rounded-xl mb-4 transition-all hidden" id="settingsAddMemberSection">
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleSettingsAddMemberForm()">
+                        <h4 class="text-xs font-semibold text-riverBlue flex items-center gap-1">
+                            <span class="material-icons-outlined text-sm">person_add</span> नया सदस्य जोड़ें (Add New Member)
+                        </h4>
+                        <span class="material-icons-outlined text-sm text-slate-400" id="settingsAddMemberFormIcon">expand_more</span>
+                    </div>
+                    <form id="addMemberFormSettings" class="space-y-3 mt-3 hidden">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-medium text-slate-500 mb-0.5">नाम ⭐</label>
+                                <input type="text" id="settingsMemberName" required placeholder="नाम" 
+                                    class="w-full bg-white border-none rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-riverBlue/30 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-medium text-slate-500 mb-0.5">मोबाइल नंबर ⭐</label>
+                                <input type="tel" id="settingsMemberMobile" required maxlength="10" placeholder="10 अंक" 
+                                    class="w-full bg-white border-none rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-riverBlue/30 outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-riverBlue text-white rounded-lg py-2 text-xs font-medium hover:bg-riverBlue/90 transition-colors">
+                            सदस्य जोड़ें (Add Member)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Members List Header -->
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs text-slate-500 font-medium" id="membersCountText">कुल सदस्य: 0</span>
+                </div>
+
+                <!-- List UI -->
+                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-1" id="membersListContainer">
+                    <!-- Data will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Admin Controls Card -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 hidden" id="adminControlsCard">
+                <h3 class="text-md text-riverBlue font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
+                    <span class="material-icons-outlined">settings</span>
+                    एडमिन नियंत्रण (Admin Controls)
+                </h3>
+                <div class="space-y-4">
+                    <!-- Lock Edit Mode -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-sm font-semibold text-slate-700 block">संपादन लॉक (Lock Edit Mode)</span>
+                            <span class="text-[10px] text-slate-400">इसे चालू करने पर सामान्य सदस्य एंट्री नहीं जोड़ पाएंगे।</span>
+                        </div>
+                        <!-- Toggle Switch -->
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="adminLockEditToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-riverBlue"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About App Card -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6">
+                <h3 class="text-sm font-medium text-slate-700 mb-3 flex items-center gap-2">
+                    <span class="material-icons-outlined text-riverBlue text-md">info</span>
+                    प्रणाली के बारे में (About System)
+                </h3>
+                <div class="text-xs text-slate-500 leading-relaxed space-y-2">
+                    <p>यह ऐप 🌿 प्रजापति एकता ग्रुप के घाट निर्माण कार्य के वित्तीय दान (Donations) और खर्चों (Expenses) का प्रबंधन करने के लिए बनाया गया है।</p>
+                    <p>सभी डेटा रीयल-टाइम में क्लाउड डेटाबेस के साथ सिंक होता है।</p>
+                    <p class="font-medium text-riverBlue">वर्ज़न: 1.0.0 (Progressive Web App)</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL: ADD/EDIT EXPENSE ================= -->
+    <div id="expenseModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto animate-ripple">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-lightGray">
+                <h3 class="text-md text-softRed font-medium" id="expenseModalTitle">💸 नया खर्च (Expense) दर्ज करें</h3>
+                <button id="closeExpenseModal" class="text-slate-400 hover:text-slate-600 flex items-center">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            
+            <form id="expenseForm" class="space-y-4">
+                <input type="hidden" id="expId">
+                <!-- Amount -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">खर्च राशि (₹) ⭐</label>
+                    <input type="number" id="expAmount" required placeholder="राशि दर्ज करें" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-softRed/30 outline-none">
+                </div>
+                
+                <!-- Paid To -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">भुगतान पाने वाला (Paid To) ⭐</label>
+                    <input type="text" id="expPaidTo" required placeholder="जैसे: राजू कांट्रेक्टर" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-softRed/30 outline-none">
+                </div>
+                
+                <!-- Date -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">तारीख ⭐</label>
+                    <div class="relative">
+                        <input type="text" id="expDate" readonly placeholder="DD-MM-YYYY" 
+                            class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-softRed/30 outline-none cursor-pointer">
+                        <span class="material-icons-outlined absolute right-3 top-2.5 text-slate-400 pointer-events-none">calendar_today</span>
+                        
+                        <!-- Custom Calendar Container for Expense -->
+                        <div id="customCalendarContainerExpense" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-2xl shadow-lg z-50 p-4 animate-ripple">
+                            <!-- Calendar Header -->
+                            <div class="flex justify-between items-center mb-3">
+                                <button type="button" id="prevMonthBtnExp" class="p-1 rounded-full hover:bg-sandBeige/30 text-riverBlue flex items-center justify-center">
+                                    <span class="material-icons-outlined text-lg">chevron_left</span>
+                                </button>
+                                <span id="calendarMonthYearExp" class="text-sm font-medium text-riverBlue">जून 2026</span>
+                                <button type="button" id="nextMonthBtnExp" class="p-1 rounded-full hover:bg-sandBeige/30 text-riverBlue flex items-center justify-center">
+                                    <span class="material-icons-outlined text-lg">chevron_right</span>
+                                </button>
+                            </div>
+                            <!-- Weekdays -->
+                            <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-slate-500 font-semibold mb-1">
+                                <div>रवि</div><div>सोम</div><div>मंगल</div><div>बुध</div><div>गुरु</div><div>शुक्र</div><div>शनि</div>
+                            </div>
+                            <!-- Calendar Days Grid -->
+                            <div id="calendarDaysGridExp" class="grid grid-cols-7 gap-1 text-center text-xs">
+                                <!-- Days injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">खर्च विवरण</label>
+                    <input type="text" id="expDesc" placeholder="जैसे: सीमेंट के कट्टे खरीदे या मजदूरी" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-softRed/30 outline-none">
+                </div>
+                
+                <!-- Bill Image -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">रसीद/बिल की फोटो (वैकल्पिक)</label>
+                    <div class="flex items-center gap-3">
+                        <label class="flex-1 bg-lightGray rounded-xl px-4 py-2.5 text-xs text-slate-500 cursor-pointer flex items-center justify-center gap-2 border border-dashed border-slate-300">
+                            <span class="material-icons-outlined text-lg">photo_camera</span>
+                            <span id="billFileName">फोटो अपलोड करें</span>
+                            <input type="file" id="expBillFile" accept="image/*" class="hidden">
+                        </label>
+                        <button type="button" id="clearBillBtn" class="hidden bg-softRed/10 text-softRed p-2.5 rounded-xl flex items-center justify-center">
+                            <span class="material-icons-outlined text-lg">delete</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-softRed text-white rounded-xl py-3 text-sm font-medium hover:bg-softRed/90 transition-colors shadow-sm">
+                    खर्च सुरक्षित करें
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- ================= MODAL: EDIT CONTRIBUTION ================= -->
+    <div id="contributionModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto animate-ripple">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-lightGray">
+                <h3 class="text-md text-riverBlue font-medium" id="contributionModalTitle">✍️ योगदान संशोधित करें</h3>
+                <button id="closeContributionModal" class="text-slate-400 hover:text-slate-600 flex items-center">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            
+            <form id="editContributionForm" class="space-y-4">
+                <input type="hidden" id="editContId">
+                <!-- Name -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">नाम ⭐</label>
+                    <input type="text" id="editContName" required placeholder="जैसे: राम प्रजापति" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                </div>
+                
+                <!-- Mobile -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">मोबाइल नंबर (वैकल्पिक)</label>
+                    <input type="tel" id="editContMobile" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                </div>
+                
+                <!-- Contribution Type -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">योगदान का प्रकार ⭐</label>
+                    <div class="relative custom-dropdown" id="dropdownEditTypeContainer">
+                        <button type="button" id="dropdownEditTypeBtn" class="w-full bg-lightGray text-left rounded-xl px-4 py-2.5 text-sm flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                            <span class="flex items-center gap-2" id="dropdownEditTypeValue"><span class="material-icons-outlined text-riverBlue text-sm">payments</span> 💰 नकद (Cash)</span>
+                            <span class="material-icons-outlined text-sm text-slate-400">expand_more</span>
+                        </button>
+                        <div id="dropdownEditTypeList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-50 overflow-hidden">
+                            <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer flex items-center gap-2" data-value="cash">
+                                <span class="material-icons-outlined text-riverBlue text-sm">payments</span> 💰 नकद (Cash)
+                            </div>
+                            <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer flex items-center gap-2" data-value="goods">
+                                <span class="material-icons-outlined text-natureGreen text-sm">inventory_2</span> 🏗️ सामग्री (Goods)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Date Picker -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">तारीख ⭐</label>
+                    <div class="relative">
+                        <input type="text" id="editContDate" readonly placeholder="DD-MM-YYYY" 
+                            class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none cursor-pointer">
+                        <span class="material-icons-outlined absolute right-3 top-2.5 text-slate-400 pointer-events-none">calendar_today</span>
+                        
+                        <!-- Custom Theme Calendar Container -->
+                        <div id="customCalendarContainerEditCont" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-2xl shadow-lg z-50 p-4 animate-ripple">
+                            <!-- Calendar Header -->
+                            <div class="flex justify-between items-center mb-3">
+                                <button type="button" id="prevMonthBtnEditCont" class="p-1 rounded-full hover:bg-sandBeige/30 text-riverBlue flex items-center justify-center">
+                                    <span class="material-icons-outlined text-lg">chevron_left</span>
+                                </button>
+                                <span id="calendarMonthYearEditCont" class="text-sm font-medium text-riverBlue">जून 2026</span>
+                                <button type="button" id="nextMonthBtnEditCont" class="p-1 rounded-full hover:bg-sandBeige/30 text-riverBlue flex items-center justify-center">
+                                    <span class="material-icons-outlined text-lg">chevron_right</span>
+                                </button>
+                            </div>
+                            <!-- Weekdays -->
+                            <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-slate-500 font-semibold mb-1">
+                                <div>रवि</div><div>सोम</div><div>मंगल</div><div>बुध</div><div>गुरु</div><div>शुक्र</div><div>शनि</div>
+                            </div>
+                            <!-- Calendar Days Grid -->
+                            <div id="calendarDaysGridEditCont" class="grid grid-cols-7 gap-1 text-center text-xs">
+                                <!-- Days injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Remark -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">विवरण (Remark)</label>
+                    <input type="text" id="editContRemark" placeholder="जैसे: घाट निर्माण के लिए" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                </div>
+                
+                <!-- CONDITIONAL SECTION: CASH -->
+                <div id="editCashFields" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">दान राशि (₹) ⭐</label>
+                        <input type="number" id="editCashAmount" placeholder="राशि दर्ज करें" 
+                            class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">भुगतान का माध्यम ⭐</label>
+                        <div class="relative custom-dropdown" id="dropdownEditModeContainer">
+                            <button type="button" id="dropdownEditModeBtn" class="w-full bg-lightGray text-left rounded-xl px-4 py-2.5 text-sm flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                                <span class="flex items-center gap-2" id="dropdownEditModeValue">💵 नकद (Cash)</span>
+                                <span class="material-icons-outlined text-sm text-slate-400">expand_more</span>
+                            </button>
+                            <div id="dropdownEditModeList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-50 overflow-hidden">
+                                <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer" data-value="cash">💵 नकद (Cash)</div>
+                                <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer" data-value="upi">📱 UPI (PhonePe / GPay)</div>
+                                <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer" data-value="bank">🏦 बैंक ट्रांसफर</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CONDITIONAL SECTION: GOODS -->
+                <div id="editGoodsFields" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">सामग्री का नाम ⭐</label>
+                        <input type="text" id="editGoodsItemName" placeholder="जैसे: ईंट, सीमेंट, रेत" 
+                            class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">मात्रा (Qty) ⭐</label>
+                            <input type="number" id="editGoodsQty" placeholder="0" 
+                                class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">दर (Rate per Qty) ⭐</label>
+                            <input type="number" id="editGoodsRate" placeholder="₹ 0" 
+                                class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">स्वचालित कुल मूल्य (Auto Total Value)</label>
+                        <div class="w-full bg-lightGray/70 rounded-xl px-4 py-3 text-sm text-slate-500 font-medium" id="editGoodsAutoTotal">
+                            ₹ 0.00
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-riverBlue text-white rounded-xl py-3 text-sm font-medium hover:bg-riverBlue/90 transition-colors shadow-sm mt-2">
+                    अपडेट सुरक्षित करें
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: LOGIN ================= -->
+    <div id="loginModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl animate-ripple">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-lightGray">
+                <h3 class="text-md text-riverBlue font-medium">🔑 लॉगिन करें (Member Login)</h3>
+                <button id="closeLoginModal" class="text-slate-400 hover:text-slate-600">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">मोबाइल नंबर (Mobile Number)</label>
+                    <input type="tel" id="loginMobile" required maxlength="10" placeholder="10 अंकों का मोबाइल" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">पासवर्ड / पिन (Password)</label>
+                    <input type="password" id="loginPassword" required placeholder="एडमिन पिन या मोबाइल के अंतिम 4 अंक" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                </div>
+                <div class="text-[10px] text-slate-400">
+                    *सामान्य सदस्यों के लिए पासवर्ड उनके मोबाइल नंबर के आखिरी 4 अंक हैं।
+                </div>
+                <button type="submit" class="w-full bg-riverBlue text-white rounded-xl py-3 text-sm font-medium hover:bg-riverBlue/90 transition-colors shadow-sm">
+                    लॉगिन करें
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: ADD CONTRIBUTION ================= -->
+    <div id="addContributionModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto animate-ripple">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-lightGray">
+                <h3 class="text-md text-riverBlue font-medium">✍️ नया योगदान (Contribution) जोड़ें</h3>
+                <button id="closeAddContributionModal" class="text-slate-400 hover:text-slate-600 flex items-center">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            
+            <form id="addContributionForm" class="space-y-4">
+                <!-- Member Select Dropdown (Visible only in General Add Mode) -->
+                <div id="addContMemberSelectContainer" class="hidden">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">सदस्य चुनें ⭐</label>
+                    <div class="relative custom-dropdown" id="dropdownAddMemberContainer">
+                        <button type="button" id="dropdownAddMemberBtn" class="w-full bg-lightGray text-left rounded-xl px-4 py-2.5 text-sm flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                            <span class="flex items-center gap-2" id="dropdownAddMemberValue">👥 सदस्य चुनें</span>
+                            <span class="material-icons-outlined text-sm text-slate-400">expand_more</span>
+                        </button>
+                        <div id="dropdownAddMemberList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-50 overflow-hidden max-h-48 overflow-y-auto">
+                            <!-- Injected dynamically by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Readonly Name & Mobile container (Visible in direct member add mode) -->
+                <div id="addContNameContainer">
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">नाम ⭐</label>
+                        <input type="text" id="addContName" required readonly
+                            class="w-full bg-lightGray/80 border-none rounded-xl px-4 py-2.5 text-sm text-slate-500 font-medium outline-none">
+                    </div>
+                    
+                    <!-- Mobile -->
+                    <div class="mt-4">
+                        <label class="block text-xs font-medium text-slate-600 mb-1">मोबाइल नंबर</label>
+                        <input type="tel" id="addContMobile" readonly
+                            class="w-full bg-lightGray/80 border-none rounded-xl px-4 py-2.5 text-sm text-slate-500 font-medium outline-none">
+                    </div>
+                </div>
+                
+                <!-- Contribution Type -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">योगदान का प्रकार ⭐</label>
+                    <div class="relative custom-dropdown" id="dropdownAddTypeContainer">
+                        <button type="button" id="dropdownAddTypeBtn" class="w-full bg-lightGray text-left rounded-xl px-4 py-2.5 text-sm flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                            <span class="flex items-center gap-2" id="dropdownAddTypeValue"><span class="material-icons-outlined text-riverBlue text-sm">payments</span> 💰 नकद (Cash)</span>
+                            <span class="material-icons-outlined text-sm text-slate-400">expand_more</span>
+                        </button>
+                        <div id="dropdownAddTypeList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-30 overflow-hidden">
+                            <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer flex items-center gap-2" data-value="cash">
+                                <span class="material-icons-outlined text-riverBlue text-sm">payments</span> 💰 नकद (Cash)
+                            </div>
+                            <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer flex items-center gap-2" data-value="goods">
+                                <span class="material-icons-outlined text-natureGreen text-sm">inventory_2</span> 🏗️ सामग्री (Goods)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Date Picker -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">तारीख ⭐</label>
+                    <div class="relative">
+                        <input type="text" id="addContDate" readonly placeholder="DD-MM-YYYY" 
+                            class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none cursor-pointer">
+                        <span class="material-icons-outlined absolute right-3 top-2.5 text-slate-400 pointer-events-none">calendar_today</span>
+                        
+                        <!-- Custom Theme Calendar Container -->
+                        <div id="customCalendarContainerAddCont" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-2xl shadow-lg z-50 p-4 animate-ripple">
+                            <!-- Calendar Header -->
+                            <div class="flex justify-between items-center mb-3">
+                                <button type="button" id="prevMonthBtnAddCont" class="p-1 rounded-full hover:bg-sandBeige/30 text-riverBlue flex items-center justify-center">
+                                    <span class="material-icons-outlined text-lg">chevron_left</span>
+                                </button>
+                                <span id="calendarMonthYearAddCont" class="text-sm font-medium text-riverBlue">जून 2026</span>
+                                <button type="button" id="nextMonthBtnAddCont" class="p-1 rounded-full hover:bg-sandBeige/30 text-riverBlue flex items-center justify-center">
+                                    <span class="material-icons-outlined text-lg">chevron_right</span>
+                                </button>
+                            </div>
+                            <!-- Weekdays -->
+                            <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-slate-500 font-semibold mb-1">
+                                <div>रवि</div><div>सोम</div><div>मंगल</div><div>बुध</div><div>गुरु</div><div>शुक्र</div><div>शनि</div>
+                            </div>
+                            <!-- Calendar Days Grid -->
+                            <div id="calendarDaysGridAddCont" class="grid grid-cols-7 gap-1 text-center text-xs">
+                                <!-- Days injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Remark -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">विवरण (Remark)</label>
+                    <input type="text" id="addContRemark" placeholder="जैसे: घाट निर्माण के लिए" 
+                        class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                </div>
+                
+                <!-- CONDITIONAL SECTION: CASH -->
+                <div id="addCashFields" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">दान राशि (₹) ⭐</label>
+                        <input type="number" id="addCashAmount" placeholder="राशि दर्ज करें" 
+                            class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">भुगतान का माध्यम ⭐</label>
+                        <div class="relative custom-dropdown" id="dropdownAddModeContainer">
+                            <button type="button" id="dropdownAddModeBtn" class="w-full bg-lightGray text-left rounded-xl px-4 py-2.5 text-sm flex justify-between items-center focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                                <span class="flex items-center gap-2" id="dropdownAddModeValue">💵 नकद (Cash)</span>
+                                <span class="material-icons-outlined text-sm text-slate-400">expand_more</span>
+                            </button>
+                            <div id="dropdownAddModeList" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-sandBeige rounded-xl shadow-lg z-30 overflow-hidden">
+                                <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer" data-value="cash">💵 नकद (Cash)</div>
+                                <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer" data-value="upi">📱 UPI (PhonePe / GPay)</div>
+                                <div class="px-4 py-2.5 text-sm hover:bg-sandBeige/20 cursor-pointer" data-value="bank">🏦 बैंक ट्रांसफर</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CONDITIONAL SECTION: GOODS -->
+                <div id="addGoodsFields" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">सामग्री का नाम ⭐</label>
+                        <input type="text" id="addGoodsItemName" placeholder="जैसे: ईंट, सीमेंट, रेत" 
+                            class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">मात्रा (Qty) ⭐</label>
+                            <input type="number" id="addGoodsQty" placeholder="0" 
+                                class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">दर (Rate per Qty) ⭐</label>
+                            <input type="number" id="addGoodsRate" placeholder="₹ 0" 
+                                class="w-full bg-lightGray border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">स्वचालित कुल मूल्य (Auto Total Value)</label>
+                        <div class="w-full bg-lightGray/70 rounded-xl px-4 py-3 text-sm text-slate-500 font-medium" id="addGoodsAutoTotal">
+                            ₹ 0.00
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2">
+                    योगदान जोड़ें (Add Contribution)
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- ================= MODAL: MEMBER DETAIL ================= -->
+    <div id="memberDetailModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto animate-ripple">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-lightGray">
+                <h3 class="text-md text-riverBlue font-medium" id="mDetName">👤 सदस्य विवरण</h3>
+                <button id="closeMemberDetailModal" class="text-slate-400 hover:text-slate-600 flex items-center">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-riverBlue/5 p-3 rounded-xl">
+                    <span class="text-[10px] text-slate-500 block">💵 कुल नकद दान</span>
+                    <span class="text-sm font-semibold text-riverBlue" id="mDetCash">₹0.00</span>
+                </div>
+                <div class="bg-natureGreen/5 p-3 rounded-xl">
+                    <span class="text-[10px] text-slate-500 block">🏗️ कुल सामग्री मूल्य</span>
+                    <span class="text-sm font-semibold text-natureGreen" id="mDetGoods">₹0.00</span>
+                </div>
+                <div class="bg-riverBlue/5 p-3 rounded-xl col-span-2 flex justify-between items-center">
+                    <span class="text-xs font-semibold text-riverBlue">💰 कुल समग्र योगदान:</span>
+                    <span class="text-md font-semibold text-riverBlue" id="mDetOverall">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Admin Controls for Member Status (Only visible to Admin) -->
+            <div id="mDetAdminControls" class="mb-4 p-3 bg-lightGray rounded-xl border border-sandBeige/30 hidden animate-ripple">
+                <!-- Toggle switch will be injected dynamically -->
+            </div>
+
+            <!-- History List -->
+            <h4 class="text-xs font-semibold text-slate-700 mb-2">📜 योगदान इतिहास (Contribution History)</h4>
+            <div class="space-y-2" id="mDetHistoryList">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: BILL IMAGE LIGHTBOX ================= -->
+    <div id="billImageModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden" onclick="this.classList.add('hidden')">
+        <img id="billModalImg" class="max-w-full max-h-[85vh] rounded-xl shadow-2xl object-contain" src="" alt="Bill Image">
+    </div>
+
+    <!-- Bottom Navigation Bar (Floating Card Style) -->
+    <div class="fixed bottom-4 left-4 right-4 z-40 pointer-events-none">
+        <nav class="max-w-sm mx-auto bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-sandBeige/20 py-2.5 px-2 pointer-events-auto">
+            <div class="grid grid-cols-4 text-center">
+                <!-- Dashboard -->
+                <button class="nav-item flex flex-col items-center justify-center text-riverBlue transition-all" data-target="page-dashboard">
+                    <span class="material-icons-outlined text-[28px]">home</span>
+                    <span class="text-[13px] font-semibold mt-1">डैशबोर्ड</span>
+                </button>
+                
+                <!-- Member -->
+                <button class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-riverBlue transition-all" data-target="page-members">
+                    <span class="material-icons-outlined text-[28px]">people</span>
+                    <span class="text-[13px] font-semibold mt-1">सदस्य</span>
+                </button>
+                
+                <!-- Reports -->
+                <button class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-riverBlue transition-all" data-target="page-reports">
+                    <span class="material-icons-outlined text-[28px]">bar_chart</span>
+                    <span class="text-[13px] font-semibold mt-1">रिपोर्ट</span>
+                </button>
+
+                <!-- Settings -->
+                <button class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-riverBlue transition-all" data-target="page-settings">
+                    <span class="material-icons-outlined text-[28px]">settings</span>
+                    <span class="text-[13px] font-semibold mt-1">सेटिंग्स</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- App Script with cache-busting version query -->
+    <script src="app.js?v=6"></script>
+</body>
+</html>
