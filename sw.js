@@ -1,12 +1,14 @@
 // sw.js - Service Worker for offline PWA support
 
-const CACHE_NAME = 'prajapati-ekta-v10';
+const CACHE_NAME = 'prajapati-ekta-v47';
 const ASSETS = [
     './',
     './index.html',
-    './app.js',
+    './dist/style.min.css',
+    './dist/app.min.js',
     './manifest.json',
-    './logo.png'
+    './logo.png',
+    './pwa-icon.png'
 ];
 
 // Install Service Worker and cache resources
@@ -36,41 +38,61 @@ self.addEventListener('activate', (e) => {
     );
 });
 
-// Fetch assets using Network First strategy (always fetch fresh if online, fallback to cache)
+// Fetch assets: Fonts, images, icons, and scripts are cached. API data is always live.
 self.addEventListener('fetch', (e) => {
-    // Only cache GET requests
+    // Only handle GET requests
     if (e.request.method !== 'GET') return;
     
-    // Bypass for API calls (so they always query the network)
-    if (e.request.url.includes('api.php')) {
+    const url = new URL(e.request.url);
+    
+    // 1. API Data calls MUST be live (Network Only)
+    if (url.pathname.includes('api.php') || url.searchParams.has('action')) {
+        e.respondWith(fetch(e.request));
         return;
     }
 
-    e.respondWith(
-        fetch(e.request).then((networkResponse) => {
-            // Check if we received a valid response
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-                return networkResponse;
-            }
-            
-            // Clone response and update cache
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-                cache.put(e.request, responseToCache);
-            });
-            
-            return networkResponse;
-        }).catch(() => {
-            // Offline fallback to cache
-            return caches.match(e.request).then((cachedResponse) => {
-                if (cachedResponse) {
+    // 2. For static assets (fonts, images, icons, local CSS/JS), use Stale-While-Revalidate
+    const isStaticAsset = 
+        ASSETS.includes(url.pathname) ||
+        url.hostname.includes('fonts.googleapis.com') ||
+        url.hostname.includes('fonts.gstatic.com') ||
+        url.hostname.includes('cdnjs.cloudflare.com') ||
+        url.pathname.match(/\.(html|css|js|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|otf)$/);
+
+    if (isStaticAsset) {
+        e.respondWith(
+            caches.match(e.request).then((cachedResponse) => {
+                const fetchPromise = fetch(e.request).then((networkResponse) => {
+                    if (networkResponse && networkResponse.status === 200 && (networkResponse.type === 'basic' || networkResponse.type === 'cors')) {
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(e.request, responseToCache);
+                        });
+                    }
+                    return networkResponse;
+                }).catch(() => {
+                    // Fallback to cached response if network fails
                     return cachedResponse;
+                });
+                
+                // Return cached response instantly if available, otherwise wait for network
+                return cachedResponse || fetchPromise;
+            })
+        );
+    } else {
+        // Default Network First for other requests
+        e.respondWith(
+            fetch(e.request).then((networkResponse) => {
+                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(e.request, responseToCache);
+                    });
                 }
-                // If it's a page navigation request, return index.html fallback
-                if (e.request.mode === 'navigate') {
-                    return caches.match('./index.html');
-                }
-            });
-        })
-    );
+                return networkResponse;
+            }).catch(() => {
+                return caches.match(e.request);
+            })
+        );
+    }
 });

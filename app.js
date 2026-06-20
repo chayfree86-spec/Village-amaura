@@ -3,7 +3,7 @@
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('sw.js?v=47')
             .then(reg => {
                 console.log('Service Worker registered successfully:', reg.scope);
                 // Listen for updates
@@ -31,6 +31,94 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
     return false;
 };
 
+// Custom Alert Popup Modal implementation
+function showCustomAlert(message, type = 'info', title = '', callback = null) {
+    const modal = document.getElementById("customAlertModal");
+    const card = document.getElementById("customAlertCard");
+    const iconContainer = document.getElementById("customAlertIcon");
+    const titleEl = document.getElementById("customAlertTitle");
+    const msgEl = document.getElementById("customAlertMessage");
+    const btn = document.getElementById("customAlertBtn");
+
+    if (!modal || !card || !iconContainer || !titleEl || !msgEl || !btn) return;
+
+    // Detect type if not provided explicitly
+    const msgStr = String(message);
+    const msgLower = msgStr.toLowerCase();
+    if (type === 'info') {
+        if (msgLower.includes("सफलतापूर्वक") || msgLower.includes("सफलता पूर्वक") || msgLower.includes("सफल") || msgLower.includes("सफलता") || msgLower.includes("success")) {
+            type = 'success';
+        } else if (msgLower.includes("त्रुटि") || msgLower.includes("विफल") || msgLower.includes("समस्या") || msgLower.includes("गलत") || msgLower.includes("error") || msgLower.includes("fail") || msgLower.includes("invalid")) {
+            type = 'error';
+        } else {
+            type = 'info';
+        }
+    }
+
+    // Set colors & icons based on type
+    let iconHTML = '';
+    let btnColorClass = '';
+    let iconContainerClass = '';
+    let defaultTitle = '';
+
+    if (type === 'success') {
+        iconHTML = '<span class="material-icons-outlined text-3xl text-natureGreen">check_circle</span>';
+        iconContainerClass = 'bg-[#E8F5E9] border-[#A5D6A7]'; // Light green matching natureGreen
+        btnColorClass = 'bg-[#2E7D32] hover:bg-[#2E7D32]/90';
+        defaultTitle = 'सफलता (Success)';
+    } else if (type === 'error') {
+        iconHTML = '<span class="material-icons-outlined text-3xl text-softRed">error_outline</span>';
+        iconContainerClass = 'bg-[#FFEBEE] border-[#FFCDD2]'; // Light red matching softRed
+        btnColorClass = 'bg-[#E53935] hover:bg-[#E53935]/90';
+        defaultTitle = 'त्रुटि (Error)';
+    } else {
+        // Info
+        iconHTML = '<span class="material-icons-outlined text-3xl text-riverBlue">info</span>';
+        iconContainerClass = 'bg-[#E3F2FD] border-[#90CAF9]'; // Light blue matching riverBlue
+        btnColorClass = 'bg-[#1E5AA8] hover:bg-[#1E5AA8]/90';
+        defaultTitle = 'सूचना (Notification)';
+    }
+
+    // Setup elements
+    iconContainer.className = `w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 border shadow-sm ${iconContainerClass}`;
+    iconContainer.innerHTML = iconHTML;
+    titleEl.innerText = title || defaultTitle;
+    msgEl.innerText = msgStr;
+    
+    // Set button style
+    btn.className = `w-full text-white rounded-xl py-2.5 text-xs font-semibold transition-all shadow-md focus:outline-none ${btnColorClass}`;
+
+    // Show modal with animations
+    modal.classList.remove("hidden");
+    setTimeout(() => {
+        card.classList.remove("scale-95", "opacity-0");
+        card.classList.add("scale-100", "opacity-100");
+    }, 10);
+
+    // Click handler for OK button
+    const handleClose = () => {
+        card.classList.remove("scale-100", "opacity-100");
+        card.classList.add("scale-95", "opacity-0");
+        setTimeout(() => {
+            modal.classList.add("hidden");
+            if (typeof callback === 'function') {
+                callback();
+            }
+        }, 150);
+        btn.removeEventListener("click", handleClose);
+    };
+
+    // Clean up any old listeners by replacing button node (or just using one-time listener)
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener("click", handleClose);
+}
+
+// Override window.alert globally
+window.alert = function(message) {
+    showCustomAlert(message);
+};
+
 // State Variables
 let appData = {
     dashboard: { total_cash: 0, total_goods: 0, total_collection: 0, total_expense: 0, current_balance: 0 },
@@ -41,6 +129,7 @@ let appData = {
     members: []
 };
 
+let appLoadTime = Date.now();
 let currentUser = JSON.parse(localStorage.getItem('prajapati_user')) || null;
 let currentActivePage = 'page-dashboard';
 let pollInterval = null;
@@ -86,6 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize Search
     initUniversalSearch();
     initVoiceSearch();
+    initClearCache();
+    initPinChange();
 });
 
 // ================= NAVIGATION =================
@@ -111,6 +202,16 @@ function initNavigation() {
             if (targetPage) {
                 targetPage.classList.add("active");
                 currentActivePage = target;
+                
+                // Show/hide Add Expense FAB container based on tab and login status
+                const fabContainer = document.getElementById("addExpenseFabContainer");
+                if (fabContainer) {
+                    if (currentUser && target === 'page-reports') {
+                        fabContainer.classList.remove("hidden");
+                    } else {
+                        fabContainer.classList.add("hidden");
+                    }
+                }
                 
                 // Scroll to top of the page on tab switch
                 window.scrollTo({ top: 0, behavior: 'instant' });
@@ -146,7 +247,10 @@ function initNavigation() {
                 
                 // Extra actions depending on page
                 if (target === 'page-reports') {
-                    renderFilteredReport();
+                    // Defer heavy list rendering to keep page transition and floating button rendering instant
+                    setTimeout(() => {
+                        renderFilteredReport();
+                    }, 50);
                 }
             }
         });
@@ -295,34 +399,77 @@ function updateAuthUI() {
     const settingsAddMemberSection = document.getElementById("settingsAddMemberSection");
     const adminControlsCard = document.getElementById("adminControlsCard");
     const profileDetailsContainer = document.getElementById("profileDetailsContainer");
+    const navSettings = document.getElementById("nav-settings");
+    const bottomNavContainer = document.getElementById("bottomNavContainer");
+    const fabContainer = document.getElementById("addExpenseFabContainer");
+    const pinChangeCard = document.getElementById("pinChangeCard");
 
     if (currentUser) {
         // Authenticated UI
+        if (navSettings) navSettings.classList.remove("hidden");
+        if (bottomNavContainer) {
+            bottomNavContainer.classList.add("grid-cols-4");
+            bottomNavContainer.classList.remove("grid-cols-3");
+        }
+        if (fabContainer) {
+            if (currentActivePage === 'page-reports') {
+                fabContainer.classList.remove("hidden");
+            } else {
+                fabContainer.classList.add("hidden");
+            }
+        }
         if (authBtn) authBtn.innerHTML = `<span class="material-icons-outlined">person</span>`;
         if (logoutBtn) logoutBtn.classList.remove("hidden");
         
         // Settings page profile info
         if (profileDetailsContainer) {
-            profileDetailsContainer.innerHTML = `
-                <div class="flex justify-between items-center border-b border-lightGray pb-2">
-                    <span class="text-xs text-slate-500">नाम (Name):</span>
-                    <span class="text-sm font-medium text-slate-800">${currentUser.name}</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-lightGray pb-2">
-                    <span class="text-xs text-slate-500">मोबाइल (Mobile):</span>
-                    <span class="text-sm font-medium text-slate-800">${currentUser.mobile}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-slate-500">पद (Role):</span>
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${currentUser.is_admin ? 'bg-riverBlue/10 text-riverBlue' : 'bg-natureGreen/10 text-natureGreen'}">
-                        ${currentUser.is_admin ? 'एडमिन (Admin)' : 'सामान्य सदस्य (Member)'}
-                    </span>
-                </div>
-            `;
+            if (currentUser.is_admin === 1) {
+                profileDetailsContainer.innerHTML = `
+                    <form id="profileUpdateForm" class="space-y-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-semibold text-slate-700">नाम (Name)</label>
+                            <input type="text" id="profileNameInput" class="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${currentUser.name}" required>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-semibold text-slate-700">मोबाइल (Mobile)</label>
+                            <input type="tel" id="profileMobileInput" class="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${currentUser.mobile}" required pattern="[0-9]{10}">
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-sandBeige/20">
+                            <span class="text-sm text-slate-600">पद (Role): <span class="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-riverBlue/10 text-riverBlue">एडमिन (Admin)</span></span>
+                            <button type="submit" class="bg-riverBlue text-white rounded-xl px-5 py-2 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm">
+                                अपडेट करें (Update)
+                            </button>
+                        </div>
+                    </form>
+                `;
+                
+                const profileUpdateForm = document.getElementById("profileUpdateForm");
+                if (profileUpdateForm) {
+                    profileUpdateForm.addEventListener("submit", handleProfileUpdate);
+                }
+            } else {
+                profileDetailsContainer.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-lightGray pb-3 pt-1">
+                        <span class="text-sm font-semibold text-slate-600">नाम (Name):</span>
+                        <span class="text-sm font-medium text-slate-800">${currentUser.name}</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-lightGray py-3">
+                        <span class="text-sm font-semibold text-slate-600">मोबाइल (Mobile):</span>
+                        <span class="text-sm font-medium text-slate-800">${currentUser.mobile}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-3">
+                        <span class="text-sm font-semibold text-slate-600">पद (Role):</span>
+                        <span class="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-natureGreen/10 text-natureGreen">
+                            सामान्य सदस्य (Member)
+                        </span>
+                    </div>
+                `;
+            }
         }
 
         // Show add member section in settings to logged in users
         if (settingsAddMemberSection) settingsAddMemberSection.classList.remove("hidden");
+        if (pinChangeCard) pinChangeCard.classList.remove("hidden");
 
         if (currentUser.is_admin === 1) {
             // Admin only features
@@ -332,10 +479,17 @@ function updateAuthUI() {
         }
     } else {
         // Guest UI
+        if (navSettings) navSettings.classList.add("hidden");
+        if (bottomNavContainer) {
+            bottomNavContainer.classList.add("grid-cols-3");
+            bottomNavContainer.classList.remove("grid-cols-4");
+        }
+        if (fabContainer) fabContainer.classList.add("hidden");
         if (authBtn) authBtn.innerHTML = `<span class="material-icons-outlined">login</span>`;
         if (logoutBtn) logoutBtn.classList.add("hidden");
         if (settingsAddMemberSection) settingsAddMemberSection.classList.add("hidden");
         if (adminControlsCard) adminControlsCard.classList.add("hidden");
+        if (pinChangeCard) pinChangeCard.classList.add("hidden");
         if (profileDetailsContainer) {
             profileDetailsContainer.innerHTML = `
                 <div class="text-center text-slate-400 py-2 text-xs flex flex-col items-center gap-2">
@@ -347,6 +501,55 @@ function updateAuthUI() {
             `;
         }
     }
+}
+
+function handleProfileUpdate(e) {
+    e.preventDefault();
+    if (!currentUser || currentUser.is_admin !== 1) return;
+
+    const nameInput = document.getElementById("profileNameInput");
+    const mobileInput = document.getElementById("profileMobileInput");
+    if (!nameInput || !mobileInput) return;
+
+    const new_name = nameInput.value.trim();
+    const new_mobile = mobileInput.value.trim();
+
+    if (!new_name || !new_mobile) {
+        alert("नाम और मोबाइल नंबर आवश्यक हैं।");
+        return;
+    }
+
+    if (!/^[0-9]{10}$/.test(new_mobile)) {
+        alert("मोबाइल नंबर 10 अंकों का होना चाहिए।");
+        return;
+    }
+
+    fetch('api.php?action=update_profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_mobile: currentUser.mobile,
+            new_name: new_name,
+            new_mobile: new_mobile
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            // Update local memory and local storage
+            currentUser = data.user;
+            localStorage.setItem('prajapati_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            fetchLiveData(); // Refresh calculations and listings
+        } else {
+            alert(data.error || "प्रोफ़ाइल अपडेट करने में विफल!");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("प्रोफ़ाइल अपडेट करने में त्रुटि हुई।");
+    });
 }
 
 // ================= CUSTOM DROPDOWNS =================
@@ -600,11 +803,44 @@ function fetchLiveData() {
             const adminLockEditToggle = document.getElementById("adminLockEditToggle");
             if (adminLockEditToggle) adminLockEditToggle.checked = data.edit_locked;
         }
+        dismissSplashScreen();
     })
     .catch(err => {
         if (syncIndicator) syncIndicator.classList.add("hidden");
         console.error("Sync error:", err);
+        dismissSplashScreen();
     });
+}
+
+function dismissSplashScreen() {
+    const splash = document.getElementById("splash-screen");
+    if (splash && !splash.classList.contains("opacity-0")) {
+        const timeElapsed = Date.now() - appLoadTime;
+        const remainingTime = Math.max(0, 1500 - timeElapsed); // Ensure 1.5s minimum display time
+        
+        setTimeout(() => {
+            splash.classList.add("opacity-0", "pointer-events-none");
+            setTimeout(() => {
+                splash.style.display = "none";
+            }, 700); // Match transition duration (duration-700)
+        }, remainingTime);
+    }
+}
+
+function getCashBreakup(contributions) {
+    let handCash = 0;
+    let onlineCash = 0;
+    contributions.forEach(c => {
+        if (c.type === 'cash') {
+            const amt = parseFloat(c.amount) || 0;
+            if (c.payment_mode === 'upi' || c.payment_mode === 'bank') {
+                onlineCash += amt;
+            } else {
+                handCash += amt;
+            }
+        }
+    });
+    return { handCash, onlineCash };
 }
 
 function renderDashboard() {
@@ -617,13 +853,20 @@ function renderDashboard() {
     const expEl = document.getElementById("dashTotalExpense");
     const balanceEl = document.getElementById("dashCurrentBalance");
 
-    if (cashEl) cashEl.innerText = `₹ ${d.total_cash.toLocaleString('en-IN')}`;
-    if (goodsEl) goodsEl.innerText = `₹ ${d.total_goods.toLocaleString('en-IN')}`;
-    if (collEl) collEl.innerText = `₹ ${d.total_collection.toLocaleString('en-IN')}`;
-    if (expEl) expEl.innerText = `₹ ${d.total_expense.toLocaleString('en-IN')}`;
+    if (cashEl) cashEl.innerText = `₹ ${Number(d.total_cash || 0).toLocaleString('en-IN')}`;
+    
+    const breakupEl = document.getElementById("dashTotalCashBreakup");
+    if (breakupEl) {
+        const breakup = getCashBreakup(appData.contributions || []);
+        breakupEl.innerHTML = `नकद: ₹${Number(breakup.handCash).toLocaleString('en-IN')} | ऑनलाइन: ₹${Number(breakup.onlineCash).toLocaleString('en-IN')}`;
+    }
+
+    if (goodsEl) goodsEl.innerText = `₹ ${Number(d.total_goods || 0).toLocaleString('en-IN')}`;
+    if (collEl) collEl.innerText = `₹ ${Number(d.total_collection || 0).toLocaleString('en-IN')}`;
+    if (expEl) expEl.innerText = `₹ ${Number(d.total_expense || 0).toLocaleString('en-IN')}`;
     
     if (balanceEl) {
-        balanceEl.innerText = `₹ ${d.current_balance.toLocaleString('en-IN')}`;
+        balanceEl.innerText = `₹ ${Number(d.current_balance || 0).toLocaleString('en-IN')}`;
         
         // Color code balance text if negative/positive for dark green background compatibility
         if (d.current_balance < 0) {
@@ -670,19 +913,19 @@ function renderActivityFeed() {
                 icon = `<span class="material-icons-outlined text-riverBlue bg-riverBlue/10 p-1.5 rounded-full text-lg">waves</span>`;
                 title = `<span class="font-medium text-slate-700">${item.name}</span> ने नकद योगदान दिया`;
                 subtitle = item.item_name ? `📝 ${item.item_name}` : '💰 नकद दान';
-                amountStr = `<span class="text-riverBlue font-semibold text-right block">+₹${item.amount.toLocaleString('en-IN')}</span>`;
+                amountStr = `<span class="text-riverBlue font-semibold text-right block">+₹${Number(item.amount || 0).toLocaleString('en-IN')}</span>`;
             } else {
                 icon = `<span class="material-icons-outlined text-natureGreen bg-natureGreen/10 p-1.5 rounded-full text-lg">grass</span>`;
                 title = `<span class="font-medium text-slate-700">${item.name}</span> ने सामग्री योगदान दिया`;
                 subtitle = `🏗️ ${item.item_name}`;
-                amountStr = `<span class="text-natureGreen font-semibold text-right block">+₹${item.total_value.toLocaleString('en-IN')}</span>`;
+                amountStr = `<span class="text-natureGreen font-semibold text-right block">+₹${Number(item.total_value || 0).toLocaleString('en-IN')}</span>`;
             }
         } else {
             // Expense
             icon = `<span class="material-icons-outlined text-softRed bg-softRed/10 p-1.5 rounded-full text-lg">payments</span>`;
             title = `💸 <span class="font-medium text-slate-700">${item.name}</span> को भुगतान किया गया`;
             subtitle = `📝 ${item.item_name || 'खर्च'}`;
-            amountStr = `<span class="text-softRed font-semibold text-right block">-₹${item.amount.toLocaleString('en-IN')}</span>`;
+            amountStr = `<span class="text-softRed font-semibold text-right block">-₹${Number(item.amount || 0).toLocaleString('en-IN')}</span>`;
         }
 
         itemDiv.innerHTML = `
@@ -725,7 +968,7 @@ function renderContributionsList() {
                     <span class="material-icons-outlined text-riverBlue text-base">waves</span>
                     <span class="font-medium text-slate-700 text-[15px]">${c.name}</span>
                 </div>
-                <span class="text-base font-semibold text-riverBlue">₹${c.amount.toLocaleString('en-IN')}</span>
+                <span class="text-base font-semibold text-riverBlue">₹${Number(c.amount || 0).toLocaleString('en-IN')}</span>
             `;
             detailsInfo = `
                 <div class="text-slate-500 text-[13px]">💰 नकद दान: ${c.payment_mode === 'upi' ? 'UPI' : (c.payment_mode === 'bank' ? 'बैंक ट्रांसफर' : 'नकद')}</div>
@@ -736,7 +979,7 @@ function renderContributionsList() {
                     <span class="material-icons-outlined text-natureGreen text-base">grass</span>
                     <span class="font-medium text-slate-700 text-[15px]">${c.name}</span>
                 </div>
-                <span class="text-base font-semibold text-natureGreen">₹${c.total_value.toLocaleString('en-IN')}</span>
+                <span class="text-base font-semibold text-natureGreen">₹${Number(c.total_value || 0).toLocaleString('en-IN')}</span>
             `;
             detailsInfo = `
                 <div class="text-slate-500 text-[13px]">🏗️ सामग्री: ${c.item_name}</div>
@@ -744,17 +987,22 @@ function renderContributionsList() {
             `;
         }
 
-        // Show delete button only if admin OR edit mode unlocked
-        const canDelete = currentUser && (currentUser.is_admin === 1 || !appData.edit_locked);
-        const deleteBtn = canDelete ? `
-            <button onclick="handleDelete(${c.id}, 'contribution')" class="text-softRed/70 hover:text-softRed p-1 rounded-full hover:bg-softRed/5 transition-colors absolute top-3 right-3">
-                <span class="material-icons-outlined text-md">delete</span>
-            </button>
+        // Show edit & delete buttons only if admin
+        const canModify = currentUser && currentUser.is_admin === 1;
+        const actionButtons = canModify ? `
+            <div class="flex items-center gap-1 absolute top-2.5 right-2.5 z-10">
+                <button onclick="openEditModal(${c.id}, 'contribution')" class="text-riverBlue/70 hover:text-riverBlue p-1 rounded-full hover:bg-riverBlue/5 transition-colors" title="संशोधित करें">
+                    <span class="material-icons-outlined text-[16px]">edit</span>
+                </button>
+                <button onclick="handleDelete(${c.id}, 'contribution')" class="text-softRed/70 hover:text-softRed p-1 rounded-full hover:bg-softRed/5 transition-colors" title="हटाएं">
+                    <span class="material-icons-outlined text-[16px]">delete</span>
+                </button>
+            </div>
         ` : '';
 
         card.innerHTML = `
-            ${deleteBtn}
-            <div class="flex justify-between items-start mb-2 pr-6">
+            ${actionButtons}
+            <div class="flex justify-between items-start mb-2 pr-12">
                 ${mainInfo}
             </div>
             <div class="border-t border-lightGray/70 pt-2 flex justify-between items-end mt-1">
@@ -773,6 +1021,8 @@ function getFilteredReportData() {
     let cashSum = 0;
     let goodsSum = 0;
     let expenseSum = 0;
+    let handCashSum = 0;
+    let onlineCashSum = 0;
     
     const filteredCont = appData.contributions.filter(c => {
         if (reportFilters.type === 'expense') return false;
@@ -796,7 +1046,13 @@ function getFilteredReportData() {
     
     filteredCont.forEach(c => {
         if (c.type === 'cash') {
-            cashSum += parseFloat(c.amount) || 0;
+            const amt = parseFloat(c.amount) || 0;
+            cashSum += amt;
+            if (c.payment_mode === 'upi' || c.payment_mode === 'bank') {
+                onlineCashSum += amt;
+            } else {
+                handCashSum += amt;
+            }
         } else {
             goodsSum += parseFloat(c.total_value) || 0;
         }
@@ -806,10 +1062,12 @@ function getFilteredReportData() {
         expenseSum += parseFloat(e.amount) || 0;
     });
     
-    const collectionSum = cashSum + goodsSum;
+    const collectionSum = cashSum;
     
     return {
         cash: cashSum,
+        handCash: handCashSum,
+        onlineCash: onlineCashSum,
         goods: goodsSum,
         collection: collectionSum,
         expense: expenseSum,
@@ -847,15 +1105,25 @@ function renderFilteredReport() {
     if (!transactionsList) return;
     
     const fd = getFilteredReportData();
+
+    const cashCardVal = document.getElementById("reportTotalCashFiltered");
+    if (cashCardVal) {
+        cashCardVal.innerText = `₹ ${Number(fd.cash || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    }
+    
+    const cashBreakupVal = document.getElementById("reportTotalCashBreakup");
+    if (cashBreakupVal) {
+        cashBreakupVal.innerHTML = `नकद: ₹${Number(fd.handCash || 0).toLocaleString('en-IN')} | ऑनलाइन: ₹${Number(fd.onlineCash || 0).toLocaleString('en-IN')}`;
+    }
     
     const expenseCardVal = document.getElementById("reportTotalExpenseFiltered");
     if (expenseCardVal) {
-        expenseCardVal.innerText = `₹ ${fd.expense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+        expenseCardVal.innerText = `₹ ${Number(fd.expense || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
     }
     
     const balanceCardVal = document.getElementById("reportCurrentBalance");
     if (balanceCardVal) {
-        balanceCardVal.innerText = `₹ ${fd.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+        balanceCardVal.innerText = `₹ ${Number(fd.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
         
         // Color code balance text if negative/positive
         if (fd.balance < 0) {
@@ -926,8 +1194,8 @@ function renderFilteredReport() {
         return;
     }
     
-    const canDelete = currentUser && (currentUser.is_admin === 1 || !appData.edit_locked);
-    const canEdit = currentUser && (currentUser.is_admin === 1 || !appData.edit_locked);
+    const canDelete = currentUser && currentUser.is_admin === 1;
+    const canEdit = currentUser && currentUser.is_admin === 1;
     
     combined.forEach(item => {
         const card = document.createElement("div");
@@ -947,10 +1215,10 @@ function renderFilteredReport() {
             titleHtml = `<span class="font-medium text-slate-700">${item.name}</span> ने योगदान दिया`;
             
             if (item.type === 'cash') {
-                amountStr = `+₹${item.amount.toLocaleString('en-IN')}`;
+                amountStr = `+₹${Number(item.amount || 0).toLocaleString('en-IN')}`;
                 detailsHtml = `<div class="text-slate-500 text-xs">💰 नकद दान: ${item.payment_mode === 'upi' ? 'UPI' : (item.payment_mode === 'bank' ? 'बैंक ट्रांसफर' : 'नकद')}</div>`;
             } else {
-                amountStr = `+₹${item.total_value.toLocaleString('en-IN')}`;
+                amountStr = `+₹${Number(item.total_value || 0).toLocaleString('en-IN')}`;
                 detailsHtml = `
                     <div class="text-slate-500 text-xs">🏗️ सामग्री: ${item.item_name}</div>
                     <div class="text-[11px] text-slate-400 mt-0.5">📦 मात्रा: ${item.quantity} | दर: ₹${item.rate}</div>
@@ -960,7 +1228,7 @@ function renderFilteredReport() {
             typeClass = 'text-softRed';
             iconHtml = `<span class="material-icons-outlined text-softRed bg-softRed/10 p-1.5 rounded-full text-lg">payments</span>`;
             titleHtml = `💸 <span class="font-medium text-slate-700">${item.paid_to}</span> को भुगतान किया गया`;
-            amountStr = `-₹${item.amount.toLocaleString('en-IN')}`;
+            amountStr = `-₹${Number(item.amount || 0).toLocaleString('en-IN')}`;
             detailsHtml = `<div class="text-slate-500 text-xs">📝 ${item.description || 'खर्च विवरण उपलब्ध नहीं है'}</div>`;
         }
         
@@ -1103,6 +1371,13 @@ function renderMembersList() {
     if (countEl) countEl.innerText = `कुल सदस्य: ${totalCount}`;
     if (tabCountEl) tabCountEl.innerText = `कुल सदस्य: ${totalCount}`;
 
+    // Sort members: Admins always at the top, others sorted alphabetically by Hindi locale
+    const sortedMembers = [...appData.members].sort((a, b) => {
+        if (a.is_admin === 1 && b.is_admin !== 1) return -1;
+        if (a.is_admin !== 1 && b.is_admin === 1) return 1;
+        return a.name.localeCompare(b.name, 'hi');
+    });
+
     function populateList(container) {
         if (!container) return;
         container.innerHTML = '';
@@ -1112,40 +1387,68 @@ function renderMembersList() {
             return;
         }
 
-        appData.members.forEach(m => {
+        sortedMembers.forEach(m => {
             const card = document.createElement("div");
-            card.className = "bg-white p-4 rounded-2xl shadow-sm border border-sandBeige/20 hover:shadow-md transition-shadow cursor-pointer flex flex-col";
+            card.setAttribute("data-name", m.name.toLowerCase());
+            card.setAttribute("data-mobile", m.mobile || "");
+            
+            // Set up premium layout classes
+            let cardClasses = "p-4 rounded-2xl cursor-pointer flex flex-col transition-all duration-300 ";
+            let avatarClasses = "w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm border ";
+            let nameClasses = "text-[14.5px] font-semibold flex items-center gap-1.5 ";
+            let badgesHtml = "";
+            
+            if (m.is_admin === 1) {
+                // Admin premium gold card styling
+                cardClasses += "bg-gradient-to-tr from-[#FFFDF8] via-white to-[#FDF5E2] border-amber-300 shadow-[0_6px_18px_rgba(217,119,6,0.08)] hover:shadow-[0_8px_24px_rgba(217,119,6,0.14)] hover:border-amber-400 scale-[1.01] border-2";
+                avatarClasses += "bg-amber-100 text-amber-700 border-amber-300 font-bold text-lg";
+                nameClasses += "text-slate-800 text-[15.5px] font-bold";
+                badgesHtml += ""; // Admin badge removed as requested
+            } else if (m.status === 1) {
+                // Active member premium card styling
+                cardClasses += "bg-gradient-to-tr from-white via-white to-riverBlue/[0.03] border-riverBlue/30 shadow-[0_4px_15px_rgba(30,90,168,0.05)] hover:shadow-[0_6px_20px_rgba(30,90,168,0.1)] hover:border-riverBlue/45 scale-[1.01]";
+                avatarClasses += "bg-riverBlue/10 text-riverBlue border-riverBlue/25";
+                nameClasses += "text-slate-800";
+                badgesHtml += `
+                    <span class="text-[9.5px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 border border-natureGreen/20">
+                        ✅ सक्रिय
+                    </span>
+                `;
+            } else {
+                // Normal member standard card styling
+                cardClasses += "bg-white border-sandBeige/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-sandBeige/40";
+                avatarClasses += "bg-slate-100 text-slate-500 border-slate-200/50";
+                nameClasses += "text-slate-700";
+            }
+            
+            card.className = cardClasses;
             card.addEventListener("click", () => showMemberDetail(m));
-
-            const isAdminBadge = m.is_admin === 1 ? `
-                <span class="text-[10px] bg-riverBlue/10 text-riverBlue px-1.5 py-0.5 rounded font-medium">एडमिन</span>
-            ` : '';
 
             const callBtn = `
                 <a href="tel:${m.mobile}" onclick="event.stopPropagation();" 
-                    class="flex-1 bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors">
+                    class="${currentUser ? 'flex-1' : 'w-full'} bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors">
                     <span class="material-icons-outlined text-base">call</span> कॉल करें
                 </a>
             `;
 
-            const contributeBtn = `
+            const contributeBtn = currentUser ? `
                 <button onclick="event.stopPropagation(); openAddContributionModal('${m.name}', '${m.mobile}')" 
                     class="flex-1 bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors shadow-sm">
                     <span class="material-icons-outlined text-base">add_circle</span> योगदान
                 </button>
-            `;
+            ` : '';
 
             card.innerHTML = `
                 <!-- Top Row: Profile & Total Contribution -->
                 <div class="flex justify-between items-start mb-3">
                     <div class="flex items-center gap-3">
-                        <div class="bg-riverBlue/10 text-riverBlue w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm">
-                            ${m.name.charAt(0)}
+                        <div class="${avatarClasses} overflow-hidden">
+                            ${(m.status === 1 || m.is_admin === 1) ? '<img src="logo.png" class="w-full h-full object-cover" alt="Active">' : m.name.charAt(0)}
                         </div>
                         <div>
-                            <div class="text-[14.5px] font-semibold text-slate-700 flex items-center gap-1.5">
+                            <div class="${nameClasses}">
                                 ${m.name}
-                                ${isAdminBadge}
+                                ${badgesHtml}
                             </div>
                             <div class="text-xs text-slate-400 mt-1 flex items-center gap-1">
                                 <span class="material-icons-outlined text-xs">phone</span> ${m.mobile}
@@ -1194,11 +1497,11 @@ function showMemberDetail(member) {
     const historyList = document.getElementById("mDetHistoryList");
 
     if (nameEl) nameEl.innerHTML = `👤 ${member.name} (${member.is_admin ? 'एडमिन' : 'सदस्य'})`;
-    if (cashEl) cashEl.innerText = `₹ ${member.cash_total.toLocaleString('en-IN')}`;
-    if (goodsEl) goodsEl.innerText = `₹ ${member.goods_total.toLocaleString('en-IN')}`;
-    if (overallEl) overallEl.innerText = `₹ ${member.overall_total.toLocaleString('en-IN')}`;
+    if (cashEl) cashEl.innerText = `₹ ${(Number(member.cash_total) || 0).toLocaleString('en-IN')}`;
+    if (goodsEl) goodsEl.innerText = `₹ ${(Number(member.goods_total) || 0).toLocaleString('en-IN')}`;
+    if (overallEl) overallEl.innerText = `₹ ${(Number(member.overall_total) || 0).toLocaleString('en-IN')}`;
 
-    // Render Admin Controls toggle inside the modal
+    // Render Admin Controls inside the modal
     const adminControlsEl = document.getElementById("mDetAdminControls");
     if (adminControlsEl) {
         if (currentUser && currentUser.is_admin === 1) {
@@ -1206,16 +1509,39 @@ function showMemberDetail(member) {
             const disabledAttr = member.id === currentUser.id ? 'disabled opacity-50' : '';
             const checkedAttr = member.status === 1 ? 'checked' : '';
             adminControlsEl.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-700 block">लॉगिन अनुमति (Login Allowed)</span>
-                        <span class="text-[10px] text-slate-400">इस सदस्य के लिए लॉगिन सुविधा चालू या बंद करें।</span>
+                <div class="space-y-4">
+                    <h5 class="text-sm font-semibold text-riverBlue flex items-center gap-1.5 border-b border-sandBeige/20 pb-1.5">
+                        <span class="material-icons-outlined text-base">manage_accounts</span>
+                        एडमिन नियंत्रण (Admin Controls)
+                    </h5>
+                    
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-semibold text-slate-600">सदस्य का नाम (Name)</label>
+                        <input type="text" id="mDetEditName" class="w-full border border-sandBeige/70 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${member.name}">
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" ${checkedAttr} ${disabledAttr} 
-                            onchange="handleMemberStatusToggle(${member.id}, this.checked)" class="sr-only peer">
-                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-riverBlue"></div>
-                    </label>
+                    
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-semibold text-slate-600">मोबाइल नंबर (Mobile)</label>
+                        <input type="tel" id="mDetEditMobile" class="w-full border border-sandBeige/70 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${member.mobile || ''}" pattern="[0-9]{10}">
+                    </div>
+                    
+                    <div class="flex items-center justify-between border-t border-sandBeige/20 pt-3">
+                        <div>
+                            <span class="text-sm font-semibold text-slate-700 block">लॉगिन अनुमति</span>
+                            <span class="text-xs text-slate-500">लॉगिन सुविधा चालू/बंद करें।</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" ${checkedAttr} ${disabledAttr} 
+                                onchange="handleMemberStatusToggle(${member.id}, this.checked)" class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-riverBlue"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-end pt-2 border-t border-sandBeige/20">
+                        <button onclick="updateMemberProfileByAdmin(${member.id})" class="bg-riverBlue text-white rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm w-full">
+                            विवरण सहेजें (Save Info)
+                        </button>
+                    </div>
                 </div>
             `;
         } else {
@@ -1227,8 +1553,8 @@ function showMemberDetail(member) {
     if (historyList) {
         historyList.innerHTML = '';
         
-        // Filter contributions by this member mobile
-        const mContributions = appData.contributions.filter(c => c.mobile === member.mobile);
+        // Filter contributions by this member mobile (safe comparison)
+        const mContributions = appData.contributions.filter(c => c.mobile && member.mobile && String(c.mobile).trim() === String(member.mobile).trim());
         
         if (mContributions.length === 0) {
             historyList.innerHTML = `<div class="text-center text-slate-400 py-4 text-xs">कोई योगदान इतिहास नहीं मिला</div>`;
@@ -1238,13 +1564,13 @@ function showMemberDetail(member) {
                 row.className = "flex justify-between items-center text-sm p-2 bg-lightGray rounded-lg";
                 
                 let desc = c.type === 'cash' ? `💵 नकद दान` : `🏗️ सामग्री: ${c.item_name}`;
-                let val = c.type === 'cash' ? `+₹${c.amount.toLocaleString('en-IN')}` : `+₹${c.total_value.toLocaleString('en-IN')}`;
+                let val = c.type === 'cash' ? `+₹${(Number(c.amount) || 0).toLocaleString('en-IN')}` : `+₹${(Number(c.total_value) || 0).toLocaleString('en-IN')}`;
                 let valColor = c.type === 'cash' ? 'text-riverBlue' : 'text-natureGreen';
 
                 row.innerHTML = `
                     <div>
                         <span class="font-medium text-slate-700 block">${desc}</span>
-                        <span class="text-[11px] text-slate-400">📅 ${formatDateDisplay(c.date)} ${c.remark ? '| ' + c.remark : ''}</span>
+                        <span class="text-xs text-slate-400">📅 ${formatDateDisplay(c.date)} ${c.remark ? '| ' + c.remark : ''}</span>
                     </div>
                     <span class="font-semibold ${valColor}">${val}</span>
                 `;
@@ -1504,6 +1830,65 @@ function handleMemberStatusToggle(memberId, isEnabled) {
     });
 }
 
+function updateMemberProfileByAdmin(memberId) {
+    if (!currentUser || currentUser.is_admin !== 1) return;
+    
+    const editNameEl = document.getElementById("mDetEditName");
+    const editMobileEl = document.getElementById("mDetEditMobile");
+    
+    if (!editNameEl || !editMobileEl) return;
+    
+    const name = editNameEl.value.trim();
+    const mobile = editMobileEl.value.trim();
+    
+    if (!name || !mobile) {
+        alert("नाम और मोबाइल नंबर आवश्यक हैं।");
+        return;
+    }
+    
+    if (!/^[0-9]{10}$/.test(mobile)) {
+        alert("मोबाइल नंबर 10 अंकों का होना चाहिए।");
+        return;
+    }
+    
+    fetch('api.php?action=admin_update_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_mobile: currentUser.mobile,
+            member_id: memberId,
+            name: name,
+            mobile: mobile
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            
+            // Close Member Detail Modal
+            const modal = document.getElementById("memberDetailModal");
+            if (modal) modal.classList.add("hidden");
+            
+            // If admin edited their own profile, sync the session
+            if (memberId === currentUser.id) {
+                currentUser.name = name;
+                currentUser.mobile = mobile;
+                localStorage.setItem('prajapati_user', JSON.stringify(currentUser));
+                updateAuthUI();
+            }
+            
+            fetchLiveData(); // Refresh
+        } else {
+            alert(data.error || "विवरण अपडेट करने में विफल!");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("अपडेट के दौरान त्रुटि हुई।");
+    });
+}
+
 // ================= ADMIN TOGGLES =================
 function initAdminToggle() {
     const adminLockEditToggle = document.getElementById("adminLockEditToggle");
@@ -1643,12 +2028,80 @@ function initFormSubmits() {
         billFileInput.addEventListener("change", function() {
             if (this.files && this.files[0]) {
                 const file = this.files[0];
-                if (billFileNameLabel) billFileNameLabel.innerText = file.name.substring(0, 15) + '...';
-                if (clearBillBtn) clearBillBtn.classList.remove("hidden");
-
+                if (billFileNameLabel) billFileNameLabel.innerText = 'कंप्रेस किया जा रहा है...';
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    base64BillImage = e.target.result;
+                    const img = new Image();
+                    img.onload = function() {
+                        const maxDim = 1000;
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > maxDim || height > maxDim) {
+                            if (width > height) {
+                                height = Math.round((height * maxDim) / width);
+                                width = maxDim;
+                            } else {
+                                width = Math.round((width * maxDim) / height);
+                                height = maxDim;
+                            }
+                        }
+                        
+                        const canvas = document.createElement("canvas");
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        let quality = 0.85;
+                        let dataUrl = canvas.toDataURL("image/jpeg", quality);
+                        let sizeKB = (dataUrl.length * 3) / 4 / 1024;
+                        
+                        // Iteratively decrease quality if above 50KB
+                        while (sizeKB > 50 && quality > 0.15) {
+                            quality -= 0.1;
+                            dataUrl = canvas.toDataURL("image/jpeg", quality);
+                            sizeKB = (dataUrl.length * 3) / 4 / 1024;
+                        }
+                        
+                        // If still above 50KB, scale down canvas size iteratively
+                        let scale = 0.9;
+                        while (sizeKB > 50 && scale > 0.25) {
+                            const tempCanvas = document.createElement("canvas");
+                            const tempCtx = tempCanvas.getContext("2d");
+                            tempCanvas.width = Math.round(canvas.width * scale);
+                            tempCanvas.height = Math.round(canvas.height * scale);
+                            tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+                            
+                            quality = 0.8;
+                            dataUrl = tempCanvas.toDataURL("image/jpeg", quality);
+                            sizeKB = (dataUrl.length * 3) / 4 / 1024;
+                            
+                            while (sizeKB > 50 && quality > 0.2) {
+                                quality -= 0.1;
+                                dataUrl = tempCanvas.toDataURL("image/jpeg", quality);
+                                sizeKB = (dataUrl.length * 3) / 4 / 1024;
+                            }
+                            scale -= 0.1;
+                        }
+                        
+                        base64BillImage = dataUrl;
+                        if (billFileNameLabel) {
+                            billFileNameLabel.innerText = file.name.substring(0, 15) + '... (' + Math.round(sizeKB) + ' KB)';
+                        }
+                        if (clearBillBtn) clearBillBtn.classList.remove("hidden");
+                    };
+                    img.onerror = function() {
+                        // Fallback if image processing fails
+                        base64BillImage = e.target.result;
+                        const sizeKB = (e.target.result.length * 3) / 4 / 1024;
+                        if (billFileNameLabel) {
+                            billFileNameLabel.innerText = file.name.substring(0, 15) + '... (' + Math.round(sizeKB) + ' KB)';
+                        }
+                        if (clearBillBtn) clearBillBtn.classList.remove("hidden");
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
@@ -1782,12 +2235,6 @@ function initFormSubmits() {
                     alert(data.message);
                     addMembFormSettings.reset();
                     fetchLiveData(); // Refresh
-                    
-                    // Collapse the form
-                    const form = document.getElementById("addMemberFormSettings");
-                    const icon = document.getElementById("settingsAddMemberFormIcon");
-                    if (form) form.classList.add("hidden");
-                    if (icon) icon.innerText = "expand_more";
                 } else {
                     alert(data.error || "सदस्य जोड़ने में विफल!");
                 }
@@ -2017,15 +2464,78 @@ function initExportActions() {
     if (waBtn) {
         waBtn.addEventListener("click", () => {
             const fd = getFilteredReportData();
+            
+            // Filter contributions and expenses
+            const filteredCont = appData.contributions.filter(c => {
+                if (reportFilters.type === 'expense') return false;
+                if (!c.date || typeof c.date !== 'string' || c.date.length < 7) return false;
+                const year = c.date.substring(0, 4);
+                const month = c.date.substring(5, 7);
+                const yearMatch = reportFilters.year === 'all' || year === reportFilters.year;
+                const monthMatch = reportFilters.month === 'all' || month === reportFilters.month;
+                return yearMatch && monthMatch;
+            });
+            
+            const filteredExp = appData.expenses.filter(e => {
+                if (reportFilters.type === 'income') return false;
+                if (!e.date || typeof e.date !== 'string' || e.date.length < 7) return false;
+                const year = e.date.substring(0, 4);
+                const month = e.date.substring(5, 7);
+                const yearMatch = reportFilters.year === 'all' || year === reportFilters.year;
+                const monthMatch = reportFilters.month === 'all' || month === reportFilters.month;
+                return yearMatch && monthMatch;
+            });
+
+            let combined = [];
+            filteredCont.forEach(c => {
+                const itemDate = c.date ? new Date(c.date) : new Date();
+                const tVal = isNaN(itemDate.getTime()) ? 0 : itemDate.getTime();
+                combined.push({
+                    ...c,
+                    item_type: 'contribution',
+                    timestamp: tVal + parseInt(c.id || 0)
+                });
+            });
+            filteredExp.forEach(e => {
+                const itemDate = e.date ? new Date(e.date) : new Date();
+                const tVal = isNaN(itemDate.getTime()) ? 0 : itemDate.getTime();
+                combined.push({
+                    ...e,
+                    item_type: 'expense',
+                    timestamp: tVal + parseInt(e.id || 0)
+                });
+            });
+            
+            combined.sort((a, b) => b.timestamp - a.timestamp);
+
+            let historyText = "";
+            if (combined.length > 0) {
+                historyText = "\n\n📜 *लेनदेन विवरण (Transaction History):*";
+                combined.forEach((item, index) => {
+                    const dateStr = formatDateDisplay(item.date);
+                    if (item.item_type === 'contribution') {
+                        if (item.type === 'cash') {
+                            const modeMap = { 'upi': 'UPI', 'bank': 'बैंक', 'cash': 'नकद' };
+                            const modeText = modeMap[item.payment_mode] || 'नकद';
+                            historyText += `\n${index + 1}. ➕ ${dateStr} - ${item.name}: +₹${Number(item.amount || 0).toLocaleString('en-IN')} (${modeText})`;
+                        } else {
+                            historyText += `\n${index + 1}. ➕ ${dateStr} - ${item.name}: +₹${Number(item.total_value || 0).toLocaleString('en-IN')} (सामग्री: ${item.item_name})`;
+                        }
+                    } else {
+                        historyText += `\n${index + 1}. ➖ ${dateStr} - ${item.paid_to}: -₹${Number(item.amount || 0).toLocaleString('en-IN')} (${item.description || 'खर्च'})`;
+                    }
+                });
+            }
+
             const formattedText = `🌿 *PRAJAPATI EKTA GROUP*
 🌊 *Ghaat Construction Report*
 📅 *अवधि:* ${fd.periodText}
 
-💰 *नकद योगदान:* ₹${fd.cash.toLocaleString('en-IN')}
+💰 *नकद योगदान:* ₹${fd.cash.toLocaleString('en-IN')} (नकद: ₹${fd.handCash.toLocaleString('en-IN')}, ऑनलाइन: ₹${fd.onlineCash.toLocaleString('en-IN')})
 🏗️ *सामग्री मूल्य:* ₹${fd.goods.toLocaleString('en-IN')}
 
-📦 *कुल संग्रह (अवधि):* ₹${fd.collection.toLocaleString('en-IN')}
-💸 *कुल खर्च (अवधि):* ₹${fd.expense.toLocaleString('en-IN')}
+📦 *कुल योगदान (अवधि):* ₹${fd.collection.toLocaleString('en-IN')}
+💸 *कुल खर्च (अवधि):* ₹${fd.expense.toLocaleString('en-IN')}${historyText}
 
 💰 *वर्तमान कुल शेष (Overall Balance):* ₹${fd.balance.toLocaleString('en-IN')}
 
@@ -2079,12 +2589,12 @@ function initExportActions() {
             // Table Block
             let currentY = 55;
             doc.setFillColor(245, 247, 250); // Light Gray Background
-            doc.rect(15, currentY, 180, 80, "F");
+            doc.rect(15, currentY, 180, 60, "F");
 
             // Table Borders
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.2);
-            doc.rect(15, currentY, 180, 80);
+            doc.rect(15, currentY, 180, 60);
 
             // Rows
             doc.setFont("helvetica", "bold");
@@ -2095,6 +2605,13 @@ function initExportActions() {
             doc.text("Cash Donation (Period)", 20, currentY + 12);
             doc.setFont("helvetica", "normal");
             doc.text(`Rs. ${fd.cash.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 190, currentY + 12, { align: "right" });
+            
+            // Sub-breakup for cash donation
+            doc.setFontSize(9);
+            doc.setTextColor(120, 130, 140);
+            doc.text(`(Cash: Rs. ${fd.handCash.toLocaleString('en-IN')}, Online: Rs. ${fd.onlineCash.toLocaleString('en-IN')})`, 20, currentY + 17);
+            doc.setFontSize(12); // Reset
+            doc.setTextColor(51, 65, 85);
             doc.line(15, currentY + 20, 195, currentY + 20);
 
             // Row 2: Goods Value
@@ -2104,29 +2621,21 @@ function initExportActions() {
             doc.text(`Rs. ${fd.goods.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 190, currentY + 32, { align: "right" });
             doc.line(15, currentY + 40, 195, currentY + 40);
 
-            // Row 3: Total Collection
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(30, 90, 168); // River Blue Highlight
-            doc.text("Total Collection (Period)", 20, currentY + 52);
-            doc.text(`Rs. ${fd.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 190, currentY + 52, { align: "right" });
-            doc.setTextColor(51, 65, 85);
-            doc.line(15, currentY + 60, 195, currentY + 60);
-
-            // Row 4: Total Expense
+            // Row 3: Total Expense
             doc.setFont("helvetica", "bold");
             doc.setTextColor(229, 57, 53); // Soft Red for Expense
-            doc.text("Total Expenses (Period)", 20, currentY + 72);
-            doc.text(`Rs. ${fd.expense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 190, currentY + 72, { align: "right" });
+            doc.text("Total Expenses (Period)", 20, currentY + 52);
+            doc.text(`Rs. ${fd.expense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 190, currentY + 52, { align: "right" });
 
-            // Row 5: Net Balance Card
+            // Row 4: Net Balance Card
             doc.setFillColor(30, 90, 168); // River Blue
-            doc.rect(15, currentY + 90, 180, 20, "F");
+            doc.rect(15, currentY + 70, 180, 20, "F");
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
             doc.setTextColor(255, 255, 255);
-            doc.text("Current Balance (Overall)", 20, currentY + 103);
-            doc.text(`Rs. ${fd.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 190, currentY + 103, { align: "right" });
+            doc.text("Current Balance (Overall)", 20, currentY + 83);
+            doc.text(`Rs. ${fd.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 190, currentY + 83, { align: "right" });
 
             // Footer
             doc.setFont("helvetica", "bold");
@@ -2160,11 +2669,37 @@ function filterListCards(containerId, query) {
         const card = cards[i];
         if (card.classList.contains("text-center")) continue; // Skip empty list message card
         
-        const cardText = card.innerText.toLowerCase();
-        if (cardText.includes(query)) {
-            card.style.display = ""; // Show
+        if (!query) {
+            card.style.display = ""; // Show all if query is empty
+            continue;
+        }
+        
+        const nameAttr = card.getAttribute("data-name");
+        const mobileAttr = card.getAttribute("data-mobile");
+        
+        if (nameAttr !== null && mobileAttr !== null) {
+            // Precise member matching (search by name, mobile, and starting letter of any word in name)
+            const name = nameAttr.toLowerCase();
+            const mobile = mobileAttr.toLowerCase();
+            const words = name.split(/\s+/);
+            
+            const matchesName = name.includes(query);
+            const matchesMobile = mobile.includes(query);
+            const matchesFirstWord = words.some(word => word.startsWith(query));
+            
+            if (matchesName || matchesMobile || matchesFirstWord) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
         } else {
-            card.style.display = "none"; // Hide
+            // Fallback for non-member lists
+            const cardText = card.innerText.toLowerCase();
+            if (cardText.includes(query)) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
         }
     }
 }
@@ -2226,3 +2761,125 @@ function toggleSettingsAddMemberForm() {
     }
 }
 
+// ================= CLEAR CACHE LOGIC =================
+function initClearCache() {
+    const clearCacheBtn = document.getElementById("clearCacheBtn");
+    if (clearCacheBtn) {
+        clearCacheBtn.addEventListener("click", () => {
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
+            }
+            if (window.caches) {
+                caches.keys().then(names => {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+            alert("कैश साफ़ कर दिया गया है। ऐप अब अपडेट हो रहा है...");
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 1000);
+        });
+    }
+}
+
+// ================= PIN CHANGE LOGIC =================
+function initPinChange() {
+    const changePinForm = document.getElementById("changePinForm");
+    if (!changePinForm) return;
+
+    // Toggle PIN visibility
+    document.querySelectorAll(".pin-toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const targetId = btn.getAttribute("data-target");
+            const input = document.getElementById(targetId);
+            const icon = btn.querySelector(".material-icons-outlined");
+            if (input && icon) {
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.innerText = "visibility";
+                } else {
+                    input.type = "password";
+                    icon.innerText = "visibility_off";
+                }
+            }
+        });
+    });
+
+    changePinForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        if (!currentUser) {
+            alert("PIN बदलने के लिए कृपया पहले लॉगिन करें।");
+            return;
+        }
+
+        const oldPinInput = document.getElementById("oldPinInput");
+        const newPinInput = document.getElementById("newPinInput");
+        const confirmPinInput = document.getElementById("confirmPinInput");
+        const changePinBtn = document.getElementById("changePinBtn");
+
+        if (!oldPinInput || !newPinInput || !confirmPinInput) return;
+
+        const old_pin = oldPinInput.value.trim();
+        const new_pin = newPinInput.value.trim();
+        const confirm_pin = confirmPinInput.value.trim();
+
+        if (new_pin !== confirm_pin) {
+            alert("नया PIN और पुष्टि PIN मेल नहीं खाते हैं!");
+            return;
+        }
+
+        if (new_pin.length < 4 || new_pin.length > 6) {
+            alert("नया PIN 4 से 6 अंकों का होना चाहिए।");
+            return;
+        }
+
+        // Disable button during request
+        if (changePinBtn) {
+            changePinBtn.disabled = true;
+            changePinBtn.innerHTML = `<span class="material-icons-outlined text-sm animate-spin">sync</span> कृपया प्रतीक्षा करें...`;
+        }
+
+        fetch('api.php?action=change_pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_mobile: currentUser.mobile,
+                old_pin: old_pin,
+                new_pin: new_pin
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message || "PIN सफलतापूर्वक बदल दिया गया है!");
+                changePinForm.reset();
+                // Reset pin input types back to password
+                [oldPinInput, newPinInput, confirmPinInput].forEach(input => {
+                    input.type = "password";
+                });
+                document.querySelectorAll(".pin-toggle-btn .material-icons-outlined").forEach(icon => {
+                    icon.innerText = "visibility_off";
+                });
+            } else {
+                alert(data.error || "PIN बदलने में विफल!");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("PIN बदलने के दौरान कोई त्रुटि हुई।");
+        })
+        .finally(() => {
+            if (changePinBtn) {
+                changePinBtn.disabled = false;
+                changePinBtn.innerHTML = `<span class="material-icons-outlined text-sm">lock_reset</span> PIN बदलें`;
+            }
+        });
+    });
+}

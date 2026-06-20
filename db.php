@@ -7,6 +7,12 @@ $db_user = 'root';
 $db_pass = '';
 $db_name = 'prajapati_ekta';
 
+// $host = 'localhost';
+// $db_user = 'praj_ekta';
+// $db_pass = 'z@WY|N:1a5S^';
+// $db_name = 'praj_ekta';
+
+
 try {
     // Connect to MySQL server first using PDO
     $db = new PDO("mysql:host=$host", $db_user, $db_pass);
@@ -21,16 +27,24 @@ try {
     $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
     // Create tables
-    
+
     // 1. Members table
     $db->exec("CREATE TABLE IF NOT EXISTS `members` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,
         `name` VARCHAR(100) NOT NULL,
         `mobile` VARCHAR(15) UNIQUE NOT NULL,
+        `pin` VARCHAR(10) DEFAULT NULL, -- Custom login PIN
         `status` TINYINT(1) DEFAULT 0, -- 0 = Disable, 1 = Enable member login
         `is_admin` TINYINT(1) DEFAULT 0,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+    // Add pin column if table already exists (migration)
+    try {
+        $db->exec("ALTER TABLE `members` ADD COLUMN `pin` VARCHAR(10) DEFAULT NULL AFTER `mobile`");
+    } catch (PDOException $e) {
+        // Column already exists, ignore
+    }
 
     // 2. Contributions table
     $db->exec("CREATE TABLE IF NOT EXISTS `contributions` (
@@ -75,7 +89,7 @@ try {
     $stmt = $db->prepare("SELECT id FROM `members` WHERE `mobile` = '9628717175'");
     $stmt->execute();
     if ($stmt->rowCount() == 0) {
-        $ins = $db->prepare("INSERT INTO `members` (`name`, `mobile`, `status`, `is_admin`) VALUES ('Admin', '9628717175', 1, 1)");
+        $ins = $db->prepare("INSERT INTO `members` (`name`, `mobile`, `status`, `is_admin`) VALUES ('Sandeep Prajapati', '9628717175', 1, 1)");
         $ins->execute();
     }
 

@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --color-riverBlue: #1E5AA8;
+  --color-natureGreen: #2E7D32;
+  --color-sandBeige: #F5E6C8;
+  --color-lightGray: #F5F7FA;
+  --color-softRed: #E53935;
+  --font-sans: "Anek Devanagari", sans-serif;
+}
+
+body {
+    font-family: 'Anek Devanagari', sans-serif;
+    font-weight: 400;
+    background-color: #F5E6C8; /* sandBeige */
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Thick fonts avoidance */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500 !important;
+}
+
+.bold-override {
+    font-weight: 500 !important;
+}
+
+/* Hide scrollbars but keep functionality */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Water ripple animation */
+@keyframes ripple {
+    0% { transform: scale(0.95); opacity: 0.5; }
+    50% { transform: scale(1.02); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-ripple {
+    animation: ripple 0.5s ease-out;
+}
+
+/* Page active styling */
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Align icons/emojis with Devanagari text */
+.val-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    transform: translateY(1px);
+    line-height: 1;
+}
+
+.val-text {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.page-view:not(.active) {
+    display: none !important;
+}
