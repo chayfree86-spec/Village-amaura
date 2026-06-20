@@ -10,9 +10,9 @@ header('Content-Type: application/json; charset=utf-8');
 
 // Live DB Settings
 $host = 'localhost';
-$db_user = 'praj_ekta';
+$db_user = 'u748421121_praj_ekta';
 $db_pass = 'z@WY|N:1a5S^';
-$db_name = 'praj_ekta';
+$db_name = 'u748421121_praj_ekta';
 
 
 try {
