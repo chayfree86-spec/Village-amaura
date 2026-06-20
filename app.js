@@ -3,7 +3,7 @@
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=47')
+        navigator.serviceWorker.register('sw.js?v=49')
             .then(reg => {
                 console.log('Service Worker registered successfully:', reg.scope);
                 // Listen for updates
@@ -241,16 +241,11 @@ function initNavigation() {
                     // Reset all filters
                     filterListCards("tabMembersListContainer", "");
                     filterListCards("membersListContainer", "");
-                    filterListCards("transactionsList", "");
-                    filterListCards("recentActivityFeed", "");
                 }
                 
                 // Extra actions depending on page
                 if (target === 'page-reports') {
-                    // Defer heavy list rendering to keep page transition and floating button rendering instant
-                    setTimeout(() => {
-                        renderFilteredReport();
-                    }, 50);
+                    renderFilteredReport();
                 }
             }
         });
