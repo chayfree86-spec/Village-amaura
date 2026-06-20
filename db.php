@@ -2,11 +2,13 @@
 // db.php - Database connection using PDO (compatible with pdo_mysql)
 header('Content-Type: application/json; charset=utf-8');
 
+// // Local DB Settings
 // $host = 'localhost';
 // $db_user = 'root';
 // $db_pass = '';
 // $db_name = 'prajapati_ekta';
 
+// Live DB Settings
 $host = 'localhost';
 $db_user = 'praj_ekta';
 $db_pass = 'z@WY|N:1a5S^';
