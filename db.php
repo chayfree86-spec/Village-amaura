@@ -2,17 +2,27 @@
 // db.php - Database connection using PDO (compatible with pdo_mysql)
 header('Content-Type: application/json; charset=utf-8');
 
-// // Local DB Settings
-// $host = 'localhost';
-// $db_user = 'root';
-// $db_pass = '';
-// $db_name = 'prajapati_ekta';
+// Check if running on localhost
+$is_local = false;
+if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1' || strpos($_SERVER['HTTP_HOST'], 'localhost:') === 0)) {
+    $is_local = true;
+} else if (php_sapi_name() === 'cli') {
+    $is_local = true;
+}
 
-// Live DB Settings
-$host = 'localhost';
-$db_user = 'u748421121_praj_ekta';
-$db_pass = 'z@WY|N:1a5S^';
-$db_name = 'u748421121_praj_ekta';
+if ($is_local) {
+    // Local DB Settings
+    $host = 'localhost';
+    $db_user = 'root';
+    $db_pass = '';
+    $db_name = 'prajapati_ekta';
+} else {
+    // Live DB Settings
+    $host = 'localhost';
+    $db_user = 'u748421121_praj_ekta';
+    $db_pass = 'z@WY|N:1a5S^';
+    $db_name = 'u748421121_praj_ekta';
+}
 
 
 try {

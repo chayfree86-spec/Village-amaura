@@ -81,7 +81,7 @@
     <main class="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pt-4 pb-12">
         
         <!-- ================= PAGE 1: DASHBOARD ================= -->
-        <section id="page-dashboard" class="page-view active animate-ripple flex-1 flex flex-col pt-2">
+        <section id="page-dashboard" class="page-view active animate-ripple flex-1 flex flex-col pt-2 pb-32">
             
             <!-- Dashboard Summary Cards -->
             <div class="grid grid-cols-2 gap-3 mt-3">
@@ -275,7 +275,7 @@
         </section>
 
         <!-- ================= PAGE 3: REPORTS ================= -->
-        <section id="page-reports" class="page-view animate-ripple pb-24">
+        <section id="page-reports" class="page-view animate-ripple pb-32">
             <!-- Filter Row -->
             <div class="grid grid-cols-3 gap-2 mb-4">
                 <!-- Year Filter -->
@@ -409,10 +409,58 @@
         
 
         <!-- ================= PAGE 5: SETTINGS ================= -->
-        <section id="page-settings" class="page-view animate-ripple">
-            
+        <section id="page-settings" class="page-view animate-ripple grid grid-cols-1 md:grid-cols-2 gap-4 pb-32">
+
+            <!-- Members Management Section (Moved under settings) -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 hidden md:order-1" id="settingsAddMemberSection">
+                <h3 class="text-md text-riverBlue font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
+                    <span class="material-icons-outlined">person_add</span>
+                    नया सदस्य जोड़ें (Add New Member)
+                </h3>
+                
+                <form id="addMemberFormSettings" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-medium text-slate-500 mb-0.5">नाम ⭐</label>
+                            <input type="text" id="settingsMemberName" required placeholder="नाम" 
+                                class="w-full bg-lightGray border-none rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-slate-500 mb-0.5">मोबाइल नंबर ⭐</label>
+                            <input type="tel" id="settingsMemberMobile" required maxlength="10" placeholder="10 अंक" 
+                                class="w-full bg-lightGray border-none rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-riverBlue/30 outline-none">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-riverBlue text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-riverBlue/90 transition-colors shadow-sm mt-2">
+                        सदस्य जोड़ें (Add Member)
+                    </button>
+                </form>
+            </div>
+
+            <!-- Admin Controls Card -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 hidden md:order-2" id="adminControlsCard">
+                <h3 class="text-md text-riverBlue font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
+                    <span class="material-icons-outlined">settings</span>
+                    एडमिन नियंत्रण (Admin Controls)
+                </h3>
+                <div class="space-y-4">
+                    <!-- Lock Edit Mode -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-sm font-semibold text-slate-700 block">संपादन लॉक (Lock Edit Mode)</span>
+                            <span class="text-[10px] text-slate-400">इसे चालू करने पर सामान्य सदस्य एंट्री नहीं जोड़ पाएंगे।</span>
+                        </div>
+                        <!-- Toggle Switch -->
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="adminLockEditToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-riverBlue"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <!-- User Status Card -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 md:order-3">
                 <h3 class="text-md text-slate-700 font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
                     <span class="material-icons-outlined text-riverBlue">person</span>
                     प्रोफाइल विवरण (Profile Details)
@@ -430,7 +478,7 @@
             </div>
 
             <!-- PIN Change Card -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 hidden" id="pinChangeCard">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 hidden md:order-4" id="pinChangeCard">
                 <h3 class="text-md text-slate-700 font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
                     <span class="material-icons-outlined text-riverBlue">lock</span>
                     PIN बदलें (Change PIN)
@@ -473,56 +521,8 @@
                 </form>
             </div>
 
-            <!-- Members Management Section (Moved under settings) -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 hidden" id="settingsAddMemberSection">
-                <h3 class="text-md text-riverBlue font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
-                    <span class="material-icons-outlined">person_add</span>
-                    नया सदस्य जोड़ें (Add New Member)
-                </h3>
-                
-                <form id="addMemberFormSettings" class="space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-medium text-slate-500 mb-0.5">नाम ⭐</label>
-                            <input type="text" id="settingsMemberName" required placeholder="नाम" 
-                                class="w-full bg-lightGray border-none rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-riverBlue/30 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-medium text-slate-500 mb-0.5">मोबाइल नंबर ⭐</label>
-                            <input type="tel" id="settingsMemberMobile" required maxlength="10" placeholder="10 अंक" 
-                                class="w-full bg-lightGray border-none rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-riverBlue/30 outline-none">
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-riverBlue text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-riverBlue/90 transition-colors shadow-sm mt-2">
-                        सदस्य जोड़ें (Add Member)
-                    </button>
-                </form>
-            </div>
-
-            <!-- Admin Controls Card -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 hidden" id="adminControlsCard">
-                <h3 class="text-md text-riverBlue font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-2">
-                    <span class="material-icons-outlined">settings</span>
-                    एडमिन नियंत्रण (Admin Controls)
-                </h3>
-                <div class="space-y-4">
-                    <!-- Lock Edit Mode -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-sm font-semibold text-slate-700 block">संपादन लॉक (Lock Edit Mode)</span>
-                            <span class="text-[10px] text-slate-400">इसे चालू करने पर सामान्य सदस्य एंट्री नहीं जोड़ पाएंगे।</span>
-                        </div>
-                        <!-- Toggle Switch -->
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="adminLockEditToggle" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-riverBlue"></div>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
             <!-- About App Card -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 mb-6 col-span-1 md:col-span-2 md:order-5">
                 <h3 class="text-sm font-medium text-slate-700 mb-3 flex items-center gap-2">
                     <span class="material-icons-outlined text-riverBlue text-md">info</span>
                     प्रणाली के बारे में (About System)
