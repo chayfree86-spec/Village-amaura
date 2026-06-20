@@ -1101,184 +1101,192 @@ function getFilterPeriodText() {
 }
 
 function renderFilteredReport() {
-    const transactionsList = document.getElementById("transactionsList");
-    if (!transactionsList) return;
-    
-    const fd = getFilteredReportData();
+    try {
+        const transactionsList = document.getElementById("transactionsList");
+        if (!transactionsList) return;
+        
+        const fd = getFilteredReportData();
 
-    const cashCardVal = document.getElementById("reportTotalCashFiltered");
-    if (cashCardVal) {
-        cashCardVal.innerText = `₹ ${Number(fd.cash || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-    }
-    
-    const cashBreakupVal = document.getElementById("reportTotalCashBreakup");
-    if (cashBreakupVal) {
-        cashBreakupVal.innerHTML = `नकद: ₹${Number(fd.handCash || 0).toLocaleString('en-IN')} | ऑनलाइन: ₹${Number(fd.onlineCash || 0).toLocaleString('en-IN')}`;
-    }
-    
-    const expenseCardVal = document.getElementById("reportTotalExpenseFiltered");
-    if (expenseCardVal) {
-        expenseCardVal.innerText = `₹ ${Number(fd.expense || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-    }
-    
-    const balanceCardVal = document.getElementById("reportCurrentBalance");
-    if (balanceCardVal) {
-        balanceCardVal.innerText = `₹ ${Number(fd.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-        
-        // Color code balance text if negative/positive
-        if (fd.balance < 0) {
-            balanceCardVal.classList.add("text-red-300");
-            balanceCardVal.classList.remove("text-white");
-        } else {
-            balanceCardVal.classList.add("text-white");
-            balanceCardVal.classList.remove("text-red-300");
+        const cashCardVal = document.getElementById("reportTotalCashFiltered");
+        if (cashCardVal) {
+            cashCardVal.innerText = `₹ ${Number(fd.cash || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
         }
-    }
-    
-    const filterStatusText = document.getElementById("filterStatusText");
-    if (filterStatusText) {
-        filterStatusText.innerHTML = `अवधि: ${fd.periodText}`;
-    }
-    
-    const filteredCont = appData.contributions.filter(c => {
-        if (reportFilters.type === 'expense') return false;
-        if (!c.date || typeof c.date !== 'string' || c.date.length < 7) return false;
-        const year = c.date.substring(0, 4);
-        const month = c.date.substring(5, 7);
-        const yearMatch = reportFilters.year === 'all' || year === reportFilters.year;
-        const monthMatch = reportFilters.month === 'all' || month === reportFilters.month;
-        return yearMatch && monthMatch;
-    });
-    
-    const filteredExp = appData.expenses.filter(e => {
-        if (reportFilters.type === 'income') return false;
-        if (!e.date || typeof e.date !== 'string' || e.date.length < 7) return false;
-        const year = e.date.substring(0, 4);
-        const month = e.date.substring(5, 7);
-        const yearMatch = reportFilters.year === 'all' || year === reportFilters.year;
-        const monthMatch = reportFilters.month === 'all' || month === reportFilters.month;
-        return yearMatch && monthMatch;
-    });
-    
-    let combined = [];
-    filteredCont.forEach(c => {
-        const itemDate = c.date ? new Date(c.date) : new Date();
-        const tVal = isNaN(itemDate.getTime()) ? 0 : itemDate.getTime();
-        combined.push({
-            ...c,
-            item_type: 'contribution',
-            timestamp: tVal + parseInt(c.id || 0)
-        });
-    });
-    filteredExp.forEach(e => {
-        const itemDate = e.date ? new Date(e.date) : new Date();
-        const tVal = isNaN(itemDate.getTime()) ? 0 : itemDate.getTime();
-        combined.push({
-            ...e,
-            item_type: 'expense',
-            timestamp: tVal + parseInt(e.id || 0)
-        });
-    });
-    
-    combined.sort((a, b) => b.timestamp - a.timestamp);
-    
-    const countText = document.getElementById("totalTransactionsCount");
-    if (countText) {
-        countText.innerText = `कुल प्रविष्टियां: ${combined.length}`;
-    }
-    
-    transactionsList.innerHTML = '';
-    
-    if (combined.length === 0) {
-        transactionsList.innerHTML = `<div class="text-center text-slate-400 py-8 text-xs">कोई लेनदेन नहीं मिला</div>`;
-        return;
-    }
-    
-    const canDelete = currentUser && currentUser.is_admin === 1;
-    const canEdit = currentUser && currentUser.is_admin === 1;
-    
-    combined.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "bg-white p-3.5 rounded-2xl shadow-sm border border-sandBeige/20 relative flex flex-col justify-between hover:shadow-md transition-shadow";
         
-        let detailsHtml = "";
-        let amountStr = "";
-        let typeClass = "";
-        let iconHtml = "";
-        let titleHtml = "";
+        const cashBreakupVal = document.getElementById("reportTotalCashBreakup");
+        if (cashBreakupVal) {
+            cashBreakupVal.innerHTML = `नकद: ₹${Number(fd.handCash || 0).toLocaleString('en-IN')} | ऑनलाइन: ₹${Number(fd.onlineCash || 0).toLocaleString('en-IN')}`;
+        }
         
-        if (item.item_type === 'contribution') {
-            typeClass = item.type === 'cash' ? 'text-riverBlue' : 'text-natureGreen';
-            iconHtml = item.type === 'cash' 
-                ? `<span class="material-icons-outlined text-riverBlue bg-riverBlue/10 p-1.5 rounded-full text-lg">payments</span>`
-                : `<span class="material-icons-outlined text-natureGreen bg-natureGreen/10 p-1.5 rounded-full text-lg">inventory_2</span>`;
-            titleHtml = `<span class="font-medium text-slate-700">${item.name}</span> ने योगदान दिया`;
+        const expenseCardVal = document.getElementById("reportTotalExpenseFiltered");
+        if (expenseCardVal) {
+            expenseCardVal.innerText = `₹ ${Number(fd.expense || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+        }
+        
+        const balanceCardVal = document.getElementById("reportCurrentBalance");
+        if (balanceCardVal) {
+            balanceCardVal.innerText = `₹ ${Number(fd.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
             
-            if (item.type === 'cash') {
-                amountStr = `+₹${Number(item.amount || 0).toLocaleString('en-IN')}`;
-                detailsHtml = `<div class="text-slate-500 text-xs">💰 नकद दान: ${item.payment_mode === 'upi' ? 'UPI' : (item.payment_mode === 'bank' ? 'बैंक ट्रांसफर' : 'नकद')}</div>`;
+            // Color code balance text if negative/positive
+            if (fd.balance < 0) {
+                balanceCardVal.classList.add("text-red-300");
+                balanceCardVal.classList.remove("text-white");
             } else {
-                amountStr = `+₹${Number(item.total_value || 0).toLocaleString('en-IN')}`;
-                detailsHtml = `
-                    <div class="text-slate-500 text-xs">🏗️ सामग्री: ${item.item_name}</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">📦 मात्रा: ${item.quantity} | दर: ₹${item.rate}</div>
-                `;
+                balanceCardVal.classList.add("text-white");
+                balanceCardVal.classList.remove("text-red-300");
             }
-        } else {
-            typeClass = 'text-softRed';
-            iconHtml = `<span class="material-icons-outlined text-softRed bg-softRed/10 p-1.5 rounded-full text-lg">payments</span>`;
-            titleHtml = `💸 <span class="font-medium text-slate-700">${item.paid_to}</span> को भुगतान किया गया`;
-            amountStr = `-₹${Number(item.amount || 0).toLocaleString('en-IN')}`;
-            detailsHtml = `<div class="text-slate-500 text-xs">📝 ${item.description || 'खर्च विवरण उपलब्ध नहीं है'}</div>`;
         }
         
-        let actionButtonsHtml = "";
-        if (canEdit || canDelete) {
-            actionButtonsHtml = `
-                <div class="flex items-center gap-1.5">
-                    ${canEdit ? `
-                        <button onclick="openEditModal(${item.id}, '${item.item_type}')" class="text-riverBlue/70 hover:text-riverBlue p-1 rounded-full hover:bg-riverBlue/5 transition-colors" title="संशोधित करें">
-                            <span class="material-icons-outlined text-base">edit</span>
-                        </button>
-                    ` : ''}
-                    ${canDelete ? `
-                        <button onclick="handleDelete(${item.id}, '${item.item_type}')" class="text-softRed/70 hover:text-softRed p-1 rounded-full hover:bg-softRed/5 transition-colors" title="हटाएं">
-                            <span class="material-icons-outlined text-base">delete</span>
-                        </button>
-                    ` : ''}
-                </div>
-            `;
+        const filterStatusText = document.getElementById("filterStatusText");
+        if (filterStatusText) {
+            filterStatusText.innerHTML = `अवधि: ${fd.periodText}`;
         }
         
-        const billAttachment = (item.item_type === 'expense' && item.bill_image) ? `
-            <button onclick="viewBillImage('${item.bill_image}')" class="mt-1 text-[11.5px] text-riverBlue flex items-center gap-1 hover:underline">
-                <span class="material-icons-outlined text-xs">receipt_long</span>
-                रसीद देखें (View Bill)
-            </button>
-        ` : '';
+        const filteredCont = appData.contributions.filter(c => {
+            if (reportFilters.type === 'expense') return false;
+            if (!c.date || typeof c.date !== 'string' || c.date.length < 7) return false;
+            const year = c.date.substring(0, 4);
+            const month = c.date.substring(5, 7);
+            const yearMatch = reportFilters.year === 'all' || year === reportFilters.year;
+            const monthMatch = reportFilters.month === 'all' || month === reportFilters.month;
+            return yearMatch && monthMatch;
+        });
         
-        card.innerHTML = `
-            <div class="flex justify-between items-start mb-2 pr-6">
-                <div class="flex items-center gap-2">
-                    <div class="flex-shrink-0">${iconHtml}</div>
-                    <div class="min-w-0">
-                        <div class="text-[13.5px] text-slate-600 truncate">${titleHtml}</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">📅 ${formatDateDisplay(item.date)}</div>
+        const filteredExp = appData.expenses.filter(e => {
+            if (reportFilters.type === 'income') return false;
+            if (!e.date || typeof e.date !== 'string' || e.date.length < 7) return false;
+            const year = e.date.substring(0, 4);
+            const month = e.date.substring(5, 7);
+            const yearMatch = reportFilters.year === 'all' || year === reportFilters.year;
+            const monthMatch = reportFilters.month === 'all' || month === reportFilters.month;
+            return yearMatch && monthMatch;
+        });
+        
+        let combined = [];
+        filteredCont.forEach(c => {
+            const itemDate = c.date ? new Date(c.date) : new Date();
+            const tVal = isNaN(itemDate.getTime()) ? 0 : itemDate.getTime();
+            combined.push({
+                ...c,
+                item_type: 'contribution',
+                timestamp: tVal + parseInt(c.id || 0)
+            });
+        });
+        filteredExp.forEach(e => {
+            const itemDate = e.date ? new Date(e.date) : new Date();
+            const tVal = isNaN(itemDate.getTime()) ? 0 : itemDate.getTime();
+            combined.push({
+                ...e,
+                item_type: 'expense',
+                timestamp: tVal + parseInt(e.id || 0)
+            });
+        });
+        
+        combined.sort((a, b) => b.timestamp - a.timestamp);
+        
+        const countText = document.getElementById("totalTransactionsCount");
+        if (countText) {
+            countText.innerText = `कुल प्रविष्टियां: ${combined.length}`;
+        }
+        
+        transactionsList.innerHTML = '';
+        
+        if (combined.length === 0) {
+            transactionsList.innerHTML = `<div class="text-center text-slate-400 py-8 text-xs">कोई लेनदेन नहीं मिला</div>`;
+            return;
+        }
+        
+        const canDelete = currentUser && currentUser.is_admin === 1;
+        const canEdit = currentUser && currentUser.is_admin === 1;
+        
+        combined.forEach(item => {
+            try {
+                const card = document.createElement("div");
+                card.className = "bg-white p-3.5 rounded-2xl shadow-sm border border-sandBeige/20 relative flex flex-col justify-between hover:shadow-md transition-shadow";
+                
+                let detailsHtml = "";
+                let amountStr = "";
+                let typeClass = "";
+                let iconHtml = "";
+                let titleHtml = "";
+                
+                if (item.item_type === 'contribution') {
+                    typeClass = item.type === 'cash' ? 'text-riverBlue' : 'text-natureGreen';
+                    iconHtml = item.type === 'cash' 
+                        ? `<span class="material-icons-outlined text-riverBlue bg-riverBlue/10 p-1.5 rounded-full text-lg">payments</span>`
+                        : `<span class="material-icons-outlined text-natureGreen bg-natureGreen/10 p-1.5 rounded-full text-lg">inventory_2</span>`;
+                    titleHtml = `<span class="font-medium text-slate-700">${item.name}</span> ने योगदान दिया`;
+                    
+                    if (item.type === 'cash') {
+                        amountStr = `+₹${Number(item.amount || 0).toLocaleString('en-IN')}`;
+                        detailsHtml = `<div class="text-slate-500 text-xs">💰 नकद दान: ${item.payment_mode === 'upi' ? 'UPI' : (item.payment_mode === 'bank' ? 'बैंक ट्रांसफर' : 'नकद')}</div>`;
+                    } else {
+                        amountStr = `+₹${Number(item.total_value || 0).toLocaleString('en-IN')}`;
+                        detailsHtml = `
+                            <div class="text-slate-500 text-xs">🏗️ सामग्री: ${item.item_name}</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">📦 मात्रा: ${item.quantity} | दर: ₹${item.rate}</div>
+                        `;
+                    }
+                } else {
+                    typeClass = 'text-softRed';
+                    iconHtml = `<span class="material-icons-outlined text-softRed bg-softRed/10 p-1.5 rounded-full text-lg">payments</span>`;
+                    titleHtml = `💸 <span class="font-medium text-slate-700">${item.paid_to}</span> को भुगतान किया गया`;
+                    amountStr = `-₹${Number(item.amount || 0).toLocaleString('en-IN')}`;
+                    detailsHtml = `<div class="text-slate-500 text-xs">📝 ${item.description || 'खर्च विवरण उपलब्ध नहीं है'}</div>`;
+                }
+                
+                let actionButtonsHtml = "";
+                if (canEdit || canDelete) {
+                    actionButtonsHtml = `
+                        <div class="flex items-center gap-1.5">
+                            ${canEdit ? `
+                                <button onclick="openEditModal(${item.id}, '${item.item_type}')" class="text-riverBlue/70 hover:text-riverBlue p-1 rounded-full hover:bg-riverBlue/5 transition-colors" title="संशोधित करें">
+                                    <span class="material-icons-outlined text-base">edit</span>
+                                </button>
+                            ` : ''}
+                            ${canDelete ? `
+                                <button onclick="handleDelete(${item.id}, '${item.item_type}')" class="text-softRed/70 hover:text-softRed p-1 rounded-full hover:bg-softRed/5 transition-colors" title="हटाएं">
+                                    <span class="material-icons-outlined text-base">delete</span>
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+                
+                const billAttachment = (item.item_type === 'expense' && item.bill_image) ? `
+                    <button onclick="viewBillImage('${item.bill_image}')" class="mt-1 text-[11.5px] text-riverBlue flex items-center gap-1 hover:underline">
+                        <span class="material-icons-outlined text-xs">receipt_long</span>
+                        रसीद देखें (View Bill)
+                    </button>
+                ` : '';
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2 pr-6">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0">${iconHtml}</div>
+                            <div class="min-w-0">
+                                <div class="text-[13.5px] text-slate-600 truncate">${titleHtml}</div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">📅 ${formatDateDisplay(item.date)}</div>
+                            </div>
+                        </div>
+                        <span class="text-[14.5px] font-semibold ${typeClass} text-right block">${amountStr}</span>
                     </div>
-                </div>
-                <span class="text-[14.5px] font-semibold ${typeClass} text-right block">${amountStr}</span>
-            </div>
-            <div class="border-t border-lightGray/70 pt-2 flex justify-between items-end mt-1">
-                <div>
-                    ${detailsHtml}
-                    ${item.remark ? `<div class="text-[11px] text-slate-400 mt-1">📝 ${item.remark}</div>` : ''}
-                    ${billAttachment}
-                </div>
-                ${actionButtonsHtml}
-            </div>
-        `;
-        transactionsList.appendChild(card);
-    });
+                    <div class="border-t border-lightGray/70 pt-2 flex justify-between items-end mt-1">
+                        <div>
+                            ${detailsHtml}
+                            ${item.remark ? `<div class="text-[11px] text-slate-400 mt-1">📝 ${item.remark}</div>` : ''}
+                            ${billAttachment}
+                        </div>
+                        ${actionButtonsHtml}
+                    </div>
+                `;
+                transactionsList.appendChild(card);
+            } catch (innerError) {
+                console.error("Error rendering transaction item:", item, innerError);
+            }
+        });
+    } catch (e) {
+        console.error("Error in renderFilteredReport:", e);
+    }
 }
 
 function openEditModal(id, type) {
