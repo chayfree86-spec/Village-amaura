@@ -35,6 +35,11 @@ export default function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [recentlyAddedMember, setRecentlyAddedMember] = useState(null);
 
+  // PWA states
+  const [pwaPromptEvent, setPwaPromptEvent] = useState(null);
+  const [showPwaBanner, setShowPwaBanner] = useState(false);
+  const [isAlreadyInstalled, setIsAlreadyInstalled] = useState(false);
+
   // Custom Alert state
   const [customAlert, setCustomAlert] = useState({
     show: false,
@@ -239,6 +244,46 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
     document.body.classList.remove("h-screen", "overflow-hidden");
   }, [currentActivePage]);
+
+  // Listen for PWA Install Prompt
+  useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setPwaPromptEvent(e);
+      if (!isStandalone && window.innerWidth < 768) {
+        setShowPwaBanner(true);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    window.addEventListener('appinstalled', () => {
+      setIsAlreadyInstalled(true);
+      setShowPwaBanner(false);
+      setPwaPromptEvent(null);
+    });
+
+    if (isStandalone) {
+      setShowPwaBanner(false);
+    } else {
+      if ('getInstalledRelatedApps' in navigator) {
+        navigator.getInstalledRelatedApps().then(apps => {
+          if (apps.length > 0) {
+            setIsAlreadyInstalled(true);
+            if (window.innerWidth < 768) {
+              setShowPwaBanner(true);
+            }
+          }
+        });
+      }
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
 
   // Computed Auto Totals
   const addGoodsAutoTotalVal = useMemo(() => {
@@ -3411,6 +3456,78 @@ export default function App() {
             src={lightboxImgSrc} 
             alt="Bill Image" 
           />
+        </div>
+      )}
+
+      {/* PWA Install / Open Popup */}
+      {showPwaBanner && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[100] flex items-center justify-center p-6">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center border border-sandBeige/35 animate-ripple relative">
+            <button
+              onClick={() => setShowPwaBanner(false)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-655 cursor-pointer"
+            >
+              <span className="material-icons-outlined text-xl">close</span>
+            </button>
+            
+            <div className="w-16 h-16 rounded-full bg-riverBlue/5 flex items-center justify-center mx-auto mb-4 border border-sandBeige shadow-sm overflow-hidden">
+              <img src="logo.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            
+            <h3 className="text-lg font-bold text-riverBlue mb-1.5">प्रजापति एकता ग्रुप ऐप</h3>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed px-2">
+              {isAlreadyInstalled 
+                ? "क्या आप बेहतर अनुभव के लिए ऐप को सीधे मोबाइल एप्लिकेशन में खोलना चाहते हैं?" 
+                : "बेहतर और तेज़ अनुभव के लिए इस ऐप को अपने मोबाइल पर इंस्टॉल करें।"}
+            </p>
+            
+            <div className="flex flex-col gap-2.5">
+              {isAlreadyInstalled ? (
+                <button
+                  onClick={() => {
+                    window.location.reload();
+                    setShowPwaBanner(false);
+                  }}
+                  className="w-full bg-riverBlue text-white rounded-xl py-3 text-xs font-semibold hover:bg-riverBlue/95 transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span className="material-icons-outlined text-base">open_in_new</span>
+                  <span>ऐप में खोलें (Open in App)</span>
+                </button>
+              ) : pwaPromptEvent ? (
+                <button
+                  onClick={() => {
+                    pwaPromptEvent.prompt();
+                    pwaPromptEvent.userChoice.then((choiceResult) => {
+                      if (choiceResult.outcome === 'accepted') {
+                        setIsAlreadyInstalled(true);
+                      }
+                      setShowPwaBanner(false);
+                    });
+                  }}
+                  className="w-full bg-riverBlue text-white rounded-xl py-3 text-xs font-semibold hover:bg-riverBlue/95 transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span className="material-icons-outlined text-base">file_download</span>
+                  <span>ऐप इंस्टॉल करें (Install App)</span>
+                </button>
+              ) : (
+                // iOS Safari fallback instruction
+                <div className="text-left bg-lightGray p-3.5 rounded-xl border border-sandBeige/25 mb-1">
+                  <span className="text-[11px] font-bold text-riverBlue block mb-1">Safari (iPhone/iPad) पर इंस्टॉल करें:</span>
+                  <p className="text-[10px] text-slate-500 leading-normal">
+                    1. नीचे शेयर आइकॉन (📤) पर क्लिक करें।<br />
+                    2. थोड़ा नीचे स्क्रॉल करें और **'Home Screen में जोड़ें'** (➕) चुनें।
+                  </p>
+                </div>
+              )}
+              
+              <button
+                onClick={() => setShowPwaBanner(false)}
+                className="w-full bg-slate-100 text-slate-600 rounded-xl py-2.5 text-xs font-semibold hover:bg-slate-205 transition-all cursor-pointer"
+              >
+                वेबसाइट पर जारी रखें (Continue on Web)
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
