@@ -40,6 +40,11 @@ export default function App() {
   const [showPwaBanner, setShowPwaBanner] = useState(false);
   const [isAlreadyInstalled, setIsAlreadyInstalled] = useState(false);
 
+  const dismissPwaBanner = () => {
+    sessionStorage.setItem('prajapati_pwa_dismissed', 'true');
+    setShowPwaBanner(false);
+  };
+
   // Custom Alert state
   const [customAlert, setCustomAlert] = useState({
     show: false,
@@ -248,11 +253,18 @@ export default function App() {
   // Listen for PWA Install Prompt
   useEffect(() => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+    const dismissed = sessionStorage.getItem('prajapati_pwa_dismissed');
+
+    // Show popup immediately if mobile, not standalone, and not dismissed in current session
+    if (isMobile && !isStandalone && !dismissed) {
+      setShowPwaBanner(true);
+    }
     
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setPwaPromptEvent(e);
-      if (!isStandalone && window.innerWidth < 768) {
+      if (isMobile && !isStandalone && !dismissed) {
         setShowPwaBanner(true);
       }
     };
@@ -272,9 +284,6 @@ export default function App() {
         navigator.getInstalledRelatedApps().then(apps => {
           if (apps.length > 0) {
             setIsAlreadyInstalled(true);
-            if (window.innerWidth < 768) {
-              setShowPwaBanner(true);
-            }
           }
         });
       }
@@ -3464,8 +3473,8 @@ export default function App() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[100] flex items-center justify-center p-6">
           <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center border border-sandBeige/35 animate-ripple relative">
             <button
-              onClick={() => setShowPwaBanner(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-slate-655 cursor-pointer"
+              onClick={dismissPwaBanner}
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 cursor-pointer"
             >
               <span className="material-icons-outlined text-xl">close</span>
             </button>
@@ -3486,7 +3495,7 @@ export default function App() {
                 <button
                   onClick={() => {
                     window.location.reload();
-                    setShowPwaBanner(false);
+                    dismissPwaBanner();
                   }}
                   className="w-full bg-riverBlue text-white rounded-xl py-3 text-xs font-semibold hover:bg-riverBlue/95 transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
                 >
@@ -3501,7 +3510,7 @@ export default function App() {
                       if (choiceResult.outcome === 'accepted') {
                         setIsAlreadyInstalled(true);
                       }
-                      setShowPwaBanner(false);
+                      dismissPwaBanner();
                     });
                   }}
                   className="w-full bg-riverBlue text-white rounded-xl py-3 text-xs font-semibold hover:bg-riverBlue/95 transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
@@ -3521,8 +3530,8 @@ export default function App() {
               )}
               
               <button
-                onClick={() => setShowPwaBanner(false)}
-                className="w-full bg-slate-100 text-slate-600 rounded-xl py-2.5 text-xs font-semibold hover:bg-slate-205 transition-all cursor-pointer"
+                onClick={dismissPwaBanner}
+                className="w-full bg-slate-100 text-slate-600 rounded-xl py-2.5 text-xs font-semibold hover:bg-slate-200 transition-all cursor-pointer"
               >
                 वेबसाइट पर जारी रखें (Continue on Web)
               </button>
