@@ -3318,23 +3318,50 @@ export default function App() {
 
             {/* History List */}
             <h4 className="text-xs font-bold text-slate-700 mb-2.5 uppercase tracking-wider">📜 योगदान इतिहास (Contribution History)</h4>
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
               {selectedMemberHistory.length === 0 ? (
                 <div className="text-center text-slate-400 py-4 text-xs">कोई योगदान इतिहास नहीं मिला</div>
               ) : (
                 selectedMemberHistory.map((c) => (
-                  <div key={c.id} className="flex justify-between items-center text-xs p-2.5 bg-lightGray rounded-xl border border-sandBeige/10">
-                    <div>
-                      <span className="font-semibold text-slate-750 block">
-                        {c.type === 'cash' ? `💵 नकद दान` : `🏗️ सामग्री: ${c.item_name}`}
+                  <div key={c.id} className="flex justify-between items-start text-xs p-3 bg-slate-50 rounded-xl border border-sandBeige/20 transition-all hover:border-riverBlue/25">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-semibold text-slate-800 block truncate text-[12.5px]">
+                        {c.type === 'cash' ? '💵 नकद योगदान' : `🏗️ सामग्री: ${c.item_name}`}
                       </span>
-                      <span className="text-[10px] text-slate-400 block mt-0.5">
-                        📅 {formatDateDisplay(c.date)} {c.remark ? `| ${c.remark}` : ''}
+                      
+                      {/* Details badges */}
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {c.type === 'cash' ? (
+                          <span className="inline-flex items-center gap-0.5 text-[8.5px] font-semibold text-slate-650 bg-slate-200/60 px-2 py-0.5 rounded-full">
+                            पेमेंट: {c.payment_mode === 'upi' ? 'UPI' : c.payment_mode === 'bank' ? 'बैंक' : 'नकद'}
+                          </span>
+                        ) : (
+                          <>
+                            <span className="inline-flex items-center gap-0.5 text-[8.5px] font-semibold text-blue-800 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
+                              📦 मात्रा: {c.quantity}
+                            </span>
+                            <span className="inline-flex items-center gap-0.5 text-[8.5px] font-semibold text-indigo-800 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
+                              🏷️ दर: ₹{c.rate}
+                            </span>
+                          </>
+                        )}
+                        <span className="inline-flex items-center gap-0.5 text-[8.5px] text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-full font-medium">
+                          📅 {formatDateDisplay(c.date)}
+                        </span>
+                      </div>
+                      
+                      {c.remark && (
+                        <span className="text-[9.5px] text-slate-400 block mt-1 leading-normal italic">
+                          टिप्पणी: {c.remark}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <span className="font-extrabold text-[13.5px] block tracking-tight text-natureGreen">
+                        {c.type === 'cash' ? `+₹${c.amount.toLocaleString('en-IN')}` : `+₹${c.total_value.toLocaleString('en-IN')}`}
                       </span>
                     </div>
-                    <span className={`font-bold ${c.type === 'cash' ? 'text-riverBlue' : 'text-natureGreen'}`}>
-                      {c.type === 'cash' ? `+₹${c.amount.toLocaleString('en-IN')}` : `+₹${c.total_value.toLocaleString('en-IN')}`}
-                    </span>
                   </div>
                 ))
               )}
