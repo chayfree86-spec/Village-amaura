@@ -2176,18 +2176,20 @@ export default function App() {
                       onClick={handlePdfExport}
                       id="pdfExportBtn"
                       title="PDF डाउनलोड करें"
-                      className="w-8 h-8 rounded-full text-slate-500 hover:text-riverBlue hover:bg-riverBlue/8 flex items-center justify-center transition-all cursor-pointer"
+                      className="w-8 h-8 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-riverBlue/5 hover:border-riverBlue/30 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-all cursor-pointer shadow-sm"
                     >
-                      <span className="material-icons-outlined text-lg leading-none">picture_as_pdf</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" className="w-[16px] h-[16px]">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
                     </button>
                     <button
                       onClick={handleWhatsappShare}
                       id="whatsappShareBtn"
                       title="WhatsApp पर साझा करें"
-                      className="w-8 h-8 rounded-full text-slate-500 hover:text-natureGreen hover:bg-natureGreen/8 flex items-center justify-center transition-all cursor-pointer"
+                      className="w-8 h-8 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-natureGreen/5 hover:border-natureGreen/30 text-slate-500 hover:text-natureGreen flex items-center justify-center transition-all cursor-pointer shadow-sm"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" className="flex-shrink-0">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.501-5.734-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.638 1.966 14.156.933 11.53.931c-5.445 0-9.871 4.373-9.875 9.802-.001 1.768.468 3.49 1.357 5.013l-.99 3.616 3.73-.967zm12.35-7.397c-.305-.152-1.808-.888-2.086-.989-.278-.1-.48-.152-.68.152-.2.305-.776.989-.95 1.193-.175.203-.35.228-.655.076-.305-.152-1.288-.475-2.454-1.512-.907-.808-1.52-1.807-1.698-2.112-.178-.305-.019-.47.133-.621.137-.137.305-.35.457-.528.152-.178.203-.305.305-.508.102-.203.05-.381-.025-.533-.076-.152-.68-1.637-.93-2.236-.243-.588-.49-.508-.68-.518-.175-.008-.376-.01-.577-.01-.202 0-.53.076-.807.38-.278.305-1.062 1.037-1.062 2.531s1.087 2.94 1.238 3.143c.152.203 2.14 3.243 5.184 4.547.724.31 1.29.496 1.73.636.727.23 1.39.198 1.916.12.585-.087 1.808-.737 2.06-1.449.253-.71.253-1.32.177-1.448-.076-.127-.278-.203-.582-.356z"/>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-[15px] h-[15px] flex-shrink-0">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.456h.004c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                       </svg>
                     </button>
                   </div>
@@ -2307,20 +2309,24 @@ export default function App() {
                                     e.stopPropagation();
                                     isContribution ? openEditContribution(item) : openEditExpenseModal(item);
                                   }}
-                                  className="w-7 h-7 rounded-full text-slate-500 hover:text-riverBlue hover:bg-riverBlue/8 flex items-center justify-center transition-all cursor-pointer"
+                                  className="w-7 h-7 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-riverBlue/5 hover:border-riverBlue/30 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-all cursor-pointer shadow-sm"
                                   title="संपादित करें"
                                 >
-                                  <span className="material-icons-outlined text-[15px]">edit</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[13px] h-[13px]">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                  </svg>
                                 </button>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDeleteEntry(item.id, isContribution ? 'contribution' : 'expense');
                                   }}
-                                  className="w-7 h-7 rounded-full text-slate-500 hover:text-softRed hover:bg-softRed/8 flex items-center justify-center transition-all cursor-pointer"
+                                  className="w-7 h-7 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-softRed/5 hover:border-softRed/30 text-slate-500 hover:text-softRed flex items-center justify-center transition-all cursor-pointer shadow-sm"
                                   title="हटाएं"
                                 >
-                                  <span className="material-icons-outlined text-[15px]">delete</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[13px] h-[13px]">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
                                 </button>
                               </div>
                             )}
