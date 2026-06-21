@@ -237,11 +237,7 @@ export default function App() {
   // Sync UI states for tabs (height constraints and scroll resetting)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
-    if (currentActivePage === 'page-members') {
-      document.body.classList.add("h-screen", "overflow-hidden");
-    } else {
-      document.body.classList.remove("h-screen", "overflow-hidden");
-    }
+    document.body.classList.remove("h-screen", "overflow-hidden");
   }, [currentActivePage]);
 
   // Computed Auto Totals
@@ -1793,7 +1789,7 @@ export default function App() {
                                       }}
                                       className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold rounded-lg inline-flex items-center justify-center gap-1 transition-colors h-7 px-2.5"
                                     >
-                                      <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">add_circle</span>
+                                      <span className="material-icons-outlined text-[11px] inline-flex items-center justify-center leading-none">add_circle</span>
                                       <span className="transform translate-y-[1.5px]">योगदान</span>
                                     </button>
                                   )}
@@ -1801,7 +1797,7 @@ export default function App() {
                                     href={`tel:${m.mobile}`}
                                     className="bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold rounded-lg inline-flex items-center justify-center gap-1 transition-colors h-7 px-2.5"
                                   >
-                                    <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">call</span>
+                                    <span className="material-icons-outlined text-[11px] inline-flex items-center justify-center leading-none">call</span>
                                     <span className="transform translate-y-[1.5px]">कॉल</span>
                                   </a>
                                 </div>
@@ -1883,7 +1879,7 @@ export default function App() {
                                 }}
                                 className="flex-1 bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                               >
-                                <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">add_circle</span>
+                                <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">add_circle</span>
                                 <span className="transform translate-y-[1.5px]">योगदान</span>
                               </button>
                             )}
@@ -1892,7 +1888,7 @@ export default function App() {
                               onClick={(e) => e.stopPropagation()}
                               className={`${currentUser ? 'flex-1' : 'w-full'} bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors`}
                             >
-                              <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">call</span>
+                              <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">call</span>
                               <span className="transform translate-y-[1.5px]">कॉल करें</span>
                             </a>
                           </div>
