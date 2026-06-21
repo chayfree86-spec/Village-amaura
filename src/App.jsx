@@ -985,6 +985,34 @@ export default function App() {
     return result;
   };
 
+  const getLevenshteinDistance = (a, b) => {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1, // substitution
+            Math.min(
+              matrix[i][j - 1] + 1, // insertion
+              matrix[i - 1][j] + 1  // deletion
+            )
+          );
+        }
+      }
+    }
+    return matrix[b.length][a.length];
+  };
+
   const cleanPhonetic = (str) => {
     if (!str) return '';
     let text = str;
@@ -1029,9 +1057,22 @@ export default function App() {
       // Bilingual phonetic matching
       const cleanName = cleanPhonetic(m.name);
       const cleanQuery = cleanPhonetic(query);
-      const matchesPhonetic = cleanName.includes(cleanQuery);
+      const matchesPhonetic = cleanName.includes(cleanQuery) || cleanQuery.includes(cleanName);
       
-      return matchesName || matchesMobile || matchesFirstWord || matchesPhonetic;
+      // Word-level fuzzy phonetic matching using Levenshtein distance
+      const namePhoneticWords = m.name.split(/\s+/).map(w => cleanPhonetic(w)).filter(Boolean);
+      const queryPhoneticWords = query.split(/\s+/).map(w => cleanPhonetic(w)).filter(Boolean);
+      
+      const matchesFuzzyPhonetic = queryPhoneticWords.length > 0 && queryPhoneticWords.every(qw => {
+        return namePhoneticWords.some(nw => {
+          if (nw.includes(qw) || qw.includes(nw)) return true;
+          const dist = getLevenshteinDistance(nw, qw);
+          const maxDist = qw.length <= 3 ? 1 : (qw.length <= 5 ? 1 : 2);
+          return dist <= maxDist;
+        });
+      });
+      
+      return matchesName || matchesMobile || matchesFirstWord || matchesPhonetic || matchesFuzzyPhonetic;
     });
   }, [appData.members, searchQuery]);
 
@@ -1436,7 +1477,7 @@ export default function App() {
 
           {/* PAGE 1: DASHBOARD */}
           {currentActivePage === 'page-dashboard' && (
-            <section className="page-view active animate-ripple flex-1 flex flex-col pt-2 pb-32 md:pb-6">
+            <section className="page-view active animate-ripple flex-1 flex flex-col pt-2 pb-16 md:pb-6">
               <div className="flex flex-col gap-6 mt-3">
                 
                 {/* Dashboard Summary Cards */}
@@ -1725,9 +1766,6 @@ export default function App() {
                               <div className="min-w-0">
                                 <div className="font-semibold text-slate-800 text-[13.5px] flex items-center gap-1">
                                   <span>{isContribution ? '➕' : '➖'} {item.name}</span>
-                                  {isContribution && matchedMember && (
-                                    <span className="material-icons-outlined text-[12px] text-slate-400">open_in_new</span>
-                                  )}
                                 </div>
                                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                                   {isContribution ? (
@@ -1789,7 +1827,7 @@ export default function App() {
 
           {/* PAGE 2: MEMBERS */}
           {currentActivePage === 'page-members' && (
-            <section className="page-view active animate-ripple flex-1 flex flex-col lg:overflow-hidden pb-36 md:pb-6">
+            <section className="page-view active animate-ripple flex-1 flex flex-col lg:overflow-hidden pb-16 md:pb-6">
               
               {/* Members List */}
               <div className="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 flex-1 flex flex-col lg:overflow-hidden mb-0">
@@ -2027,7 +2065,7 @@ export default function App() {
 
           {/* PAGE 3: REPORTS */}
           {currentActivePage === 'page-reports' && (
-            <section className="page-view active animate-ripple pb-32 md:pb-6">
+            <section className="page-view active animate-ripple pb-16 md:pb-6">
               
               {/* Filters */}
               <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4">
@@ -2133,17 +2171,17 @@ export default function App() {
                       onClick={handlePdfExport}
                       id="pdfExportBtn"
                       title="PDF डाउनलोड करें"
-                      className="w-8 h-8 rounded-lg border border-riverBlue text-riverBlue hover:bg-riverBlue/5 flex items-center justify-center transition-all shadow-sm hover:translate-y-[-2px] hover:shadow-md"
+                      className="w-8 h-8 rounded-full text-slate-500 hover:text-riverBlue hover:bg-riverBlue/8 flex items-center justify-center transition-all cursor-pointer"
                     >
-                      <span className="material-icons-outlined text-[13px] inline-flex items-center justify-center leading-none">picture_as_pdf</span>
+                      <span className="material-icons-outlined text-lg leading-none">picture_as_pdf</span>
                     </button>
                     <button
                       onClick={handleWhatsappShare}
                       id="whatsappShareBtn"
                       title="WhatsApp पर साझा करें"
-                      className="w-8 h-8 rounded-lg bg-natureGreen text-white hover:bg-natureGreen/95 flex items-center justify-center transition-all shadow-sm hover:translate-y-[-2px] hover:shadow-md"
+                      className="w-8 h-8 rounded-full text-slate-500 hover:text-natureGreen hover:bg-natureGreen/8 flex items-center justify-center transition-all cursor-pointer"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 24 24" className="flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" className="flex-shrink-0">
                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.501-5.734-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.638 1.966 14.156.933 11.53.931c-5.445 0-9.871 4.373-9.875 9.802-.001 1.768.468 3.49 1.357 5.013l-.99 3.616 3.73-.967zm12.35-7.397c-.305-.152-1.808-.888-2.086-.989-.278-.1-.48-.152-.68.152-.2.305-.776.989-.95 1.193-.175.203-.35.228-.655.076-.305-.152-1.288-.475-2.454-1.512-.907-.808-1.52-1.807-1.698-2.112-.178-.305-.019-.47.133-.621.137-.137.305-.35.457-.528.152-.178.203-.305.305-.508.102-.203.05-.381-.025-.533-.076-.152-.68-1.637-.93-2.236-.243-.588-.49-.508-.68-.518-.175-.008-.376-.01-.577-.01-.202 0-.53.076-.807.38-.278.305-1.062 1.037-1.062 2.531s1.087 2.94 1.238 3.143c.152.203 2.14 3.243 5.184 4.547.724.31 1.29.496 1.73.636.727.23 1.39.198 1.916.12.585-.087 1.808-.737 2.06-1.449.253-.71.253-1.32.177-1.448-.076-.127-.278-.203-.582-.356z"/>
                       </svg>
                     </button>
@@ -2288,7 +2326,7 @@ export default function App() {
 
           {/* PAGE 5: SETTINGS */}
           {currentActivePage === 'page-settings' && (
-            <section className="page-view active animate-ripple pb-32 md:pb-6">
+            <section className="page-view active animate-ripple pb-16 md:pb-6">
               
               {/* HERO: Add New Member Card */}
               {currentUser && (
