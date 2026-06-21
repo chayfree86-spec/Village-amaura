@@ -1856,11 +1856,6 @@ export default function App() {
                                   <div className="inline-flex items-center">
                                     <span className={`font-semibold text-slate-800 inline-flex items-center gap-1.5 ${m.is_admin === 1 ? 'text-amber-800 font-bold' : ''}`}>
                                       {m.name}
-                                      {m.status === 1 && (
-                                        <span className="inline-flex items-center text-[9px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.5 rounded-full font-medium border border-natureGreen/20 leading-none">
-                                          ✅ <span className="transform translate-y-[1px] ml-0.5">सक्रिय</span>
-                                        </span>
-                                      )}
                                     </span>
                                   </div>
                                 </div>
@@ -1951,11 +1946,6 @@ export default function App() {
                               <div>
                                 <div className={`text-[14.5px] font-semibold flex items-center gap-1.5 ${m.is_admin === 1 ? 'text-slate-800 text-[15.5px] font-bold' : 'text-slate-700'}`}>
                                   {m.name}
-                                  {m.status === 1 && (
-                                    <span className="text-[9.5px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 border border-natureGreen/20">
-                                      ✅ <span className="transform translate-y-[1px]">सक्रिय</span>
-                                    </span>
-                                  )}
                                 </div>
                                 <div className="text-xs text-slate-450 mt-1 flex items-center gap-1.5">
                                   <span className="transform translate-y-[0.5px]">{m.mobile}</span>
