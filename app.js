@@ -3,7 +3,7 @@
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=49')
+        navigator.serviceWorker.register('sw.js?v=50')
             .then(reg => {
                 console.log('Service Worker registered successfully:', reg.scope);
                 // Listen for updates
@@ -167,10 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
     initExportActions();
     initAdminToggle();
     initReportFilters();
+    initDesktopTopBar();
     
-    // Start AJAX Polling
-    fetchLiveData();
-    pollInterval = setInterval(fetchLiveData, 3000);
+    // Start AJAX Polling (Initial load can show the indicator)
+    fetchLiveData(true);
+    pollInterval = setInterval(() => fetchLiveData(false), 3000);
 
     // Initialize Search
     initUniversalSearch();
@@ -178,6 +179,38 @@ document.addEventListener("DOMContentLoaded", () => {
     initClearCache();
     initPinChange();
 });
+
+// ================= DESKTOP TOP BAR =================
+function initDesktopTopBar() {
+    const dateEl = document.getElementById('desktopDate');
+    const timeEl = document.getElementById('desktopTime');
+    if (!dateEl || !timeEl) return;
+
+    const hindiDays = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+    const hindiMonthsFull = ['जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'];
+
+    function updateDateTime() {
+        const now = new Date();
+        dateEl.innerText = `${hindiDays[now.getDay()]}, ${now.getDate()} ${hindiMonthsFull[now.getMonth()]} ${now.getFullYear()}`;
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        timeEl.innerText = `${h}:${m}`;
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 30000);
+}
+
+function updateDesktopPageTitle(pageId) {
+    const titleEl = document.getElementById('desktopPageTitle');
+    if (!titleEl) return;
+    const titles = {
+        'page-dashboard': 'डैशबोर्ड (Dashboard)',
+        'page-members': 'सदस्य (Members)',
+        'page-reports': 'रिपोर्ट (Reports)',
+        'page-settings': 'सेटिंग्स (Settings)'
+    };
+    titleEl.innerText = titles[pageId] || 'डैशबोर्ड (Dashboard)';
+}
 
 // ================= NAVIGATION =================
 function initNavigation() {
@@ -188,13 +221,16 @@ function initNavigation() {
         btn.addEventListener("click", () => {
             const target = btn.getAttribute("data-target");
             
-            // UI Update
+            // Switch active state for buttons
             navButtons.forEach(b => {
-                b.classList.remove("text-riverBlue");
-                b.classList.add("text-slate-400");
+                if (b.getAttribute("data-target") === target) {
+                    b.classList.add("text-riverBlue");
+                    b.classList.remove("text-slate-400");
+                } else {
+                    b.classList.remove("text-riverBlue");
+                    b.classList.add("text-slate-400");
+                }
             });
-            btn.classList.add("text-riverBlue");
-            btn.classList.remove("text-slate-400");
             
             // Switch Pages
             pages.forEach(p => p.classList.remove("active"));
@@ -202,14 +238,23 @@ function initNavigation() {
             if (targetPage) {
                 targetPage.classList.add("active");
                 currentActivePage = target;
+                updateDesktopPageTitle(target);
                 
                 // Show/hide Add Expense FAB container based on tab and login status
                 const fabContainer = document.getElementById("addExpenseFabContainer");
+                const desktopFabContainer = document.getElementById("desktopAddExpenseBtnContainer");
                 if (fabContainer) {
                     if (currentUser && target === 'page-reports') {
                         fabContainer.classList.remove("hidden");
                     } else {
                         fabContainer.classList.add("hidden");
+                    }
+                }
+                if (desktopFabContainer) {
+                    if (currentUser && target === 'page-reports') {
+                        desktopFabContainer.classList.remove("hidden");
+                    } else {
+                        desktopFabContainer.classList.add("hidden");
                     }
                 }
                 
@@ -255,43 +300,51 @@ function initNavigation() {
 // ================= EXPENSE MODAL CONTROLS =================
 function initExpenseModal() {
     const addExpenseFab = document.getElementById("addExpenseFab");
+    const desktopAddExpenseBtn = document.getElementById("desktopAddExpenseBtn");
     const expenseModal = document.getElementById("expenseModal");
     const closeExpenseModal = document.getElementById("closeExpenseModal");
 
-    if (addExpenseFab && expenseModal && closeExpenseModal) {
-        addExpenseFab.addEventListener("click", () => {
-            if (!currentUser) {
-                alert("खर्च जोड़ने के लिए कृपया पहले लॉगिन करें।");
-                return;
-            }
-            // Reset for Add mode
-            const expForm = document.getElementById("expenseForm");
-            if (expForm) {
-                expForm.reset();
-                expForm.removeAttribute("data-keep-image");
-            }
-            const expIdEl = document.getElementById("expId");
-            if (expIdEl) expIdEl.value = "";
-            
-            const expTitleEl = document.getElementById("expenseModalTitle");
-            if (expTitleEl) expTitleEl.innerText = "💸 नया खर्च (Expense) दर्ज करें";
-            
-            const expSubmitBtn = document.querySelector("#expenseForm button[type='submit']");
-            if (expSubmitBtn) expSubmitBtn.innerText = "खर्च सुरक्षित करें";
-            
-            const billFileNameLabel = document.getElementById("billFileName");
-            const clearBillBtn = document.getElementById("clearBillBtn");
-            if (billFileNameLabel) billFileNameLabel.innerText = "फोटो अपलोड करें";
-            if (clearBillBtn) clearBillBtn.classList.add("hidden");
-            
-            base64BillImage = "";
-            
-            // Set date to today
-            const expDateEl = document.getElementById("expDate");
-            if (expDateEl) expDateEl.value = getFormattedDate(new Date());
+    const openExpenseModal = () => {
+        if (!currentUser) {
+            alert("खर्च जोड़ने के लिए कृपया पहले लॉगिन करें।");
+            return;
+        }
+        // Reset for Add mode
+        const expForm = document.getElementById("expenseForm");
+        if (expForm) {
+            expForm.reset();
+            expForm.removeAttribute("data-keep-image");
+        }
+        const expIdEl = document.getElementById("expId");
+        if (expIdEl) expIdEl.value = "";
+        
+        const expTitleEl = document.getElementById("expenseModalTitle");
+        if (expTitleEl) expTitleEl.innerText = "💸 नया खर्च (Expense) दर्ज करें";
+        
+        const expSubmitBtn = document.querySelector("#expenseForm button[type='submit']");
+        if (expSubmitBtn) expSubmitBtn.innerText = "खर्च सुरक्षित करें";
+        
+        const billFileNameLabel = document.getElementById("billFileName");
+        const clearBillBtn = document.getElementById("clearBillBtn");
+        if (billFileNameLabel) billFileNameLabel.innerText = "फोटो अपलोड करें";
+        if (clearBillBtn) clearBillBtn.classList.add("hidden");
+        
+        base64BillImage = "";
+        
+        // Set date to today
+        const expDateEl = document.getElementById("expDate");
+        if (expDateEl) expDateEl.value = getFormattedDate(new Date());
 
-            expenseModal.classList.remove("hidden");
-        });
+        expenseModal.classList.remove("hidden");
+    };
+
+    if (expenseModal && closeExpenseModal) {
+        if (addExpenseFab) {
+            addExpenseFab.addEventListener("click", openExpenseModal);
+        }
+        if (desktopAddExpenseBtn) {
+            desktopAddExpenseBtn.addEventListener("click", openExpenseModal);
+        }
 
         closeExpenseModal.addEventListener("click", () => {
             expenseModal.classList.add("hidden");
@@ -309,10 +362,12 @@ function initExpenseModal() {
 // ================= AUTHENTICATION =================
 function initAuth() {
     const authBtn = document.getElementById("headerAuthBtn");
+    const sidebarAuthBtn = document.getElementById("sidebarAuthBtn");
     const loginModal = document.getElementById("loginModal");
     const closeLoginBtn = document.getElementById("closeLoginModal");
     const loginForm = document.getElementById("loginForm");
     const logoutBtn = document.getElementById("logoutBtn");
+    const sidebarLogoutBtn = document.getElementById("sidebarLogoutBtn");
 
     if (authBtn) {
         authBtn.addEventListener("click", () => {
@@ -323,6 +378,12 @@ function initAuth() {
             } else {
                 if (loginModal) loginModal.classList.remove("hidden");
             }
+        });
+    }
+
+    if (sidebarAuthBtn) {
+        sidebarAuthBtn.addEventListener("click", () => {
+            if (loginModal) loginModal.classList.remove("hidden");
         });
     }
 
@@ -373,16 +434,21 @@ function initAuth() {
         });
     }
 
+    const performLogout = () => {
+        currentUser = null;
+        localStorage.removeItem('prajapati_user');
+        updateAuthUI();
+        fetchLiveData();
+        const dashBtn = document.querySelector('[data-target="page-dashboard"]');
+        if (dashBtn) dashBtn.click();
+        alert("सफलतापूर्वक लॉगआउट किया गया!");
+    };
+
     if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-            currentUser = null;
-            localStorage.removeItem('prajapati_user');
-            updateAuthUI();
-            fetchLiveData();
-            const dashBtn = document.querySelector('[data-target="page-dashboard"]');
-            if (dashBtn) dashBtn.click();
-            alert("सफलतापूर्वक लॉगआउट किया गया!");
-        });
+        logoutBtn.addEventListener("click", performLogout);
+    }
+    if (sidebarLogoutBtn) {
+        sidebarLogoutBtn.addEventListener("click", performLogout);
     }
 
     updateAuthUI();
@@ -398,6 +464,11 @@ function updateAuthUI() {
     const bottomNavContainer = document.getElementById("bottomNavContainer");
     const fabContainer = document.getElementById("addExpenseFabContainer");
     const pinChangeCard = document.getElementById("pinChangeCard");
+    const sidebarUserRole = document.getElementById("sidebarUserRole");
+    const desktopFabContainer = document.getElementById("desktopAddExpenseBtnContainer");
+    const sidebarAuthBtn = document.getElementById("sidebarAuthBtn");
+    const sidebarUserContainer = document.getElementById("sidebarUserContainer");
+    const sidebarUserName = document.getElementById("sidebarUserName");
 
     if (currentUser) {
         // Authenticated UI
@@ -413,6 +484,19 @@ function updateAuthUI() {
                 fabContainer.classList.add("hidden");
             }
         }
+        if (desktopFabContainer) {
+            if (currentActivePage === 'page-reports') {
+                desktopFabContainer.classList.remove("hidden");
+            } else {
+                desktopFabContainer.classList.add("hidden");
+            }
+        }
+        if (sidebarAuthBtn) sidebarAuthBtn.classList.add("hidden");
+        if (sidebarUserContainer) sidebarUserContainer.classList.remove("hidden");
+        if (sidebarUserName) sidebarUserName.innerText = currentUser.name;
+        if (sidebarUserRole) {
+            sidebarUserRole.innerText = currentUser.is_admin === 1 ? "एडमिन" : "सदस्य";
+        }
         if (authBtn) authBtn.innerHTML = `<span class="material-icons-outlined">person</span>`;
         if (logoutBtn) logoutBtn.classList.remove("hidden");
         
@@ -423,11 +507,11 @@ function updateAuthUI() {
                     <form id="profileUpdateForm" class="space-y-4">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[13px] font-semibold text-slate-700">नाम (Name)</label>
-                            <input type="text" id="profileNameInput" class="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${currentUser.name}" required>
+                            <input type="text" id="profileNameInput" class="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${currentUser.name}" required>
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[13px] font-semibold text-slate-700">मोबाइल (Mobile)</label>
-                            <input type="tel" id="profileMobileInput" class="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${currentUser.mobile}" required pattern="[0-9]{10}">
+                            <input type="tel" id="profileMobileInput" class="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${currentUser.mobile}" required pattern="[0-9]{10}">
                         </div>
                         <div class="flex justify-between items-center pt-3 border-t border-sandBeige/20">
                             <span class="text-sm text-slate-600">पद (Role): <span class="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-riverBlue/10 text-riverBlue">एडमिन (Admin)</span></span>
@@ -480,6 +564,12 @@ function updateAuthUI() {
             bottomNavContainer.classList.remove("grid-cols-4");
         }
         if (fabContainer) fabContainer.classList.add("hidden");
+        if (desktopFabContainer) desktopFabContainer.classList.add("hidden");
+        if (sidebarAuthBtn) sidebarAuthBtn.classList.remove("hidden");
+        if (sidebarUserContainer) sidebarUserContainer.classList.add("hidden");
+        if (sidebarUserRole) {
+            sidebarUserRole.innerText = "गेस्ट";
+        }
         if (authBtn) authBtn.innerHTML = `<span class="material-icons-outlined">login</span>`;
         if (logoutBtn) logoutBtn.classList.add("hidden");
         if (settingsAddMemberSection) settingsAddMemberSection.classList.add("hidden");
@@ -778,14 +868,19 @@ function initCalculations() {
 }
 
 // ================= AJAX REAL-TIME SYNC =================
-function fetchLiveData() {
+function fetchLiveData(showIndicator = false) {
     const syncIndicator = document.getElementById("syncIndicator");
-    if (syncIndicator) syncIndicator.classList.remove("hidden");
+    const sidebarSyncIndicator = document.getElementById("sidebarSyncIndicator");
+    if (showIndicator) {
+        if (syncIndicator) syncIndicator.classList.remove("hidden");
+        if (sidebarSyncIndicator) sidebarSyncIndicator.classList.remove("hidden");
+    }
 
     fetch('api.php?action=get_data')
     .then(res => res.json())
     .then(data => {
         if (syncIndicator) syncIndicator.classList.add("hidden");
+        if (sidebarSyncIndicator) sidebarSyncIndicator.classList.add("hidden");
         if (data.success) {
             appData = data;
             renderDashboard();
@@ -802,6 +897,7 @@ function fetchLiveData() {
     })
     .catch(err => {
         if (syncIndicator) syncIndicator.classList.add("hidden");
+        if (sidebarSyncIndicator) sidebarSyncIndicator.classList.add("hidden");
         console.error("Sync error:", err);
         dismissSplashScreen();
     });
@@ -1520,12 +1616,12 @@ function showMemberDetail(member) {
                     
                     <div class="flex flex-col gap-1.5">
                         <label class="text-xs font-semibold text-slate-600">सदस्य का नाम (Name)</label>
-                        <input type="text" id="mDetEditName" class="w-full border border-sandBeige/70 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${member.name}">
+                        <input type="text" id="mDetEditName" class="w-full border border-sandBeige/70 rounded-xl px-3 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${member.name}">
                     </div>
                     
                     <div class="flex flex-col gap-1.5">
                         <label class="text-xs font-semibold text-slate-600">मोबाइल नंबर (Mobile)</label>
-                        <input type="tel" id="mDetEditMobile" class="w-full border border-sandBeige/70 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${member.mobile || ''}" pattern="[0-9]{10}">
+                        <input type="tel" id="mDetEditMobile" class="w-full border border-sandBeige/70 rounded-xl px-3 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none" value="${member.mobile || ''}" pattern="[0-9]{10}">
                     </div>
                     
                     <div class="flex items-center justify-between border-t border-sandBeige/20 pt-3">

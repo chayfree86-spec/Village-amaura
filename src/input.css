@@ -73,3 +73,339 @@ input::-webkit-inner-spin-button {
 .page-view:not(.active) {
     display: none !important;
 }
+
+/* Sidebar Nav Item Active/Inactive States */
+.sidebar-nav-item.text-riverBlue {
+    background-color: rgba(30, 90, 168, 0.08) !important;
+    color: #1E5AA8 !important;
+}
+.sidebar-nav-item.text-slate-400 {
+    color: #94A3B8 !important;
+}
+.sidebar-nav-item.text-slate-400:hover {
+    color: #1E5AA8 !important;
+    background-color: rgba(30, 90, 168, 0.03) !important;
+}
+
+/* ============================================================
+   DESKTOP PREMIUM REDESIGN (md+ only — PWA mobile untouched)
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+    /* ---- Body & Background ---- */
+    body {
+        background: linear-gradient(135deg, #f0e6d3 0%, #e8dcc8 30%, #f5efe6 70%, #ede4d6 100%);
+        background-attachment: fixed;
+    }
+
+    /* ---- Sidebar Glassmorphism ---- */
+    aside.hidden.md\:flex {
+        background: rgba(255, 255, 255, 0.82) !important;
+        backdrop-filter: blur(20px) saturate(1.8);
+        -webkit-backdrop-filter: blur(20px) saturate(1.8);
+        border-right: 1px solid rgba(245, 230, 200, 0.35) !important;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.04), 1px 0 0 rgba(255, 255, 255, 0.5) inset;
+        transition: box-shadow 0.3s ease;
+    }
+
+    /* Sidebar Logo Section */
+    aside .border-b {
+        border-image: linear-gradient(90deg, transparent, rgba(30, 90, 168, 0.15), transparent) 1;
+        padding-bottom: 1.75rem !important;
+        margin-bottom: 2rem !important;
+    }
+    aside img.rounded-full {
+        box-shadow: 0 4px 20px rgba(30, 90, 168, 0.12), 0 0 0 3px rgba(30, 90, 168, 0.06);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    aside img.rounded-full:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 28px rgba(30, 90, 168, 0.18), 0 0 0 4px rgba(30, 90, 168, 0.1);
+    }
+
+    /* Sidebar Nav Items */
+    .sidebar-nav-item {
+        border-radius: 0.875rem !important;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .sidebar-nav-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%) scaleY(0);
+        width: 3px;
+        height: 60%;
+        background: linear-gradient(180deg, #1E5AA8, #2D73CE);
+        border-radius: 0 4px 4px 0;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar-nav-item.text-riverBlue::before {
+        transform: translateY(-50%) scaleY(1);
+    }
+    .sidebar-nav-item.text-riverBlue {
+        background: linear-gradient(135deg, rgba(30, 90, 168, 0.08), rgba(30, 90, 168, 0.04)) !important;
+        box-shadow: 0 2px 8px rgba(30, 90, 168, 0.06);
+    }
+    .sidebar-nav-item:hover {
+        transform: translateX(4px);
+    }
+    .sidebar-nav-item .material-icons-outlined {
+        transition: transform 0.25s ease;
+    }
+    .sidebar-nav-item:hover .material-icons-outlined {
+        transform: scale(1.15);
+    }
+
+    /* Sidebar Footer - Auth Section */
+    aside .mt-auto {
+        border-image: linear-gradient(90deg, transparent, rgba(245, 230, 200, 0.4), transparent) 1;
+    }
+    #sidebarAuthBtn {
+        background: linear-gradient(135deg, #1E5AA8, #2D73CE) !important;
+        box-shadow: 0 4px 14px rgba(30, 90, 168, 0.25);
+        transition: all 0.3s ease !important;
+    }
+    #sidebarAuthBtn:hover {
+        box-shadow: 0 6px 20px rgba(30, 90, 168, 0.35);
+        transform: translateY(-1px);
+    }
+    #sidebarUserContainer {
+        background: linear-gradient(135deg, #F5F7FA, #EEF2F7) !important;
+        border: 1px solid rgba(245, 230, 200, 0.4) !important;
+        transition: all 0.3s ease;
+    }
+    #sidebarUserContainer:hover {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* ---- Desktop Top Bar (replaces mobile header) ---- */
+    .desktop-top-bar {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(16px) saturate(1.6);
+        -webkit-backdrop-filter: blur(16px) saturate(1.6);
+        border-bottom: 1px solid rgba(245, 230, 200, 0.3);
+        box-shadow: 0 1px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    /* ---- Main Content Area ---- */
+    main {
+        padding-top: 1.5rem !important;
+    }
+
+    /* ---- Dashboard Cards Hover Effects ---- */
+    #page-dashboard .rounded-2xl[class*="bg-gradient"] {
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: default;
+    }
+    #page-dashboard .rounded-2xl[class*="bg-gradient"]:hover {
+        transform: translateY(-4px) scale(1.01);
+    }
+    /* Blue Cash Card */
+    #page-dashboard .from-\[\#1E5AA8\]:hover {
+        box-shadow: 0 18px 40px rgba(30, 90, 168, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+    /* Green Goods Card */
+    #page-dashboard .from-\[\#2E7D32\]:hover {
+        box-shadow: 0 18px 40px rgba(46, 125, 50, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+    /* Red Expense Card */
+    #page-dashboard .from-\[\#E53935\]:hover {
+        box-shadow: 0 18px 40px rgba(229, 57, 53, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+    /* Emerald Balance Card */
+    #page-dashboard .from-\[\#105E3D\]:hover {
+        box-shadow: 0 18px 40px rgba(16, 94, 61, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+
+    /* ---- Recent Activity Panel (Desktop) ---- */
+    #page-dashboard .hidden.lg\:flex {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(245, 230, 200, 0.35) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: box-shadow 0.3s ease;
+    }
+    #page-dashboard .hidden.lg\:flex:hover {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
+    }
+
+    /* ---- White Content Cards (Members, Reports, Settings) ---- */
+    .page-view .bg-white.rounded-2xl {
+        background: rgba(255, 255, 255, 0.88) !important;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(245, 230, 200, 0.3) !important;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.035);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .page-view .bg-white.rounded-2xl:hover {
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.065);
+    }
+
+    /* ---- Member Cards Grid Enhancement ---- */
+    #tabMembersListContainer {
+        gap: 1rem !important;
+    }
+    #tabMembersListContainer > div {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    #tabMembersListContainer > div:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ---- Transaction List Items ---- */
+    #transactionsList > div {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    #transactionsList > div:hover {
+        transform: translateX(4px);
+        box-shadow: -4px 0 12px rgba(30, 90, 168, 0.06);
+    }
+
+    /* ---- Report Summary Mini Cards ---- */
+    #page-reports .rounded-2xl[class*="bg-gradient"] {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    #page-reports .rounded-2xl[class*="bg-gradient"]:hover {
+        transform: translateY(-3px);
+    }
+
+    /* ---- Report Filter Dropdowns ---- */
+    .custom-dropdown button {
+        transition: all 0.2s ease;
+    }
+    .custom-dropdown button:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border-color: rgba(30, 90, 168, 0.3) !important;
+    }
+    .custom-dropdown [id$="List"] {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+        border: 1px solid rgba(245, 230, 200, 0.4) !important;
+        backdrop-filter: blur(16px);
+    }
+
+    /* ---- Modals - Desktop Premium ---- */
+    #expenseModal > div,
+    #contributionModal > div,
+    #loginModal > div,
+    #addContributionModal > div,
+    #memberDetailModal > div,
+    #customAlertModal > div {
+        backdrop-filter: blur(4px);
+    }
+    #expenseModal > div > div,
+    #contributionModal > div > div,
+    #loginModal > div > div,
+    #addContributionModal > div > div,
+    #memberDetailModal > div > div {
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        max-width: 28rem;
+    }
+
+    /* ---- Desktop Scrollbar (show thin elegant one) ---- */
+    ::-webkit-scrollbar {
+        display: block !important;
+        width: 5px;
+        height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(30, 90, 168, 0.15);
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(30, 90, 168, 0.3);
+    }
+
+    /* ---- Buttons Premium ---- */
+    #desktopAddExpenseBtn {
+        background: linear-gradient(135deg, #E53935, #C62828) !important;
+        box-shadow: 0 4px 14px rgba(229, 57, 53, 0.25);
+        transition: all 0.3s ease !important;
+    }
+    #desktopAddExpenseBtn:hover {
+        box-shadow: 0 6px 20px rgba(229, 57, 53, 0.35);
+        transform: translateY(-1px);
+    }
+
+    /* ---- Settings Grid Enhancement ---- */
+    #page-settings .bg-white.rounded-2xl {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    #page-settings .bg-white.rounded-2xl:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.065);
+    }
+
+    /* ---- Search Bar Desktop ---- */
+    #page-members .relative.flex.items-center.bg-white {
+        transition: box-shadow 0.3s ease;
+    }
+    #page-members .relative.flex.items-center.bg-white:focus-within {
+        box-shadow: 0 4px 20px rgba(30, 90, 168, 0.1);
+        border-color: rgba(30, 90, 168, 0.3) !important;
+    }
+
+    /* ---- Export Buttons ---- */
+    #pdfExportBtn, #whatsappShareBtn {
+        transition: all 0.25s ease;
+    }
+    #pdfExportBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 90, 168, 0.15);
+    }
+    #whatsappShareBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+    }
+
+    /* ---- Form Inputs Focus Glow ---- */
+    input:focus, textarea:focus {
+        box-shadow: 0 0 0 3px rgba(30, 90, 168, 0.08), 0 2px 8px rgba(30, 90, 168, 0.05);
+    }
+
+    /* ---- Toggle Switch Upgrade ---- */
+    .peer:checked ~ div {
+        background: linear-gradient(135deg, #1E5AA8, #2D73CE) !important;
+    }
+}
+
+/* ---- Desktop Fade-In Animation ---- */
+@media (min-width: 768px) {
+    @keyframes desktopFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .page-view.active {
+        animation: desktopFadeIn 0.4s ease-out;
+    }
+
+    /* Stagger card entrance */
+    @keyframes cardEntrance {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    #page-dashboard .grid > div:nth-child(1) { animation: cardEntrance 0.4s 0.05s ease-out both; }
+    #page-dashboard .grid > div:nth-child(2) { animation: cardEntrance 0.4s 0.1s ease-out both; }
+    #page-dashboard .grid > div:nth-child(3) { animation: cardEntrance 0.4s 0.15s ease-out both; }
+    #page-dashboard .grid > div:nth-child(4) { animation: cardEntrance 0.4s 0.2s ease-out both; }
+}
