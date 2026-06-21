@@ -1337,7 +1337,7 @@ export default function App() {
         </header>
 
         {/* Main View Container */}
-        <main className={`flex-1 flex flex-col max-w-md md:max-w-none mx-auto w-full px-4 lg:px-8 pt-4 pb-12 md:pb-6 ${currentActivePage === 'page-members' ? 'overflow-hidden' : ''}`}>
+        <main className={`flex-1 flex flex-col max-w-md md:max-w-none mx-auto w-full px-4 lg:px-8 pt-4 pb-12 md:pb-6 ${currentActivePage === 'page-members' ? 'lg:overflow-hidden' : ''}`}>
 
           {/* PAGE 1: DASHBOARD */}
           {currentActivePage === 'page-dashboard' && (
@@ -1692,10 +1692,10 @@ export default function App() {
 
           {/* PAGE 2: MEMBERS */}
           {currentActivePage === 'page-members' && (
-            <section className="page-view active animate-ripple flex-1 flex flex-col overflow-hidden pb-36 md:pb-6">
+            <section className="page-view active animate-ripple flex-1 flex flex-col lg:overflow-hidden pb-36 md:pb-6">
               
               {/* Members List */}
-              <div className="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 flex-1 flex flex-col overflow-hidden mb-0">
+              <div className="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 flex-1 flex flex-col lg:overflow-hidden mb-0">
                 <div className="flex justify-between items-center mb-4 pb-2 border-b border-lightGray flex-shrink-0">
                   <h3 className="text-md text-riverBlue font-medium inline-flex items-center gap-2">
                     <span className="material-icons-outlined inline-flex items-center justify-center leading-none text-lg">people</span>
@@ -1705,7 +1705,7 @@ export default function App() {
                     {currentUser && (
                       <button
                         onClick={() => setModals(prev => ({ ...prev, addMember: true }))}
-                        className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold px-3 rounded-xl inline-flex items-center justify-center gap-1.5 transition-colors shadow-sm h-8"
+                        className="hidden lg:inline-flex bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold px-3 rounded-xl items-center justify-center gap-1.5 transition-colors shadow-sm h-8"
                       >
                         <span className="material-icons-outlined text-sm inline-flex items-center justify-center leading-none">person_add</span>
                         <span className="transform translate-y-[1.5px]">सदस्य जोड़ें (Add Member)</span>
