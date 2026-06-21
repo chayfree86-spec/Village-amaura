@@ -33,6 +33,7 @@ export default function App() {
   const [voiceActive, setVoiceActive] = useState(false);
   const [base64BillImage, setBase64BillImage] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
+  const [recentlyAddedMember, setRecentlyAddedMember] = useState(null);
 
   // Custom Alert state
   const [customAlert, setCustomAlert] = useState({
@@ -709,9 +710,13 @@ export default function App() {
       const data = await res.json();
       if (data.success) {
         triggerAlert(data.message);
+        setRecentlyAddedMember({
+          name: settingsMemberName.trim(),
+          mobile: settingsMemberMobile.trim(),
+          pin: settingsMemberMobile.trim().slice(-4)
+        });
         setSettingsMemberName('');
         setSettingsMemberMobile('');
-        setModals(prev => ({ ...prev, addMember: false }));
         fetchLiveData(true);
       } else {
         triggerAlert(data.error || "सदस्य जोड़ने में विफल!", "error");
@@ -2944,6 +2949,7 @@ export default function App() {
                 setModals(prev => ({ ...prev, addMember: false }));
                 setSettingsMemberName('');
                 setSettingsMemberMobile('');
+                setRecentlyAddedMember(null);
               }}
               className="absolute right-4 top-4 text-slate-400 hover:text-slate-650"
             >
@@ -2954,6 +2960,18 @@ export default function App() {
               <span className="material-icons-outlined text-riverBlue text-lg">person_add</span>
               नया सदस्य जोड़ें (Add New Member)
             </h3>
+
+            {recentlyAddedMember && (
+              <div className="bg-natureGreen/5 border border-natureGreen/30 rounded-xl p-3.5 text-xs text-slate-700 space-y-1.5 mb-4 animate-ripple">
+                <div className="font-bold text-natureGreen flex items-center gap-1 text-sm">
+                  <span className="material-icons-outlined text-sm">check_circle</span>
+                  सफलतापूर्वक जोड़ा गया! (Successfully Added)
+                </div>
+                <div><span className="font-semibold text-slate-600">नाम (Name):</span> {recentlyAddedMember.name}</div>
+                <div><span className="font-semibold text-slate-600">मोबाइल (Mobile):</span> {recentlyAddedMember.mobile}</div>
+                <div><span className="font-semibold text-slate-600">लॉगिन पासवर्ड (PIN):</span> <span className="font-bold text-riverBlue bg-riverBlue/5 px-2 py-0.5 rounded ml-1">{recentlyAddedMember.pin}</span></div>
+              </div>
+            )}
             
             <form onSubmit={handleAddMemberSubmit} className="space-y-4">
               <div>
