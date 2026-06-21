@@ -1190,28 +1190,28 @@ export default function App() {
             className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-dashboard' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
             <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">home</span>
-            <span className="inline-flex items-center leading-none">डैशबोर्ड (Dashboard)</span>
+            <span className="inline-flex items-center leading-none transform translate-y-[1.5px]">डैशबोर्ड (Dashboard)</span>
           </button>
           <button
             onClick={() => setCurrentActivePage('page-members')}
             className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-members' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
             <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">people</span>
-            <span className="inline-flex items-center leading-none">सदस्य (Members)</span>
+            <span className="inline-flex items-center leading-none transform translate-y-[1.5px]">सदस्य (Members)</span>
           </button>
           <button
             onClick={() => setCurrentActivePage('page-reports')}
             className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-reports' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
             <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">bar_chart</span>
-            <span className="inline-flex items-center leading-none">रिपोर्ट (Reports)</span>
+            <span className="inline-flex items-center leading-none transform translate-y-[1.5px]">रिपोर्ट (Reports)</span>
           </button>
           <button
             onClick={() => setCurrentActivePage('page-settings')}
             className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-settings' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
             <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">settings</span>
-            <span className="inline-flex items-center leading-none">सेटिंग्स (Settings)</span>
+            <span className="inline-flex items-center leading-none transform translate-y-[1.5px]">सेटिंग्स (Settings)</span>
           </button>
         </nav>
 
@@ -1222,8 +1222,8 @@ export default function App() {
                 onClick={openAddExpenseModal}
                 className="w-full bg-softRed text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-softRed/95 transition-colors flex items-center justify-center gap-2 shadow-md"
               >
-                <span class="material-icons-outlined text-base">payments</span>
-                <span>नया खर्च जोड़ें (Add Expense)</span>
+                <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">payments</span>
+                <span className="transform translate-y-[1.5px]">नया खर्च जोड़ें (Add Expense)</span>
               </button>
             </div>
           )}
@@ -1234,8 +1234,8 @@ export default function App() {
                 onClick={() => setModals(prev => ({ ...prev, login: true }))}
                 className="flex items-center justify-center gap-2 w-full bg-riverBlue text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm"
               >
-                <span className="material-icons-outlined text-sm">login</span>
-                <span>लॉगिन करें (Login)</span>
+                <span className="material-icons-outlined text-sm inline-flex items-center justify-center leading-none">login</span>
+                <span className="transform translate-y-[1.5px]">लॉगिन करें (Login)</span>
               </button>
             ) : (
               <div className="flex items-center justify-between gap-2 w-full p-3 bg-lightGray rounded-xl border border-sandBeige/30">
@@ -1708,7 +1708,7 @@ export default function App() {
                         className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold px-3 rounded-xl inline-flex items-center justify-center gap-1.5 transition-colors shadow-sm h-8"
                       >
                         <span className="material-icons-outlined text-sm inline-flex items-center justify-center leading-none">person_add</span>
-                        <span>सदस्य जोड़ें (Add Member)</span>
+                        <span className="transform translate-y-[1.5px]">सदस्य जोड़ें (Add Member)</span>
                       </button>
                     )}
                     <span className="text-xs text-slate-500 font-medium">कुल सदस्य: {appData.members.length}</span>
@@ -1761,7 +1761,7 @@ export default function App() {
                                       {m.name}
                                       {m.status === 1 && (
                                         <span className="inline-flex items-center text-[9px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.5 rounded-full font-medium border border-natureGreen/20 leading-none">
-                                          ✅ सक्रिय
+                                          ✅ <span className="transform translate-y-[1px] ml-0.5">सक्रिय</span>
                                         </span>
                                       )}
                                     </span>
@@ -1773,9 +1773,9 @@ export default function App() {
                               </td>
                               <td className="py-3 px-4 align-middle">
                                 {m.is_admin === 1 ? (
-                                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold border border-amber-200 inline-flex items-center justify-center leading-none">एडमिन (Admin)</span>
+                                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold border border-amber-200 inline-flex items-center justify-center leading-none"><span className="transform translate-y-[1.5px]">एडमिन (Admin)</span></span>
                                 ) : (
-                                  <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-medium inline-flex items-center justify-center leading-none">सदस्य (Member)</span>
+                                  <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-medium inline-flex items-center justify-center leading-none"><span className="transform translate-y-[1.5px]">सदस्य (Member)</span></span>
                                 )}
                               </td>
                               <td className="py-3 px-4 text-right font-bold text-riverBlue align-middle">
@@ -1794,7 +1794,7 @@ export default function App() {
                                       className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold rounded-lg inline-flex items-center justify-center gap-1 transition-colors h-7 px-2.5"
                                     >
                                       <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">add_circle</span>
-                                      <span>योगदान</span>
+                                      <span className="transform translate-y-[1.5px]">योगदान</span>
                                     </button>
                                   )}
                                   <a
@@ -1802,7 +1802,7 @@ export default function App() {
                                     className="bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold rounded-lg inline-flex items-center justify-center gap-1 transition-colors h-7 px-2.5"
                                   >
                                     <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">call</span>
-                                    <span>कॉल</span>
+                                    <span className="transform translate-y-[1.5px]">कॉल</span>
                                   </a>
                                 </div>
                               </td>
@@ -1856,7 +1856,7 @@ export default function App() {
                                   {m.name}
                                   {m.status === 1 && (
                                     <span className="text-[9.5px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 border border-natureGreen/20">
-                                      ✅ सक्रिय
+                                      ✅ <span className="transform translate-y-[1px]">सक्रिय</span>
                                     </span>
                                   )}
                                 </div>
@@ -1883,7 +1883,8 @@ export default function App() {
                                 }}
                                 className="flex-1 bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                               >
-                                <span className="material-icons-outlined text-base">add_circle</span> योगदान
+                                <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">add_circle</span>
+                                <span className="transform translate-y-[1.5px]">योगदान</span>
                               </button>
                             )}
                             <a
@@ -1891,7 +1892,8 @@ export default function App() {
                               onClick={(e) => e.stopPropagation()}
                               className={`${currentUser ? 'flex-1' : 'w-full'} bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors`}
                             >
-                              <span className="material-icons-outlined text-base">call</span> कॉल करें
+                              <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">call</span>
+                              <span className="transform translate-y-[1.5px]">कॉल करें</span>
                             </a>
                           </div>
                         </div>
@@ -2178,8 +2180,8 @@ export default function App() {
                       </div>
                       <button type="submit" className="w-full md:w-auto md:px-10 bg-white text-riverBlue rounded-xl py-2.5 text-xs font-bold hover:bg-white/90 transition-colors shadow-md mt-1">
                         <span className="flex items-center justify-center gap-2">
-                          <span className="material-icons-outlined text-sm">group_add</span>
-                          सदस्य जोड़ें (Add Member)
+                          <span className="material-icons-outlined text-sm inline-flex items-center justify-center leading-none">group_add</span>
+                          <span className="transform translate-y-[1.5px]">सदस्य जोड़ें (Add Member)</span>
                         </span>
                       </button>
                     </form>
@@ -2225,11 +2227,14 @@ export default function App() {
                               />
                             </div>
                             <div className="flex justify-between items-center pt-3 border-t border-sandBeige/20">
-                              <span className="text-sm text-slate-650">
-                                पद: <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-riverBlue/10 text-riverBlue">एडमिन (Admin)</span>
+                              <span className="text-sm text-slate-655 flex items-center">
+                                <span className="transform translate-y-[1.5px]">पद:&nbsp;</span>
+                                <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-riverBlue/10 text-riverBlue inline-flex items-center justify-center leading-none">
+                                  <span className="transform translate-y-[1.5px]">एडमिन (Admin)</span>
+                                </span>
                               </span>
-                              <button type="submit" className="bg-riverBlue text-white rounded-xl px-5 py-2 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm">
-                                अपडेट करें (Update)
+                              <button type="submit" className="bg-riverBlue text-white rounded-xl px-5 py-2 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm flex items-center">
+                                <span className="transform translate-y-[1.5px]">अपडेट करें (Update)</span>
                               </button>
                             </div>
                           </form>
@@ -2507,8 +2512,8 @@ export default function App() {
               <div className="text-[10px] text-slate-400">
                 *सामान्य सदस्यों के लिए पासवर्ड उनके मोबाइल नंबर के आखिरी 4 अंक हैं।
               </div>
-              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3 text-sm font-medium hover:bg-riverBlue/90 transition-colors shadow-sm">
-                लॉगिन करें
+              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3 text-sm font-medium hover:bg-riverBlue/90 transition-colors shadow-sm flex items-center justify-center">
+                <span className="transform translate-y-[1.5px]">लॉगिन करें</span>
               </button>
             </form>
           </div>
@@ -2677,8 +2682,8 @@ export default function App() {
                 </div>
               )}
 
-              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2">
-                योगदान जोड़ें (Add Contribution)
+              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2 flex items-center justify-center">
+                <span className="transform translate-y-[1.5px]">योगदान जोड़ें (Add Contribution)</span>
               </button>
             </form>
           </div>
@@ -2823,8 +2828,8 @@ export default function App() {
                 </div>
               )}
 
-              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2">
-                अपडेट सुरक्षित करें
+              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2 flex items-center justify-center">
+                <span className="transform translate-y-[1.5px]">अपडेट सुरक्षित करें</span>
               </button>
             </form>
           </div>
@@ -2934,8 +2939,8 @@ export default function App() {
                 </div>
               </div>
 
-              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2">
-                {selectedExpense ? 'अपडेट सुरक्षित करें' : 'खर्च सुरक्षित करें'}
+              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2 flex items-center justify-center">
+                <span className="transform translate-y-[1.5px]">{selectedExpense ? 'अपडेट सुरक्षित करें' : 'खर्च सुरक्षित करें'}</span>
               </button>
             </form>
           </div>
@@ -3001,8 +3006,8 @@ export default function App() {
                 />
               </div>
 
-              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2">
-                सदस्य जोड़ें (Add Member)
+              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2 flex items-center justify-center">
+                <span className="transform translate-y-[1.5px]">सदस्य जोड़ें (Add Member)</span>
               </button>
             </form>
           </div>
@@ -3087,8 +3092,8 @@ export default function App() {
                   </div>
                   
                   <div className="flex justify-end pt-2 border-t border-sandBeige/20">
-                    <button type="submit" className="bg-riverBlue text-white rounded-xl px-4 py-2 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm w-full">
-                      विवरण सहेजें (Save Info)
+                    <button type="submit" className="bg-riverBlue text-white rounded-xl px-4 py-2 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm w-full flex items-center justify-center">
+                      <span className="transform translate-y-[1.5px]">विवरण सहेजें (Save Info)</span>
                     </button>
                   </div>
                 </form>
