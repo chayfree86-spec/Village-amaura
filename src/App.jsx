@@ -1656,7 +1656,7 @@ export default function App() {
                                   <td className="py-3 px-4 text-slate-550 font-medium">
                                     📅 {formatDateDisplay(item.date)}
                                   </td>
-                                  <td className={`py-3 px-4 text-right font-bold ${isContribution ? 'text-riverBlue' : 'text-softRed'}`}>
+                                  <td className={`py-3 px-4 text-right font-bold ${isContribution ? 'text-natureGreen' : 'text-softRed'}`}>
                                     {isContribution ? (
                                       item.type === 'cash' ? `+₹${item.amount.toLocaleString('en-IN')}` : `+₹${item.total_value.toLocaleString('en-IN')}`
                                     ) : (
@@ -1708,64 +1708,66 @@ export default function App() {
                             : appData.members.find(m => m.name === item.name);
                           
                           return (
-                            <div key={idx} className="p-3.5 bg-lightGray rounded-xl border border-sandBeige/10 text-xs flex justify-between items-start gap-2">
+                            <div 
+                              key={idx} 
+                              onClick={() => {
+                                if (isContribution && matchedMember) {
+                                  setSelectedMember(matchedMember);
+                                  setModals(prev => ({ ...prev, memberDetail: true }));
+                                }
+                              }}
+                              className={`p-3.5 rounded-2xl border transition-all duration-200 ${
+                                isContribution && matchedMember
+                                  ? 'bg-white border-sandBeige/30 shadow-[0_2px_8px_rgba(0,0,0,0.02)] active:scale-[0.99] cursor-pointer hover:border-riverBlue/30 hover:shadow-md'
+                                  : 'bg-slate-50/80 border-slate-100'
+                              } flex justify-between items-start gap-3`}
+                            >
                               <div className="min-w-0">
-                                <span className="font-semibold text-slate-750 block truncate">
+                                <div className="font-semibold text-slate-800 text-[13.5px] flex items-center gap-1">
+                                  <span>{isContribution ? '➕' : '➖'} {item.name}</span>
+                                  {isContribution && matchedMember && (
+                                    <span className="material-icons-outlined text-[12px] text-slate-400">open_in_new</span>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap gap-1.5 mt-1.5">
                                   {isContribution ? (
-                                    matchedMember ? (
-                                      <button
-                                        onClick={() => {
-                                          setSelectedMember(matchedMember);
-                                          setModals(prev => ({ ...prev, memberDetail: true }));
-                                        }}
-                                        className="hover:text-riverBlue hover:underline text-left font-semibold text-riverBlue inline-flex items-center gap-0.5"
-                                      >
-                                        ➕ {item.name}
-                                        <span className="material-icons-outlined text-[10px]">open_in_new</span>
-                                      </button>
+                                    item.type === 'cash' ? (
+                                      <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                                        💵 <span className="transform translate-y-[0.5px]">नकद</span>
+                                      </span>
                                     ) : (
-                                      `➕ ${item.name}`
+                                      <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-800 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full">
+                                        🏗️ <span className="transform translate-y-[0.5px]">सामग्री: {item.item_name}</span>
+                                      </span>
                                     )
                                   ) : (
-                                    `➖ ${item.name}`
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-softRed bg-softRed/5 border border-softRed/10 px-2 py-0.5 rounded-full">
+                                      💸 <span className="transform translate-y-[0.5px]">खर्च: {item.item_name || 'विवरण नहीं'}</span>
+                                    </span>
                                   )}
-                                </span>
-                                <span className="text-[10px] text-slate-400 block mt-0.5">
-                                  {isContribution ? (
-                                    item.type === 'cash' ? `नकद योगदान` : `सामग्री: ${item.item_name}`
-                                  ) : (
-                                    `खर्च: ${item.item_name || 'विवरण उपलब्ध नहीं'}`
-                                  )}
-                                </span>
-                                <span className="text-[9px] text-slate-400 block mt-0.5">📅 {formatDateDisplay(item.date)}</span>
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
+                                    📅 <span className="transform translate-y-[0.5px]">{formatDateDisplay(item.date)}</span>
+                                  </span>
+                                </div>
                                 
-                                <div className="mt-1.5 flex gap-2">
-                                  {isContribution && matchedMember && (
+                                {!isContribution && item.bill_image && (
+                                  <div className="mt-2">
                                     <button
-                                      onClick={() => {
-                                        setSelectedMember(matchedMember);
-                                        setModals(prev => ({ ...prev, memberDetail: true }));
-                                      }}
-                                      className="text-[10.5px] text-riverBlue font-medium inline-flex items-center gap-0.5 hover:underline"
-                                    >
-                                      <span className="material-icons-outlined text-[11px]">person</span> सदस्य प्रोफ़ाइल
-                                    </button>
-                                  )}
-                                  {!isContribution && item.bill_image && (
-                                    <button
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         setLightboxImgSrc(item.bill_image);
                                         setModals(prev => ({ ...prev, billLightbox: true }));
                                       }}
-                                      className="text-[10.5px] text-riverBlue font-medium inline-flex items-center gap-0.5 hover:underline"
+                                      className="text-[10px] text-riverBlue font-semibold inline-flex items-center gap-0.5 hover:underline bg-riverBlue/5 px-2.5 py-1 rounded-lg border border-riverBlue/10 transition-colors"
                                     >
-                                      <span className="material-icons-outlined text-[11px]">image</span> रसीद देखें
+                                      <span className="material-icons-outlined text-[11px]">image</span>
+                                      <span className="transform translate-y-[0.5px]">रसीद देखें</span>
                                     </button>
-                                  )}
-                                </div>
+                                  </div>
+                                )}
                               </div>
                               <div className="text-right flex-shrink-0">
-                                <span className={`font-bold block ${isContribution ? 'text-riverBlue' : 'text-softRed'}`}>
+                                <span className={`font-extrabold text-[15px] block tracking-tight ${isContribution ? 'text-natureGreen' : 'text-softRed'}`}>
                                   {isContribution ? (
                                     item.type === 'cash' ? `+₹${item.amount.toLocaleString('en-IN')}` : `+₹${item.total_value.toLocaleString('en-IN')}`
                                   ) : (
