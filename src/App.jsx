@@ -1911,7 +1911,7 @@ export default function App() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="सदस्य खोजें (Search)..."
-                      className="w-full bg-transparent border-none outline-none text-sm md:text-base text-slate-700 placeholder-slate-405 py-0 leading-normal align-middle"
+                      className="w-full bg-transparent border-none outline-none text-sm md:text-base text-slate-700 placeholder-slate-405 py-0 pt-[2px] leading-normal align-middle transform translate-y-[2.5px]"
                     />
                     <button
                       onClick={handleVoiceSearchToggle}
