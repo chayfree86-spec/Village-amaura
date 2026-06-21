@@ -1335,12 +1335,12 @@ export default function App() {
           {/* PAGE 1: DASHBOARD */}
           {currentActivePage === 'page-dashboard' && (
             <section className="page-view active animate-ripple flex-1 flex flex-col pt-2 pb-32 md:pb-6">
-              <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 mt-3">
+              <div className="flex flex-col gap-6 mt-3">
                 
                 {/* Dashboard Summary Cards */}
-                <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                   {/* Total Cash Card */}
-                  <div className="bg-gradient-to-br from-[#1E5AA8] via-[#2D73CE] to-[#103E79] p-5 rounded-2xl shadow-[0_10px_25px_rgba(30,90,168,0.22)] border border-white/10 relative overflow-hidden col-span-2 md:col-span-2 flex flex-col justify-between h-48 text-white hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(30,90,168,0.28)] transition-all duration-350">
+                  <div className="bg-gradient-to-br from-[#1E5AA8] via-[#2D73CE] to-[#103E79] p-5 rounded-2xl shadow-[0_10px_25px_rgba(30,90,168,0.22)] border border-white/10 relative overflow-hidden col-span-2 lg:col-span-1 flex flex-col justify-between h-48 text-white hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(30,90,168,0.28)] transition-all duration-350">
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
                     <div className="flex justify-between items-start z-10">
@@ -1377,7 +1377,7 @@ export default function App() {
                   </div>
 
                   {/* Total Goods Card */}
-                  <div className="bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] p-4 md:p-5 flex flex-col justify-between h-36 md:h-48 rounded-2xl shadow-[0_8px_20px_rgba(46,125,50,0.22)] border border-white/10 relative overflow-hidden text-white col-span-1 md:col-span-2 hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(46,125,50,0.28)] transition-all duration-350">
+                  <div className="bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] p-4 md:p-5 flex flex-col justify-between h-36 md:h-48 rounded-2xl shadow-[0_8px_20px_rgba(46,125,50,0.22)] border border-white/10 relative overflow-hidden text-white col-span-1 lg:col-span-1 hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(46,125,50,0.28)] transition-all duration-350">
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none hidden md:block"></div>
                     <div className="flex justify-between items-start z-10">
@@ -1412,7 +1412,7 @@ export default function App() {
                   </div>
 
                   {/* Total Expense Card */}
-                  <div className="bg-gradient-to-br from-[#E53935] to-[#B71C1C] p-4 md:p-5 flex flex-col justify-between h-36 md:h-48 rounded-2xl shadow-[0_8px_20px_rgba(229,57,53,0.22)] border border-white/10 relative overflow-hidden text-white col-span-1 md:col-span-2 hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(229,57,53,0.28)] transition-all duration-350">
+                  <div className="bg-gradient-to-br from-[#E53935] to-[#B71C1C] p-4 md:p-5 flex flex-col justify-between h-36 md:h-48 rounded-2xl shadow-[0_8px_20px_rgba(229,57,53,0.22)] border border-white/10 relative overflow-hidden text-white col-span-1 lg:col-span-1 hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(229,57,53,0.28)] transition-all duration-350">
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none hidden md:block"></div>
                     <div className="flex justify-between items-start z-10">
@@ -1447,7 +1447,7 @@ export default function App() {
                   </div>
 
                   {/* Current Balance Card */}
-                  <div className="bg-gradient-to-br from-[#105E3D] via-[#1E7C53] to-[#0A3D26] p-5 rounded-2xl shadow-[0_10px_25px_rgba(16,94,61,0.22)] border border-white/10 relative overflow-hidden col-span-2 md:col-span-2 flex flex-col justify-between h-48 text-white hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(16,94,61,0.28)] transition-all duration-350">
+                  <div className="bg-gradient-to-br from-[#105E3D] via-[#1E7C53] to-[#0A3D26] p-5 rounded-2xl shadow-[0_10px_25px_rgba(16,94,61,0.22)] border border-white/10 relative overflow-hidden col-span-2 lg:col-span-1 flex flex-col justify-between h-48 text-white hover:scale-[1.01] hover:shadow-[0_18px_40px_rgba(16,94,61,0.28)] transition-all duration-350">
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
                     <div className="flex justify-between items-start z-10">
@@ -1482,44 +1482,201 @@ export default function App() {
 
                 </div>
 
-                {/* Recent Activity (Desktop only) */}
-                <div className="hidden lg:flex flex-col w-80 bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 h-[25rem] flex-shrink-0">
-                  <h3 className="text-sm font-semibold text-slate-700 mb-4 pb-2 border-b border-lightGray flex items-center gap-1.5">
+                {/* Recent Activity Section (Full Width, below cards) */}
+                <div className="w-full bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30">
+                  <h3 className="text-md font-semibold text-slate-800 mb-4 pb-2 border-b border-lightGray flex items-center gap-1.5">
                     <span className="material-icons-outlined text-riverBlue text-lg">history</span>
                     हालिया गतिविधियां (Recent Activity)
                   </h3>
-                  <div className="space-y-3 overflow-y-auto pr-1 flex-1">
-                    {appData.feed.length === 0 ? (
-                      <div className="text-center text-slate-400 py-8 text-xs">कोई गतिविधि नहीं मिली</div>
-                    ) : (
-                      appData.feed.map((item, idx) => (
-                        <div key={idx} className="p-3 bg-lightGray rounded-xl border border-sandBeige/10 text-xs flex justify-between items-start gap-2">
-                          <div className="min-w-0">
-                            <span className="font-semibold text-slate-750 block truncate">
-                              {item.feed_type === 'contribution' ? `➕ ${item.name}` : `➖ ${item.name}`}
-                            </span>
-                            <span className="text-[10px] text-slate-400 block mt-0.5">
-                              {item.feed_type === 'contribution' ? (
-                                item.type === 'cash' ? `नकद योगदान` : `सामग्री: ${item.item_name}`
-                              ) : (
-                                `खर्च: ${item.item_name || 'विवरण उपलब्ध नहीं'}`
-                              )}
-                            </span>
-                            <span className="text-[9px] text-slate-400 block mt-0.5">📅 {formatDateDisplay(item.date)}</span>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <span className={`font-bold block ${item.feed_type === 'contribution' ? 'text-riverBlue' : 'text-softRed'}`}>
-                              {item.feed_type === 'contribution' ? (
-                                item.type === 'cash' ? `+₹${item.amount.toLocaleString('en-IN')}` : `+₹${item.total_value.toLocaleString('en-IN')}`
-                              ) : (
-                                `-₹${item.amount.toLocaleString('en-IN')}`
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
+                  
+                  {appData.feed.length === 0 ? (
+                    <div className="text-center text-slate-400 py-8 text-xs">कोई गतिविधि नहीं मिली</div>
+                  ) : (
+                    <>
+                      {/* Desktop Table View */}
+                      <div className="hidden lg:block overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-lightGray text-[13px] font-semibold text-slate-500">
+                              <th className="py-3 px-4">प्रकार (Type)</th>
+                              <th className="py-3 px-4">सदस्य / विवरण (Name / Details)</th>
+                              <th className="py-3 px-4">तारीख (Date)</th>
+                              <th className="py-3 px-4 text-right">राशि (Amount)</th>
+                              <th className="py-3 px-4 text-center">लिंक / एक्शन (Link / Action)</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-lightGray/50 text-sm">
+                            {appData.feed.map((item, idx) => {
+                              const isContribution = item.feed_type === 'contribution';
+                              const matchedMember = item.mobile 
+                                ? appData.members.find(m => m.mobile === item.mobile) 
+                                : appData.members.find(m => m.name === item.name);
+                              
+                              return (
+                                <tr key={idx} className="hover:bg-lightGray/35 transition-colors">
+                                  <td className="py-3 px-4">
+                                    {isContribution ? (
+                                      <span className="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-riverBlue/10 text-riverBlue font-semibold">
+                                        ➕ योगदान
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-softRed/10 text-softRed font-semibold">
+                                        ➖ खर्च
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="py-3 px-4">
+                                    <div className="font-semibold text-slate-800">
+                                      {isContribution && matchedMember ? (
+                                        <button
+                                          onClick={() => {
+                                            setSelectedMember(matchedMember);
+                                            setModals(prev => ({ ...prev, memberDetail: true }));
+                                          }}
+                                          className="hover:text-riverBlue hover:underline text-left font-semibold text-riverBlue inline-flex items-center gap-0.5"
+                                          title="सदस्य विवरण देखें"
+                                        >
+                                          {item.name}
+                                          <span className="material-icons-outlined text-[12px]">open_in_new</span>
+                                        </button>
+                                      ) : (
+                                        item.name
+                                      )}
+                                    </div>
+                                    <div className="text-[11.5px] text-slate-400 mt-0.5">
+                                      {isContribution ? (
+                                        item.type === 'cash' ? `💵 नकद` : `🏗️ सामग्री: ${item.item_name}`
+                                      ) : (
+                                        `विवरण: ${item.item_name || 'उपलब्ध नहीं'}`
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-4 text-slate-550 font-medium">
+                                    📅 {formatDateDisplay(item.date)}
+                                  </td>
+                                  <td className={`py-3 px-4 text-right font-bold ${isContribution ? 'text-riverBlue' : 'text-softRed'}`}>
+                                    {isContribution ? (
+                                      item.type === 'cash' ? `+₹${item.amount.toLocaleString('en-IN')}` : `+₹${item.total_value.toLocaleString('en-IN')}`
+                                    ) : (
+                                      `-₹${item.amount.toLocaleString('en-IN')}`
+                                    )}
+                                  </td>
+                                  <td className="py-3 px-4 text-center">
+                                    {isContribution && matchedMember && (
+                                      <button
+                                        onClick={() => {
+                                          setSelectedMember(matchedMember);
+                                          setModals(prev => ({ ...prev, memberDetail: true }));
+                                        }}
+                                        className="text-xs text-riverBlue hover:underline font-semibold inline-flex items-center gap-1 hover:text-riverBlue/85"
+                                      >
+                                        <span className="material-icons-outlined text-sm">person</span>
+                                        सदस्य प्रोफ़ाइल
+                                      </button>
+                                    )}
+                                    {!isContribution && item.bill_image && (
+                                      <button
+                                        onClick={() => {
+                                          setLightboxImgSrc(item.bill_image);
+                                          setModals(prev => ({ ...prev, billLightbox: true }));
+                                        }}
+                                        className="text-xs text-riverBlue hover:underline font-semibold inline-flex items-center gap-1 hover:text-riverBlue/85"
+                                      >
+                                        <span className="material-icons-outlined text-sm">image</span>
+                                        रसीद देखें
+                                      </button>
+                                    )}
+                                    {!isContribution && !item.bill_image && (
+                                      <span className="text-xs text-slate-400 italic">रसीद नहीं है</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile List View */}
+                      <div className="lg:hidden space-y-3 max-h-[30rem] overflow-y-auto pr-1">
+                        {appData.feed.map((item, idx) => {
+                          const isContribution = item.feed_type === 'contribution';
+                          const matchedMember = item.mobile 
+                            ? appData.members.find(m => m.mobile === item.mobile) 
+                            : appData.members.find(m => m.name === item.name);
+                          
+                          return (
+                            <div key={idx} className="p-3.5 bg-lightGray rounded-xl border border-sandBeige/10 text-xs flex justify-between items-start gap-2">
+                              <div className="min-w-0">
+                                <span className="font-semibold text-slate-750 block truncate">
+                                  {isContribution ? (
+                                    matchedMember ? (
+                                      <button
+                                        onClick={() => {
+                                          setSelectedMember(matchedMember);
+                                          setModals(prev => ({ ...prev, memberDetail: true }));
+                                        }}
+                                        className="hover:text-riverBlue hover:underline text-left font-semibold text-riverBlue inline-flex items-center gap-0.5"
+                                      >
+                                        ➕ {item.name}
+                                        <span className="material-icons-outlined text-[10px]">open_in_new</span>
+                                      </button>
+                                    ) : (
+                                      `➕ ${item.name}`
+                                    )
+                                  ) : (
+                                    `➖ ${item.name}`
+                                  )}
+                                </span>
+                                <span className="text-[10px] text-slate-400 block mt-0.5">
+                                  {isContribution ? (
+                                    item.type === 'cash' ? `नकद योगदान` : `सामग्री: ${item.item_name}`
+                                  ) : (
+                                    `खर्च: ${item.item_name || 'विवरण उपलब्ध नहीं'}`
+                                  )}
+                                </span>
+                                <span className="text-[9px] text-slate-400 block mt-0.5">📅 {formatDateDisplay(item.date)}</span>
+                                
+                                <div className="mt-1.5 flex gap-2">
+                                  {isContribution && matchedMember && (
+                                    <button
+                                      onClick={() => {
+                                        setSelectedMember(matchedMember);
+                                        setModals(prev => ({ ...prev, memberDetail: true }));
+                                      }}
+                                      className="text-[10.5px] text-riverBlue font-medium inline-flex items-center gap-0.5 hover:underline"
+                                    >
+                                      <span className="material-icons-outlined text-[11px]">person</span> सदस्य प्रोफ़ाइल
+                                    </button>
+                                  )}
+                                  {!isContribution && item.bill_image && (
+                                    <button
+                                      onClick={() => {
+                                        setLightboxImgSrc(item.bill_image);
+                                        setModals(prev => ({ ...prev, billLightbox: true }));
+                                      }}
+                                      className="text-[10.5px] text-riverBlue font-medium inline-flex items-center gap-0.5 hover:underline"
+                                    >
+                                      <span className="material-icons-outlined text-[11px]">image</span> रसीद देखें
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <span className={`font-bold block ${isContribution ? 'text-riverBlue' : 'text-softRed'}`}>
+                                  {isContribution ? (
+                                    item.type === 'cash' ? `+₹${item.amount.toLocaleString('en-IN')}` : `+₹${item.total_value.toLocaleString('en-IN')}`
+                                  ) : (
+                                    `-₹${item.amount.toLocaleString('en-IN')}`
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
 
               </div>

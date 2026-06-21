@@ -71,11 +71,12 @@ switch ($action) {
         // 3. Get Recent Activity Feed (Limit 30)
         $feed = [];
         
-        $cont_res = $db->query("SELECT id, name, type, date, amount, total_value, item_name, 'contribution' as feed_type FROM contributions ORDER BY date DESC, id DESC LIMIT 50");
+        $cont_res = $db->query("SELECT id, name, mobile, type, date, amount, total_value, item_name, 'contribution' as feed_type FROM contributions ORDER BY date DESC, id DESC LIMIT 50");
         while ($row = $cont_res->fetch()) {
             $feed[] = [
                 'id' => (int)$row['id'],
                 'name' => $row['name'],
+                'mobile' => $row['mobile'],
                 'type' => $row['type'],
                 'date' => $row['date'],
                 'amount' => (float)$row['amount'],
@@ -86,16 +87,18 @@ switch ($action) {
             ];
         }
 
-        $exp_res = $db->query("SELECT id, paid_to as name, amount, date, description, 'expense' as feed_type FROM expenses ORDER BY date DESC, id DESC LIMIT 50");
+        $exp_res = $db->query("SELECT id, paid_to as name, amount, date, description, bill_image, 'expense' as feed_type FROM expenses ORDER BY date DESC, id DESC LIMIT 50");
         while ($row = $exp_res->fetch()) {
             $feed[] = [
                 'id' => (int)$row['id'],
                 'name' => $row['name'],
+                'mobile' => '',
                 'type' => 'expense',
                 'date' => $row['date'],
                 'amount' => (float)$row['amount'],
                 'total_value' => 0.0,
                 'item_name' => $row['description'],
+                'bill_image' => $row['bill_image'],
                 'feed_type' => 'expense',
                 'timestamp' => strtotime($row['date'] . ' 12:00:00') + $row['id']
             ];
