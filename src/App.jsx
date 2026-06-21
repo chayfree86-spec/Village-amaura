@@ -1764,8 +1764,13 @@ export default function App() {
                               } flex justify-between items-start gap-3`}
                             >
                               <div className="min-w-0">
-                                <div className="font-semibold text-slate-800 text-[13.5px] flex items-center gap-1">
-                                  <span>{isContribution ? '➕' : '➖'} {item.name}</span>
+                                <div className="font-semibold text-slate-800 text-[13.5px] flex items-center min-w-0">
+                                  {isContribution ? (
+                                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-50 text-emerald-600 font-bold text-[9px] mr-1.5 flex-shrink-0">＋</span>
+                                  ) : (
+                                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-rose-50 text-rose-600 font-bold text-[9px] mr-1.5 flex-shrink-0">－</span>
+                                  )}
+                                  <span className="truncate">{item.name}</span>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                                   {isContribution ? (
@@ -2220,8 +2225,13 @@ export default function App() {
                           }`}
                         >
                           <div className="min-w-0 flex-1">
-                            <span className="font-semibold text-slate-800 block truncate text-sm">
-                              {isContribution ? `➕ ${title}` : `➖ ${title}`}
+                            <span className="font-semibold text-slate-800 flex items-center min-w-0 text-sm">
+                              {isContribution ? (
+                                <span className="inline-flex items-center justify-center w-4.5 h-4.5 rounded-full bg-emerald-50 text-emerald-600 font-bold text-[9px] mr-1.5 flex-shrink-0">＋</span>
+                              ) : (
+                                <span className="inline-flex items-center justify-center w-4.5 h-4.5 rounded-full bg-rose-50 text-rose-600 font-bold text-[9px] mr-1.5 flex-shrink-0">－</span>
+                              )}
+                              <span className="truncate">{title}</span>
                             </span>
                             
                             {/* Modern tag/badge layout for details */}
@@ -2297,20 +2307,20 @@ export default function App() {
                                     e.stopPropagation();
                                     isContribution ? openEditContribution(item) : openEditExpenseModal(item);
                                   }}
-                                  className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-205 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-colors shadow-sm"
+                                  className="w-7 h-7 rounded-full text-slate-500 hover:text-riverBlue hover:bg-riverBlue/8 flex items-center justify-center transition-all cursor-pointer"
                                   title="संपादित करें"
                                 >
-                                  <span className="material-icons-outlined text-sm">edit</span>
+                                  <span className="material-icons-outlined text-[15px]">edit</span>
                                 </button>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDeleteEntry(item.id, isContribution ? 'contribution' : 'expense');
                                   }}
-                                  className="w-7 h-7 rounded-lg bg-softRed/10 hover:bg-softRed/20 text-softRed flex items-center justify-center transition-colors shadow-sm"
+                                  className="w-7 h-7 rounded-full text-slate-500 hover:text-softRed hover:bg-softRed/8 flex items-center justify-center transition-all cursor-pointer"
                                   title="हटाएं"
                                 >
-                                  <span className="material-icons-outlined text-sm">delete</span>
+                                  <span className="material-icons-outlined text-[15px]">delete</span>
                                 </button>
                               </div>
                             )}
