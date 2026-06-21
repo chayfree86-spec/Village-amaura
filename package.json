@@ -7,8 +7,6 @@
     "esbuild": "^0.28.1"
   },
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i src/input.css -o dist/style.min.css --minify",
-    "build:js": "npx esbuild app.js --minify --outfile=dist/app.min.js",
-    "build": "npm run build:css && npm run build:js"
+    "build": "node build.js"
   }
 }
