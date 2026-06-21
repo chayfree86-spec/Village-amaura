@@ -1315,7 +1315,7 @@ export default function App() {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-60 bg-white border-r border-sandBeige/30 px-4 py-4 flex-shrink-0 h-screen sticky top-0 overflow-hidden">
         <div className="flex flex-col items-center text-center mb-4 pb-4 border-b border-sandBeige/30">
-          <img src="logo.png" alt="Logo" className="w-14 h-14 object-contain rounded-full border border-sandBeige shadow-md mb-2" />
+          <img src="logo.png" alt="Logo" width="56" height="56" loading="eager" className="w-14 h-14 object-contain rounded-full border border-sandBeige shadow-md mb-2" />
           <h2 className="text-base text-riverBlue font-semibold tracking-wide leading-tight">प्रजापति एकता ग्रुप</h2>
           <p className="text-[10px] text-natureGreen font-semibold mt-0.5">“एकता में शक्ति, सेवा में समर्पण”</p>
         </div>
@@ -1466,7 +1466,7 @@ export default function App() {
               )}
             </div>
 
-            <img src="logo.png" alt="Logo" className="w-16 h-16 object-contain rounded-full border border-sandBeige shadow-sm mb-2" />
+            <img src="logo.png" alt="Logo" width="64" height="64" loading="eager" fetchpriority="high" className="w-16 h-16 object-contain rounded-full border border-sandBeige shadow-sm mb-2" />
             <h1 className="text-2xl text-riverBlue font-medium tracking-wide text-center">प्रजापति एकता ग्रुप</h1>
             <p className="text-sm text-natureGreen font-medium mt-1 text-center">“एकता में शक्ति, सेवा में समर्पण”</p>
           </div>
@@ -1891,7 +1891,7 @@ export default function App() {
                                       : 'bg-slate-100 text-slate-500 border-slate-200/50'
                                   }`}>
                                     {(m.status === 1 || m.is_admin === 1) ? (
-                                      <img src="logo.png" className="w-full h-full object-cover" alt="Active" />
+                                      <img src="logo.png" width="32" height="32" loading="lazy" className="w-full h-full object-cover" alt="Active" />
                                     ) : (
                                       m.name.charAt(0)
                                     )}
@@ -1981,7 +1981,7 @@ export default function App() {
                                   : 'bg-slate-100 text-slate-500 border-slate-200/50'
                               }`}>
                                 {(m.status === 1 || m.is_admin === 1) ? (
-                                  <img src="logo.png" className="w-full h-full object-cover" alt="Active" />
+                                  <img src="logo.png" width="40" height="40" loading="lazy" className="w-full h-full object-cover" alt="Active" />
                                 ) : (
                                   m.name.charAt(0)
                                 )}
@@ -3440,7 +3440,7 @@ function SplashScreen() {
     <div className="fixed inset-0 bg-[#F5E6C8] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
       <div className="text-center flex flex-col items-center px-6">
         <div className="relative w-32 h-32 mb-6 flex items-center justify-center">
-          <img src="logo.png" alt="Logo" className="w-full h-full object-contain rounded-full border border-sandBeige shadow-[0_8px_30px_rgba(0,0,0,0.12)]" />
+          <img src="logo.png" alt="Logo" width="128" height="128" fetchpriority="high" className="w-full h-full object-contain rounded-full border border-sandBeige shadow-[0_8px_30px_rgba(0,0,0,0.12)]" />
         </div>
         <h1 className="text-3xl text-riverBlue font-medium tracking-wide">प्रजापति एकता ग्रुप</h1>
         <p className="text-sm text-natureGreen font-medium mt-2">“एकता में शक्ति, सेवा में समर्पण”</p>
