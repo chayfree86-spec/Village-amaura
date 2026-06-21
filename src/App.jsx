@@ -1857,7 +1857,7 @@ export default function App() {
                                   )}
                                 </div>
                                 <div className="text-xs text-slate-450 mt-1 flex items-center gap-1">
-                                  <span className="material-icons-outlined text-xs">phone</span> {m.mobile}
+                                  <span className="material-icons-outlined text-[13px] text-slate-400 inline-flex items-center justify-center leading-none">smartphone</span> <span className="transform translate-y-[0.5px]">{m.mobile}</span>
                                 </div>
                               </div>
                             </div>
@@ -1877,7 +1877,7 @@ export default function App() {
                                   setAddContDate(getFormattedDate(new Date()));
                                   setModals(prev => ({ ...prev, addContribution: true }));
                                 }}
-                                className="flex-1 bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                                className="flex-1 h-10 bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                               >
                                 <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">add_circle</span>
                                 <span className="transform translate-y-[1.5px]">योगदान</span>
@@ -1886,10 +1886,10 @@ export default function App() {
                             <a
                               href={`tel:${m.mobile}`}
                               onClick={(e) => e.stopPropagation()}
-                              className={`${currentUser ? 'flex-1' : 'w-full'} bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold py-2 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors`}
+                              className={`${currentUser ? 'w-10 h-10 flex-shrink-0' : 'w-full h-10'} bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 rounded-xl flex items-center justify-center transition-colors`}
+                              title="कॉल करें"
                             >
-                              <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">call</span>
-                              <span className="transform translate-y-[1.5px]">कॉल करें</span>
+                              <span className="material-icons-outlined text-[17px] inline-flex items-center justify-center leading-none">phone</span>
                             </a>
                           </div>
                         </div>
