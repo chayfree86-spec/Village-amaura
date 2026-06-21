@@ -912,6 +912,99 @@ export default function App() {
     };
   };
 
+  // --- Bilingual Phonetic Search Helpers ---
+  const transliterateHindiToEnglish = (text) => {
+    if (!text) return '';
+    
+    const consonants = {
+      'क': 'k', 'ख': 'kh', 'ग': 'g', 'घ': 'gh', 'ङ': 'n',
+      'च': 'ch', 'छ': 'chh', 'ज': 'j', 'झ': 'jh', 'ञ': 'n',
+      'ट': 't', 'ठ': 'th', 'ड': 'd', 'ढ': 'dh', 'ण': 'n',
+      'त': 't', 'थ': 'th', 'द': 'd', 'ध': 'dh', 'न': 'n',
+      'प': 'p', 'फ': 'p', 'ब': 'b', 'भ': 'bh', 'म': 'm',
+      'य': 'y', 'र': 'r', 'ल': 'l', 'व': 'v', 'श': 'sh', 'ष': 'sh', 'स': 's', 'ह': 'h',
+      'क्ष': 'ksh', 'त्र': 'tr', 'ज्ञ': 'gy', 'श्र': 'shr',
+      'क़': 'q', 'ख़': 'kh', 'ग़': 'g', 'ज़': 'z', 'ड़': 'd', 'ढ़': 'dh', 'फ़': 'f'
+    };
+
+    const vowels = {
+      'अ': 'a', 'आ': 'a', 'इ': 'i', 'ई': 'i', 'उ': 'u', 'ऊ': 'u', 'ऋ': 'ri', 'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au',
+      'ा': 'a', 'ि': 'i', 'ी': 'i', 'ु': 'u', 'ू': 'u', 'े': 'e', 'ै': 'ai', 'ो': 'o', 'ौ': 'au',
+      'ं': 'n', 'ँ': 'n', 'ः': 'h'
+    };
+
+    const halant = '्';
+
+    let result = '';
+    let i = 0;
+    while (i < text.length) {
+      let char = text[i];
+      let nextChar = text[i + 1] || '';
+      
+      let isConsonant = false;
+      let roman = '';
+      
+      if (char + nextChar in consonants) {
+        roman = consonants[char + nextChar];
+        isConsonant = true;
+        i += 2;
+      } else if (char in consonants) {
+        roman = consonants[char];
+        isConsonant = true;
+        i += 1;
+      } else if (char in vowels) {
+        let prevChar = text[i - 1] || '';
+        let isPrevConsonant = prevChar in consonants || (i > 1 && (text[i - 2] + prevChar) in consonants);
+        
+        if ((char === 'ं' || char === 'ँ') && isPrevConsonant) {
+          roman = 'an';
+        } else {
+          roman = vowels[char];
+        }
+        i += 1;
+      } else {
+        roman = char;
+        i += 1;
+      }
+      
+      result += roman;
+      
+      if (isConsonant) {
+        let lookahead = text[i] || '';
+        if (!(lookahead in vowels) && lookahead !== halant && lookahead !== '') {
+          if (lookahead !== ' ' && lookahead !== '\t' && lookahead !== '\n') {
+            result += 'a';
+          }
+        }
+      }
+      
+      if (text[i] === halant) {
+        i += 1;
+      }
+    }
+    return result;
+  };
+
+  const cleanPhonetic = (str) => {
+    if (!str) return '';
+    let text = str;
+    if (/[\u0900-\u097F]/.test(str)) {
+      text = transliterateHindiToEnglish(str);
+    }
+    return text
+      .toLowerCase()
+      .replace(/ee/g, 'i')
+      .replace(/oo/g, 'u')
+      .replace(/y/g, 'i')
+      .replace(/v/g, 'w')
+      .replace(/sh/g, 's')
+      .replace(/z/g, 'j')
+      .replace(/ph/g, 'f')
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/(.)\1+/g, '$1')
+      .replace(/a+$/g, '');
+  };
+
   // --- Filtered lists & totals calculations ---
 
   // Member Search Filter
@@ -932,7 +1025,13 @@ export default function App() {
       const matchesName = name.includes(query);
       const matchesMobile = mobile.includes(query);
       const matchesFirstWord = words.some(word => word.startsWith(query));
-      return matchesName || matchesMobile || matchesFirstWord;
+      
+      // Bilingual phonetic matching
+      const cleanName = cleanPhonetic(m.name);
+      const cleanQuery = cleanPhonetic(query);
+      const matchesPhonetic = cleanName.includes(cleanQuery);
+      
+      return matchesName || matchesMobile || matchesFirstWord || matchesPhonetic;
     });
   }, [appData.members, searchQuery]);
 
