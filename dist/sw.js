@@ -4,8 +4,8 @@ const CACHE_NAME = 'prajapati-ekta-v55';
 const ASSETS = [
     './',
     './index.html',
-    './style.min.css',
-    './app.min.js',
+    './assets/index.css',
+    './assets/index.js',
     './manifest.json',
     './logo.png',
     './pwa-icon.png'

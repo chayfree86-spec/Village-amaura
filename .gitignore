@@ -42,6 +42,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Build output
+dist/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -74,6 +77,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local

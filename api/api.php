@@ -334,13 +334,13 @@ switch ($action) {
                 $image_base64 = base64_decode($image_parts[1]);
                 
                 $filename = 'bill_' . uniqid() . '.' . $image_type;
-                $upload_dir = 'uploads/';
+                $upload_dir = '../uploads/';
                 if (!file_exists($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
                 
                 if (file_put_contents($upload_dir . $filename, $image_base64)) {
-                    $image_path = $upload_dir . $filename;
+                    $image_path = 'uploads/' . $filename;
                 }
             }
         }
@@ -455,8 +455,8 @@ switch ($action) {
 
         if (!$keep_existing_image) {
             // Delete old image if we are clearing it or uploading a new one
-            if (!empty($image_path) && file_exists($image_path)) {
-                unlink($image_path);
+            if (!empty($image_path) && file_exists('../' . $image_path)) {
+                unlink('../' . $image_path);
             }
             $image_path = null;
         }
@@ -470,13 +470,13 @@ switch ($action) {
                 $image_base64 = base64_decode($image_parts[1]);
                 
                 $filename = 'bill_' . uniqid() . '.' . $image_type;
-                $upload_dir = 'uploads/';
+                $upload_dir = '../uploads/';
                 if (!file_exists($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
                 
                 if (file_put_contents($upload_dir . $filename, $image_base64)) {
-                    $image_path = $upload_dir . $filename;
+                    $image_path = 'uploads/' . $filename;
                 }
             }
         }
@@ -525,8 +525,8 @@ switch ($action) {
             $img_stmt->execute([$id]);
             $row = $img_stmt->fetch();
             if ($row) {
-                if (!empty($row['bill_image']) && file_exists($row['bill_image'])) {
-                    unlink($row['bill_image']);
+                if (!empty($row['bill_image']) && file_exists('../' . $row['bill_image'])) {
+                    unlink('../' . $row['bill_image']);
                 }
             }
             $stmt = $db->prepare("DELETE FROM expenses WHERE id = ?");
