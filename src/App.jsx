@@ -1187,31 +1187,31 @@ export default function App() {
         <nav className="flex-grow space-y-1">
           <button
             onClick={() => setCurrentActivePage('page-dashboard')}
-            className={`sidebar-nav-item nav-item flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-dashboard' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
+            className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-dashboard' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
-            <span className="material-icons-outlined text-xl">home</span>
-            <span>डैशबोर्ड (Dashboard)</span>
+            <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">home</span>
+            <span className="inline-flex items-center leading-none">डैशबोर्ड (Dashboard)</span>
           </button>
           <button
             onClick={() => setCurrentActivePage('page-members')}
-            className={`sidebar-nav-item nav-item flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-members' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
+            className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-members' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
-            <span className="material-icons-outlined text-xl">people</span>
-            <span>सदस्य (Members)</span>
+            <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">people</span>
+            <span className="inline-flex items-center leading-none">सदस्य (Members)</span>
           </button>
           <button
             onClick={() => setCurrentActivePage('page-reports')}
-            className={`sidebar-nav-item nav-item flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-reports' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
+            className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-reports' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
-            <span className="material-icons-outlined text-xl">bar_chart</span>
-            <span>रिपोर्ट (Reports)</span>
+            <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">bar_chart</span>
+            <span className="inline-flex items-center leading-none">रिपोर्ट (Reports)</span>
           </button>
           <button
             onClick={() => setCurrentActivePage('page-settings')}
-            className={`sidebar-nav-item nav-item flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-settings' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
+            className={`sidebar-nav-item nav-item inline-flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all font-semibold text-[13px] text-left ${currentActivePage === 'page-settings' ? 'text-riverBlue bg-riverBlue/5' : 'text-slate-400 hover:text-riverBlue hover:bg-riverBlue/5'}`}
           >
-            <span className="material-icons-outlined text-xl">settings</span>
-            <span>सेटिंग्स (Settings)</span>
+            <span className="material-icons-outlined text-xl inline-flex items-center justify-center leading-none">settings</span>
+            <span className="inline-flex items-center leading-none">सेटिंग्स (Settings)</span>
           </button>
         </nav>
 
@@ -1697,18 +1697,18 @@ export default function App() {
               {/* Members List */}
               <div className="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 flex-1 flex flex-col overflow-hidden mb-0">
                 <div className="flex justify-between items-center mb-4 pb-2 border-b border-lightGray flex-shrink-0">
-                  <h3 className="text-md text-riverBlue font-medium flex items-center gap-2">
-                    <span className="material-icons-outlined">people</span>
+                  <h3 className="text-md text-riverBlue font-medium inline-flex items-center gap-2">
+                    <span className="material-icons-outlined inline-flex items-center justify-center leading-none text-lg">people</span>
                     सदस्य सूची (Members List)
                   </h3>
                   <div className="flex items-center gap-3">
                     {currentUser && (
                       <button
                         onClick={() => setModals(prev => ({ ...prev, addMember: true }))}
-                        className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-1.5 px-3 rounded-xl flex items-center gap-1 transition-colors shadow-sm"
+                        className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold px-3 rounded-xl inline-flex items-center justify-center gap-1.5 transition-colors shadow-sm h-8"
                       >
-                        <span className="material-icons-outlined text-sm">person_add</span>
-                        सदस्य जोड़ें (Add Member)
+                        <span className="material-icons-outlined text-sm inline-flex items-center justify-center leading-none">person_add</span>
+                        <span>सदस्य जोड़ें (Add Member)</span>
                       </button>
                     )}
                     <span className="text-xs text-slate-500 font-medium">कुल सदस्य: {appData.members.length}</span>
@@ -1723,11 +1723,11 @@ export default function App() {
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-lightGray text-[13px] font-semibold text-slate-500">
-                          <th className="py-3 px-4">सदस्य (Member)</th>
-                          <th className="py-3 px-4">मोबाइल नंबर (Mobile)</th>
-                          <th className="py-3 px-4">पद (Role)</th>
-                          <th className="py-3 px-4 text-right">कुल दान (Contribution)</th>
-                          <th className="py-3 px-4 text-center">एक्शन (Action)</th>
+                          <th className="py-3 px-4 align-middle">सदस्य (Member)</th>
+                          <th className="py-3 px-4 align-middle">मोबाइल नंबर (Mobile)</th>
+                          <th className="py-3 px-4 align-middle">पद (Role)</th>
+                          <th className="py-3 px-4 text-right align-middle">कुल दान (Contribution)</th>
+                          <th className="py-3 px-4 text-center align-middle">एक्शन (Action)</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-lightGray/50 text-sm">
@@ -1741,7 +1741,7 @@ export default function App() {
                               }}
                               className="hover:bg-lightGray/35 transition-colors cursor-pointer"
                             >
-                              <td className="py-3 px-4">
+                              <td className="py-3 px-4 align-middle">
                                 <div className="flex items-center gap-3">
                                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs border overflow-hidden ${
                                     m.is_admin === 1
@@ -1756,11 +1756,11 @@ export default function App() {
                                       m.name.charAt(0)
                                     )}
                                   </div>
-                                  <div>
+                                  <div className="inline-flex items-center">
                                     <span className={`font-semibold text-slate-800 inline-flex items-center gap-1.5 ${m.is_admin === 1 ? 'text-amber-800 font-bold' : ''}`}>
                                       {m.name}
                                       {m.status === 1 && (
-                                        <span className="text-[9px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.2 rounded-full font-medium border border-natureGreen/20">
+                                        <span className="inline-flex items-center text-[9px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.5 rounded-full font-medium border border-natureGreen/20 leading-none">
                                           ✅ सक्रिय
                                         </span>
                                       )}
@@ -1768,20 +1768,20 @@ export default function App() {
                                   </div>
                                 </div>
                               </td>
-                              <td className="py-3 px-4 text-slate-600 font-medium">
+                              <td className="py-3 px-4 text-slate-600 font-medium align-middle">
                                 {m.mobile}
                               </td>
-                              <td className="py-3 px-4">
+                              <td className="py-3 px-4 align-middle">
                                 {m.is_admin === 1 ? (
-                                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold border border-amber-200">एडमिन (Admin)</span>
+                                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold border border-amber-200 inline-flex items-center justify-center leading-none">एडमिन (Admin)</span>
                                 ) : (
-                                  <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">सदस्य (Member)</span>
+                                  <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-medium inline-flex items-center justify-center leading-none">सदस्य (Member)</span>
                                 )}
                               </td>
-                              <td className="py-3 px-4 text-right font-bold text-riverBlue">
+                              <td className="py-3 px-4 text-right font-bold text-riverBlue align-middle">
                                 ₹{m.overall_total.toLocaleString('en-IN')}
                               </td>
-                              <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                              <td className="py-3 px-4 text-center align-middle" onClick={(e) => e.stopPropagation()}>
                                 <div className="flex justify-center gap-2">
                                   {currentUser && (
                                     <button
@@ -1791,16 +1791,18 @@ export default function App() {
                                         setAddContDate(getFormattedDate(new Date()));
                                         setModals(prev => ({ ...prev, addContribution: true }));
                                       }}
-                                      className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-1 px-3 rounded-lg flex items-center gap-1 transition-colors"
+                                      className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold rounded-lg inline-flex items-center justify-center gap-1 transition-colors h-7 px-2.5"
                                     >
-                                      <span className="material-icons-outlined text-xs">add_circle</span> योगदान
+                                      <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">add_circle</span>
+                                      <span>योगदान</span>
                                     </button>
                                   )}
                                   <a
                                     href={`tel:${m.mobile}`}
-                                    className="bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold py-1 px-3 rounded-lg flex items-center gap-1 transition-colors"
+                                    className="bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold rounded-lg inline-flex items-center justify-center gap-1 transition-colors h-7 px-2.5"
                                   >
-                                    <span className="material-icons-outlined text-xs">call</span> कॉल
+                                    <span className="material-icons-outlined text-xs inline-flex items-center justify-center leading-none">call</span>
+                                    <span>कॉल</span>
                                   </a>
                                 </div>
                               </td>
@@ -2151,7 +2153,7 @@ export default function App() {
                     <form onSubmit={handleAddMemberSubmit} className="space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] font-medium text-white/70 mb-1">नाम ⭐</label>
+                          <label className="block text-[10px] font-medium text-white/70 mb-1">नाम <span className="text-softRed font-semibold">*</span></label>
                           <input
                             type="text"
                             value={settingsMemberName}
@@ -2162,7 +2164,7 @@ export default function App() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-medium text-white/70 mb-1">मोबाइल नंबर ⭐</label>
+                          <label className="block text-[10px] font-medium text-white/70 mb-1">मोबाइल नंबर <span className="text-softRed font-semibold">*</span></label>
                           <input
                             type="tel"
                             value={settingsMemberMobile}
@@ -2537,7 +2539,7 @@ export default function App() {
               {/* If Name is empty (implies general add mode, show dropdown) */}
               {!addContName ? (
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">सदस्य चुनें ⭐</label>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">सदस्य चुनें <span className="text-softRed font-semibold">*</span></label>
                   <CustomDropdown
                     value={generalAddContMemberMobile}
                     onChange={(val) => {
@@ -2571,7 +2573,7 @@ export default function App() {
 
               {/* Contribution Type */}
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">योगदान का प्रकार ⭐</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">योगदान का प्रकार <span className="text-softRed font-semibold">*</span></label>
                 <CustomDropdown
                   value={addContType}
                   onChange={(val) => setAddContType(val)}
@@ -2606,7 +2608,7 @@ export default function App() {
               {addContType === 'cash' ? (
                 <div className="space-y-4 pt-2 border-t border-slate-100">
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">दान राशि (₹) ⭐</label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">दान राशि (₹) <span className="text-softRed font-semibold">*</span></label>
                     <input
                       type="number"
                       value={addCashAmount}
@@ -2617,7 +2619,7 @@ export default function App() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">भुगतान का माध्यम ⭐</label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">भुगतान का माध्यम <span className="text-softRed font-semibold">*</span></label>
                     <CustomDropdown
                       value={addPaymentMode}
                       onChange={(val) => setAddPaymentMode(val)}
@@ -2632,7 +2634,7 @@ export default function App() {
               ) : (
                 <div className="space-y-4 pt-2 border-t border-slate-100">
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">सामग्री का नाम ⭐</label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">सामग्री का नाम <span className="text-softRed font-semibold">*</span></label>
                     <input
                       type="text"
                       value={addGoodsItemName}
@@ -2644,7 +2646,7 @@ export default function App() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">मात्रा (Qty) ⭐</label>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">मात्रा (Qty) <span className="text-softRed font-semibold">*</span></label>
                       <input
                         type="number"
                         value={addGoodsQty}
@@ -2655,7 +2657,7 @@ export default function App() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">दर (Rate per Qty) ⭐</label>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">दर (Rate per Qty) <span className="text-softRed font-semibold">*</span></label>
                       <input
                         type="number"
                         value={addGoodsRate}
@@ -2702,7 +2704,7 @@ export default function App() {
             
             <form onSubmit={handleEditContributionSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">नाम ⭐</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">नाम <span className="text-softRed font-semibold">*</span></label>
                 <input
                   type="text"
                   value={editContName}
@@ -2723,7 +2725,7 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">योगदान का प्रकार ⭐</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">योगदान का प्रकार <span className="text-softRed font-semibold">*</span></label>
                 <CustomDropdown
                   value={editContType}
                   onChange={(val) => setEditContType(val)}
@@ -2754,7 +2756,7 @@ export default function App() {
               {editContType === 'cash' ? (
                 <div className="space-y-4 pt-2 border-t border-slate-100">
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">दान राशि (₹) ⭐</label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">दान राशि (₹) <span className="text-softRed font-semibold">*</span></label>
                     <input
                       type="number"
                       value={editCashAmount}
@@ -2765,7 +2767,7 @@ export default function App() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">भुगतान का माध्यम ⭐</label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">भुगतान का माध्यम <span className="text-softRed font-semibold">*</span></label>
                     <CustomDropdown
                       value={editPaymentMode}
                       onChange={(val) => setEditPaymentMode(val)}
@@ -2780,7 +2782,7 @@ export default function App() {
               ) : (
                 <div className="space-y-4 pt-2 border-t border-slate-100">
                   <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">सामग्री का नाम ⭐</label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">सामग्री का नाम <span className="text-softRed font-semibold">*</span></label>
                     <input
                       type="text"
                       value={editGoodsItemName}
@@ -2792,7 +2794,7 @@ export default function App() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">मात्रा (Qty) ⭐</label>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">मात्रा (Qty) <span className="text-softRed font-semibold">*</span></label>
                       <input
                         type="number"
                         value={editGoodsQty}
@@ -2802,7 +2804,7 @@ export default function App() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">दर (Rate per Qty) ⭐</label>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">दर (Rate per Qty) <span className="text-softRed font-semibold">*</span></label>
                       <input
                         type="number"
                         value={editGoodsRate}
@@ -2849,7 +2851,7 @@ export default function App() {
             
             <form onSubmit={handleExpenseSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">राशि (₹) ⭐</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">राशि (₹) <span className="text-softRed font-semibold">*</span></label>
                 <input
                   type="number"
                   value={expAmount}
@@ -2861,7 +2863,7 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-605 mb-1">भुगतान पाने वाले का नाम (Paid To) ⭐</label>
+                <label className="block text-xs font-medium text-slate-655 mb-1">भुगतान पाने वाले का नाम (Paid To) <span className="text-softRed font-semibold">*</span></label>
                 <input
                   type="text"
                   value={expPaidTo}
@@ -2975,7 +2977,7 @@ export default function App() {
             
             <form onSubmit={handleAddMemberSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">नाम (Name) ⭐</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">नाम (Name) <span className="text-softRed font-semibold">*</span></label>
                 <input
                   type="text"
                   value={settingsMemberName}
@@ -2987,7 +2989,7 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">मोबाइल नंबर (Mobile) ⭐</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">मोबाइल नंबर (Mobile) <span className="text-softRed font-semibold">*</span></label>
                 <input
                   type="tel"
                   value={settingsMemberMobile}
