@@ -1330,7 +1330,7 @@ export default function App() {
         </header>
 
         {/* Main View Container */}
-        <main className={`flex-1 flex flex-col max-w-md md:max-w-5xl lg:max-w-6xl mx-auto w-full px-4 lg:px-8 pt-4 pb-12 md:pb-6 ${currentActivePage === 'page-members' ? 'overflow-hidden' : ''}`}>
+        <main className={`flex-1 flex flex-col max-w-md md:max-w-none mx-auto w-full px-4 lg:px-8 pt-4 pb-12 md:pb-6 ${currentActivePage === 'page-members' ? 'overflow-hidden' : ''}`}>
 
           {/* PAGE 1: DASHBOARD */}
           {currentActivePage === 'page-dashboard' && (
