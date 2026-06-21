@@ -2135,7 +2135,7 @@ export default function App() {
                       title="PDF डाउनलोड करें"
                       className="w-8 h-8 rounded-lg border border-riverBlue text-riverBlue hover:bg-riverBlue/5 flex items-center justify-center transition-all shadow-sm hover:translate-y-[-2px] hover:shadow-md"
                     >
-                      <span className="material-icons-outlined text-base">picture_as_pdf</span>
+                      <span className="material-icons-outlined text-[13px] inline-flex items-center justify-center leading-none">picture_as_pdf</span>
                     </button>
                     <button
                       onClick={handleWhatsappShare}
@@ -2143,7 +2143,9 @@ export default function App() {
                       title="WhatsApp पर साझा करें"
                       className="w-8 h-8 rounded-lg bg-natureGreen text-white hover:bg-natureGreen/95 flex items-center justify-center transition-all shadow-sm hover:translate-y-[-2px] hover:shadow-md"
                     >
-                      <span className="material-icons-outlined text-base">send</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 24 24" className="flex-shrink-0">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.501-5.734-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.638 1.966 14.156.933 11.53.931c-5.445 0-9.871 4.373-9.875 9.802-.001 1.768.468 3.49 1.357 5.013l-.99 3.616 3.73-.967zm12.35-7.397c-.305-.152-1.808-.888-2.086-.989-.278-.1-.48-.152-.68.152-.2.305-.776.989-.95 1.193-.175.203-.35.228-.655.076-.305-.152-1.288-.475-2.454-1.512-.907-.808-1.52-1.807-1.698-2.112-.178-.305-.019-.47.133-.621.137-.137.305-.35.457-.528.152-.178.203-.305.305-.508.102-.203.05-.381-.025-.533-.076-.152-.68-1.637-.93-2.236-.243-.588-.49-.508-.68-.518-.175-.008-.376-.01-.577-.01-.202 0-.53.076-.807.38-.278.305-1.062 1.037-1.062 2.531s1.087 2.94 1.238 3.143c.152.203 2.14 3.243 5.184 4.547.724.31 1.29.496 1.73.636.727.23 1.39.198 1.916.12.585-.087 1.808-.737 2.06-1.449.253-.71.253-1.32.177-1.448-.076-.127-.278-.203-.582-.356z"/>
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -2154,13 +2156,12 @@ export default function App() {
                   ) : (
                     reportSummaryData.history.map((item, idx) => {
                       const isContribution = item.item_type === 'contribution';
+                      const matchedMember = isContribution
+                        ? (item.mobile 
+                          ? appData.members.find(m => m.mobile === item.mobile) 
+                          : appData.members.find(m => m.name === item.name))
+                        : null;
                       const title = isContribution ? item.name : item.paid_to;
-                      const subtitle = isContribution
-                        ? (item.type === 'cash' ? `💵 नकद दान` : `🏗️ सामग्री: ${item.item_name}`)
-                        : `💸 खर्च`;
-                      const details = isContribution
-                        ? (item.type === 'cash' ? `भुगतान: ${item.payment_mode === 'upi' ? 'UPI' : item.payment_mode === 'bank' ? 'बैंक' : 'नकद'}` : `Qty: ${item.quantity} | Rate: ₹${item.rate}`)
-                        : (item.description || 'विवरण नहीं है');
                       const amountStr = isContribution
                         ? (item.type === 'cash' ? `+₹${item.amount.toLocaleString('en-IN')}` : `+₹${item.total_value.toLocaleString('en-IN')}`)
                         : `-₹${item.amount.toLocaleString('en-IN')}`;
@@ -2168,53 +2169,107 @@ export default function App() {
                       return (
                         <div
                           key={idx}
-                          className={`p-3.5 rounded-xl border flex justify-between items-center transition-all hover:translate-x-[4px] hover:shadow-sm ${
-                            isContribution 
-                              ? 'bg-riverBlue/[0.015] border-riverBlue/10 hover:border-riverBlue/30' 
-                              : 'bg-softRed/[0.015] border-softRed/10 hover:border-softRed/30'
+                          onClick={() => {
+                            if (isContribution && matchedMember) {
+                              setSelectedMember(matchedMember);
+                              setModals(prev => ({ ...prev, memberDetail: true }));
+                            }
+                          }}
+                          className={`p-3.5 rounded-2xl border flex justify-between items-center transition-all hover:translate-x-[4px] hover:shadow-sm ${
+                            isContribution && matchedMember
+                              ? 'bg-white border-sandBeige/30 shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:border-riverBlue/30 cursor-pointer active:scale-[0.99]' 
+                              : 'bg-slate-50 border-slate-100'
                           }`}
                         >
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <span className="font-semibold text-slate-800 block truncate text-sm">
                               {isContribution ? `➕ ${title}` : `➖ ${title}`}
                             </span>
-                            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium mt-0.5">
-                              <span>{subtitle}</span>
-                              <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                              <span>📅 {formatDateDisplay(item.date)}</span>
+                            
+                            {/* Modern tag/badge layout for details */}
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              {isContribution ? (
+                                item.type === 'cash' ? (
+                                  <>
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                                      💵 <span className="transform translate-y-[0.5px]">नकद</span>
+                                    </span>
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                                      <span className="transform translate-y-[0.5px]">पेमेंट: {item.payment_mode === 'upi' ? 'UPI' : item.payment_mode === 'bank' ? 'बैंक' : 'नकद'}</span>
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-800 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full">
+                                      🏗️ <span className="transform translate-y-[0.5px]">सामग्री: {item.item_name}</span>
+                                    </span>
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-blue-800 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full">
+                                      📦 <span className="transform translate-y-[0.5px]">मात्रा: {item.quantity}</span>
+                                    </span>
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-indigo-800 bg-indigo-50 border border-indigo-200/60 px-2 py-0.5 rounded-full">
+                                      🏷️ <span className="transform translate-y-[0.5px]">दर: ₹{item.rate}</span>
+                                    </span>
+                                  </>
+                                )
+                              ) : (
+                                <>
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-softRed bg-softRed/5 border border-softRed/10 px-2 py-0.5 rounded-full">
+                                    💸 <span className="transform translate-y-[0.5px]">खर्च</span>
+                                  </span>
+                                  {item.description && (
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full max-w-[160px] truncate">
+                                      <span className="transform translate-y-[0.5px]">{item.description}</span>
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                              <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
+                                📅 <span className="transform translate-y-[0.5px]">{formatDateDisplay(item.date)}</span>
+                              </span>
                             </div>
-                            <span className="text-[10px] text-slate-400 block mt-1 leading-normal italic">
-                              {details} {item.remark ? `(${item.remark})` : ''}
-                            </span>
+                            
+                            {item.remark && (
+                              <span className="text-[10px] text-slate-400 block mt-1.5 leading-normal italic">
+                                टिप्पणी: {item.remark}
+                              </span>
+                            )}
+                            
                             {!isContribution && item.bill_image && (
                               <button
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setLightboxImgSrc(item.bill_image);
                                   setModals(prev => ({ ...prev, billLightbox: true }));
                                 }}
-                                className="mt-1 text-[11.5px] text-riverBlue flex items-center gap-1 hover:underline"
+                                className="mt-2 text-[10.5px] text-riverBlue font-semibold flex items-center gap-0.5 hover:underline bg-riverBlue/5 px-2.5 py-1 rounded-lg border border-riverBlue/10 transition-colors w-max"
                               >
-                                <span className="material-icons-outlined text-xs">image</span> रसीद देखें (View Bill)
+                                <span className="material-icons-outlined text-[11px]">image</span> रसीद देखें (View Bill)
                               </button>
                             )}
                           </div>
                           
-                          <div className="text-right flex-shrink-0 ml-3">
-                            <span className={`font-bold block text-sm ${isContribution ? 'text-riverBlue' : 'text-softRed'}`}>
+                          <div className="text-right flex-shrink-0 ml-3 flex flex-col items-end">
+                            <span className={`font-extrabold text-[15px] block tracking-tight ${isContribution ? 'text-natureGreen' : 'text-softRed'}`}>
                               {amountStr}
                             </span>
                             {currentUser && currentUser.is_admin === 1 && (
                               <div className="flex justify-end gap-1.5 mt-2">
                                 <button
-                                  onClick={() => isContribution ? openEditContribution(item) : openEditExpenseModal(item)}
-                                  className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-205 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-colors"
-                                  title="संशोधित करें"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    isContribution ? openEditContribution(item) : openEditExpenseModal(item);
+                                  }}
+                                  className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-205 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-colors shadow-sm"
+                                  title="संपादित करें"
                                 >
                                   <span className="material-icons-outlined text-sm">edit</span>
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteEntry(item.id, isContribution ? 'contribution' : 'expense')}
-                                  className="w-7 h-7 rounded-lg bg-softRed/10 hover:bg-softRed/20 text-softRed flex items-center justify-center transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteEntry(item.id, isContribution ? 'contribution' : 'expense');
+                                  }}
+                                  className="w-7 h-7 rounded-lg bg-softRed/10 hover:bg-softRed/20 text-softRed flex items-center justify-center transition-colors shadow-sm"
                                   title="हटाएं"
                                 >
                                   <span className="material-icons-outlined text-sm">delete</span>
