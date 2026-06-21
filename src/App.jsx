@@ -1162,11 +1162,38 @@ export default function App() {
     };
   }, [appData.contributions, appData.expenses, appData.dashboard, reportFilters]);
 
+  // Helper to load external scripts dynamically
+  const loadDynamicScript = (src) => {
+    return new Promise((resolve, reject) => {
+      if (window.jspdf || document.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error(`Failed to load script ${src}`));
+      document.body.appendChild(script);
+    });
+  };
+
   // --- Reports Export Handlers ---
-  const handlePdfExport = () => {
+  const handlePdfExport = async () => {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      setIsSyncing(true);
+      try {
+        await loadDynamicScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+      } catch (err) {
+        setIsSyncing(false);
+        triggerAlert("PDF लाइब्रेरी लोड करने में विफल। कृपया इंटरनेट चेक करें।", "error");
+        return;
+      }
+      setIsSyncing(false);
+    }
+
     const { jsPDF } = window.jspdf;
     if (!jsPDF) {
-      triggerAlert("PDF library loader is still fetching, please wait.", "error");
+      triggerAlert("PDF लाइब्रेरी लोड करने में विफल। कृपया पुन: प्रयास करें।", "error");
       return;
     }
     const doc = new jsPDF({
