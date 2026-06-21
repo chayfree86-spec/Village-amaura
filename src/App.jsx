@@ -1905,13 +1905,13 @@ export default function App() {
               <div className="fixed bottom-[88px] left-4 right-4 z-40 pointer-events-none md:static md:z-auto md:pointer-events-auto md:w-full md:px-0 md:pb-4 md:order-first">
                 <div className="max-w-sm md:max-w-full mx-auto pointer-events-auto">
                   <div className="relative flex items-center bg-white rounded-2xl border border-sandBeige/50 px-4 py-3 shadow-[0_4px_25px_rgba(0,0,0,0.12)] md:shadow-sm">
-                    <span className="material-icons-outlined text-slate-400 text-lg mr-2">search</span>
+                    <span className="material-icons-outlined text-slate-400 text-lg mr-2 inline-flex items-center justify-center leading-none">search</span>
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="सदस्य खोजें (Search)..."
-                      className="w-full bg-transparent border-none outline-none text-sm md:text-base text-slate-700 placeholder-slate-405"
+                      className="w-full bg-transparent border-none outline-none text-sm md:text-base text-slate-700 placeholder-slate-405 py-0 leading-normal align-middle"
                     />
                     <button
                       onClick={handleVoiceSearchToggle}
@@ -1919,7 +1919,7 @@ export default function App() {
                       className={`text-slate-400 hover:text-riverBlue flex items-center justify-center p-1.5 rounded-full hover:bg-slate-100 transition-colors ml-1 ${voiceActive ? 'text-softRed animate-pulse' : ''}`}
                       title="आवाज़ से खोजें (Voice Search)"
                     >
-                      <span className="material-icons-outlined text-lg">mic</span>
+                      <span className="material-icons-outlined text-lg inline-flex items-center justify-center leading-none">mic</span>
                     </button>
                   </div>
                 </div>
