@@ -50,7 +50,8 @@ export default function App() {
     editContribution: false,
     expense: false, // add or edit
     memberDetail: false,
-    billLightbox: false
+    billLightbox: false,
+    addMember: false
   });
 
   // Selection states for modals
@@ -710,6 +711,7 @@ export default function App() {
         triggerAlert(data.message);
         setSettingsMemberName('');
         setSettingsMemberMobile('');
+        setModals(prev => ({ ...prev, addMember: false }));
         fetchLiveData(true);
       } else {
         triggerAlert(data.error || "सदस्य जोड़ने में विफल!", "error");
@@ -1694,10 +1696,119 @@ export default function App() {
                     <span className="material-icons-outlined">people</span>
                     सदस्य सूची (Members List)
                   </h3>
-                  <span className="text-xs text-slate-500 font-medium">कुल सदस्य: {appData.members.length}</span>
+                  <div className="flex items-center gap-3">
+                    {currentUser && (
+                      <button
+                        onClick={() => setModals(prev => ({ ...prev, addMember: true }))}
+                        className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-1.5 px-3 rounded-xl flex items-center gap-1 transition-colors shadow-sm"
+                      >
+                        <span className="material-icons-outlined text-sm">person_add</span>
+                        सदस्य जोड़ें (Add Member)
+                      </button>
+                    )}
+                    <span className="text-xs text-slate-500 font-medium">कुल सदस्य: {appData.members.length}</span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 overflow-y-auto p-1 flex-1">
+                {/* Desktop View Table */}
+                <div className="hidden lg:block overflow-y-auto flex-1 p-1">
+                  {filteredMembersList.length === 0 ? (
+                    <div className="text-center text-slate-400 py-8 text-xs">कोई सदस्य नहीं मिला</div>
+                  ) : (
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-lightGray text-[13px] font-semibold text-slate-500">
+                          <th className="py-3 px-4">सदस्य (Member)</th>
+                          <th className="py-3 px-4">मोबाइल नंबर (Mobile)</th>
+                          <th className="py-3 px-4">पद (Role)</th>
+                          <th className="py-3 px-4 text-right">कुल दान (Contribution)</th>
+                          <th className="py-3 px-4 text-center">एक्शन (Action)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-lightGray/50 text-sm">
+                        {filteredMembersList.map((m) => {
+                          return (
+                            <tr
+                              key={m.id}
+                              onClick={() => {
+                                setSelectedMember(m);
+                                setModals(prev => ({ ...prev, memberDetail: true }));
+                              }}
+                              className="hover:bg-lightGray/35 transition-colors cursor-pointer"
+                            >
+                              <td className="py-3 px-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs border overflow-hidden ${
+                                    m.is_admin === 1
+                                      ? 'bg-amber-100 text-amber-700 border-amber-300 font-bold'
+                                      : m.status === 1
+                                      ? 'bg-riverBlue/10 text-riverBlue border-riverBlue/25'
+                                      : 'bg-slate-100 text-slate-500 border-slate-200/50'
+                                  }`}>
+                                    {(m.status === 1 || m.is_admin === 1) ? (
+                                      <img src="logo.png" className="w-full h-full object-cover" alt="Active" />
+                                    ) : (
+                                      m.name.charAt(0)
+                                    )}
+                                  </div>
+                                  <div>
+                                    <span className={`font-semibold text-slate-800 inline-flex items-center gap-1.5 ${m.is_admin === 1 ? 'text-amber-800 font-bold' : ''}`}>
+                                      {m.name}
+                                      {m.status === 1 && (
+                                        <span className="text-[9px] bg-natureGreen/10 text-natureGreen px-1.5 py-0.2 rounded-full font-medium border border-natureGreen/20">
+                                          ✅ सक्रिय
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 text-slate-600 font-medium">
+                                {m.mobile}
+                              </td>
+                              <td className="py-3 px-4">
+                                {m.is_admin === 1 ? (
+                                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold border border-amber-200">एडमिन (Admin)</span>
+                                ) : (
+                                  <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">सदस्य (Member)</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4 text-right font-bold text-riverBlue">
+                                ₹{m.overall_total.toLocaleString('en-IN')}
+                              </td>
+                              <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                <div className="flex justify-center gap-2">
+                                  {currentUser && (
+                                    <button
+                                      onClick={() => {
+                                        setAddContName(m.name);
+                                        setAddContMobile(m.mobile || '');
+                                        setAddContDate(getFormattedDate(new Date()));
+                                        setModals(prev => ({ ...prev, addContribution: true }));
+                                      }}
+                                      className="bg-riverBlue hover:bg-riverBlue/95 text-white text-xs font-semibold py-1 px-3 rounded-lg flex items-center gap-1 transition-colors"
+                                    >
+                                      <span className="material-icons-outlined text-xs">add_circle</span> योगदान
+                                    </button>
+                                  )}
+                                  <a
+                                    href={`tel:${m.mobile}`}
+                                    className="bg-natureGreen/10 hover:bg-natureGreen/25 text-natureGreen border border-natureGreen/25 text-xs font-semibold py-1 px-3 rounded-lg flex items-center gap-1 transition-colors"
+                                  >
+                                    <span className="material-icons-outlined text-xs">call</span> कॉल
+                                  </a>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+
+                {/* Mobile View Grid */}
+                <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 overflow-y-auto p-1 flex-1">
                   {filteredMembersList.length === 0 ? (
                     <div className="text-center text-slate-400 py-8 text-xs col-span-full">कोई सदस्य नहीं मिला</div>
                   ) : (
@@ -2818,6 +2929,60 @@ export default function App() {
 
               <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2">
                 {selectedExpense ? 'अपडेट सुरक्षित करें' : 'खर्च सुरक्षित करें'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Member Modal */}
+      {modals.addMember && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto animate-ripple relative">
+            <button
+              onClick={() => {
+                setModals(prev => ({ ...prev, addMember: false }));
+                setSettingsMemberName('');
+                setSettingsMemberMobile('');
+              }}
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-650"
+            >
+              <span className="material-icons-outlined">close</span>
+            </button>
+            
+            <h3 className="text-md text-riverBlue font-medium mb-4 pb-2 border-b border-lightGray flex items-center gap-1.5">
+              <span className="material-icons-outlined text-riverBlue text-lg">person_add</span>
+              नया सदस्य जोड़ें (Add New Member)
+            </h3>
+            
+            <form onSubmit={handleAddMemberSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">नाम (Name) ⭐</label>
+                <input
+                  type="text"
+                  value={settingsMemberName}
+                  onChange={(e) => setSettingsMemberName(e.target.value)}
+                  required
+                  placeholder="सदस्य का नाम दर्ज करें"
+                  className="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">मोबाइल नंबर (Mobile) ⭐</label>
+                <input
+                  type="tel"
+                  value={settingsMemberMobile}
+                  onChange={(e) => setSettingsMemberMobile(e.target.value)}
+                  required
+                  maxLength={10}
+                  placeholder="10 अंक का मोबाइल नंबर"
+                  className="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none"
+                />
+              </div>
+
+              <button type="submit" className="w-full bg-riverBlue text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-md mt-2">
+                सदस्य जोड़ें (Add Member)
               </button>
             </form>
           </div>
