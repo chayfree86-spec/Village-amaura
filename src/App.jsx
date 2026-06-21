@@ -2203,59 +2203,71 @@ export default function App() {
                     </h3>
                     <div className="space-y-3">
                       {currentUser ? (
-                        currentUser.is_admin === 1 ? (
-                          <form onSubmit={handleAdminProfileUpdate} className="space-y-4">
-                            <div className="flex flex-col gap-1.5">
-                              <label className="text-[13px] font-semibold text-slate-700">नाम (Name)</label>
-                              <input
-                                type="text"
-                                id="profileNameInput"
-                                defaultValue={currentUser.name}
-                                required
-                                className="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none"
-                              />
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                              <label className="text-[13px] font-semibold text-slate-700">मोबाइल (Mobile)</label>
-                              <input
-                                type="tel"
-                                id="profileMobileInput"
-                                defaultValue={currentUser.mobile}
-                                required
-                                pattern="[0-9]{10}"
-                                className="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none"
-                              />
-                            </div>
-                            <div className="flex justify-between items-center pt-3 border-t border-sandBeige/20">
-                              <span className="text-sm text-slate-655 flex items-center">
-                                <span className="transform translate-y-[1.5px]">पद:&nbsp;</span>
-                                <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-riverBlue/10 text-riverBlue inline-flex items-center justify-center leading-none">
-                                  <span className="transform translate-y-[1.5px]">एडमिन (Admin)</span>
+                        <>
+                          {currentUser.is_admin === 1 ? (
+                            <form onSubmit={handleAdminProfileUpdate} className="space-y-4">
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-[13px] font-semibold text-slate-700">नाम (Name)</label>
+                                <input
+                                  type="text"
+                                  id="profileNameInput"
+                                  defaultValue={currentUser.name}
+                                  required
+                                  className="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-[13px] font-semibold text-slate-700">मोबाइल (Mobile)</label>
+                                <input
+                                  type="tel"
+                                  id="profileMobileInput"
+                                  defaultValue={currentUser.mobile}
+                                  required
+                                  pattern="[0-9]{10}"
+                                  className="w-full border border-sandBeige rounded-xl px-3.5 py-2.5 text-sm md:text-base font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none"
+                                />
+                              </div>
+                              <div className="flex justify-between items-center pt-3 border-t border-sandBeige/20">
+                                <span className="text-sm text-slate-655 flex items-center">
+                                  <span className="transform translate-y-[1.5px]">पद:&nbsp;</span>
+                                  <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-riverBlue/10 text-riverBlue inline-flex items-center justify-center leading-none">
+                                    <span className="transform translate-y-[1.5px]">एडमिन (Admin)</span>
+                                  </span>
                                 </span>
-                              </span>
-                              <button type="submit" className="bg-riverBlue text-white rounded-xl px-5 py-2 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm flex items-center">
-                                <span className="transform translate-y-[1.5px]">अपडेट करें (Update)</span>
-                              </button>
+                                <button type="submit" className="bg-riverBlue text-white rounded-xl px-5 py-2 text-sm font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm flex items-center">
+                                  <span className="transform translate-y-[1.5px]">अपडेट करें (Update)</span>
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center border-b border-lightGray pb-3 pt-1">
+                                <span className="text-sm font-semibold text-slate-600">नाम (Name):</span>
+                                <span className="text-sm font-medium text-slate-800">{currentUser.name}</span>
+                              </div>
+                              <div className="flex justify-between items-center border-b border-lightGray py-3">
+                                <span className="text-sm font-semibold text-slate-600">मोबाइल (Mobile):</span>
+                                <span className="text-sm font-medium text-slate-800">{currentUser.mobile}</span>
+                              </div>
+                              <div className="flex justify-between items-center pt-3">
+                                <span className="text-sm font-semibold text-slate-600">पद (Role):</span>
+                                <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-natureGreen/10 text-natureGreen">
+                                  सामान्य सदस्य (Member)
+                                </span>
+                              </div>
                             </div>
-                          </form>
-                        ) : (
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center border-b border-lightGray pb-3 pt-1">
-                              <span className="text-sm font-semibold text-slate-600">नाम (Name):</span>
-                              <span className="text-sm font-medium text-slate-800">{currentUser.name}</span>
-                            </div>
-                            <div className="flex justify-between items-center border-b border-lightGray py-3">
-                              <span className="text-sm font-semibold text-slate-600">मोबाइल (Mobile):</span>
-                              <span className="text-sm font-medium text-slate-800">{currentUser.mobile}</span>
-                            </div>
-                            <div className="flex justify-between items-center pt-3">
-                              <span className="text-sm font-semibold text-slate-600">पद (Role):</span>
-                              <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-natureGreen/10 text-natureGreen">
-                                सामान्य सदस्य (Member)
-                              </span>
-                            </div>
+                          )}
+                          <div className="mt-4 pt-3 border-t border-slate-100">
+                            <button
+                              type="button"
+                              onClick={handleLogout}
+                              className="w-full bg-softRed/10 text-softRed font-semibold py-2.5 rounded-xl text-center hover:bg-softRed/20 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                            >
+                              <span className="material-icons-outlined text-sm inline-flex items-center justify-center leading-none">logout</span>
+                              <span className="transform translate-y-[1.5px]">लॉगआउट करें (Logout)</span>
+                            </button>
                           </div>
-                        )
+                        </>
                       ) : (
                         <div className="text-center text-slate-400 py-2 text-xs flex flex-col items-center gap-2">
                           <span>आप वर्तमान में लॉगिन नहीं हैं।</span>
