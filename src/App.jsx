@@ -2153,19 +2153,6 @@ export default function App() {
           {currentActivePage === 'page-reports' && (
             <section className="page-view active animate-ripple pb-16 md:pb-6">
               
-              {/* Mobile Add Expense Button (Only visible on mobile when logged in) */}
-              {currentUser && (
-                <div className="md:hidden mb-4">
-                  <button
-                    onClick={openAddExpenseModal}
-                    className="w-full bg-softRed text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-softRed/95 transition-colors flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">payments</span>
-                    <span className="transform translate-y-[1.5px]">नया खर्च जोड़ें (Add Expense)</span>
-                  </button>
-                </div>
-              )}
-
               {/* Filters */}
               <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4">
                 <div>
@@ -2431,6 +2418,19 @@ export default function App() {
                   )}
                 </div>
               </div>
+
+              {/* Mobile Add Expense Button (Downside) */}
+              {currentUser && (
+                <div className="md:hidden mt-4 mb-6">
+                  <button
+                    onClick={openAddExpenseModal}
+                    className="w-full bg-softRed text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-softRed/95 transition-colors flex items-center justify-center gap-2 shadow-md"
+                  >
+                    <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">payments</span>
+                    <span className="transform translate-y-[1.5px]">नया खर्च जोड़ें (Add Expense)</span>
+                  </button>
+                </div>
+              )}
             </section>
           )}
 
