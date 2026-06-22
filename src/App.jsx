@@ -2151,7 +2151,7 @@ export default function App() {
 
           {/* PAGE 3: REPORTS */}
           {currentActivePage === 'page-reports' && (
-            <section className="page-view active animate-ripple pb-16 md:pb-6">
+            <section className="page-view active animate-ripple pb-32 md:pb-6">
               
               {/* Filters */}
               <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4">
