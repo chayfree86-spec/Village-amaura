@@ -2419,16 +2419,18 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Mobile Add Expense Button (Downside) */}
+              {/* Mobile Add Expense Button (Fixed Floating above footer menu) */}
               {currentUser && (
-                <div className="md:hidden mt-4 mb-6">
-                  <button
-                    onClick={openAddExpenseModal}
-                    className="w-full bg-softRed text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-softRed/95 transition-colors flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">payments</span>
-                    <span className="transform translate-y-[1.5px]">नया खर्च जोड़ें (Add Expense)</span>
-                  </button>
+                <div className="fixed bottom-[88px] left-4 right-4 z-40 pointer-events-none md:hidden">
+                  <div className="max-w-sm mx-auto pointer-events-auto">
+                    <button
+                      onClick={openAddExpenseModal}
+                      className="w-full bg-softRed text-white rounded-xl py-3 text-sm font-semibold hover:bg-softRed/95 transition-colors flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(229,57,53,0.3)]"
+                    >
+                      <span className="material-icons-outlined text-base inline-flex items-center justify-center leading-none">payments</span>
+                      <span className="transform translate-y-[1.5px]">नया खर्च जोड़ें (Add Expense)</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </section>
