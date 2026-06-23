@@ -3,33 +3,53 @@
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json image/svg+xml
 </IfModule>
 
-# Enable Browser Caching
+# ---- Browser Caching (Expires) ----
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresDefault "access plus 1 month"
-  
-  # Fonts
+
+  # Fonts (naam stable, content kabhi nahi badalta)
   ExpiresByType font/woff2 "access plus 1 year"
   ExpiresByType font/woff "access plus 1 year"
   ExpiresByType font/ttf "access plus 1 year"
-  
+
   # Images
-  ExpiresByType image/png "access plus 1 year"
-  ExpiresByType image/jpeg "access plus 1 year"
-  ExpiresByType image/gif "access plus 1 year"
-  ExpiresByType image/webp "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 1 year"
-  ExpiresByType image/x-icon "access plus 1 year"
-  
-  # JS and CSS
-  ExpiresByType text/css "access plus 1 year"
-  ExpiresByType application/javascript "access plus 1 year"
-  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/gif "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 month"
 </IfModule>
 
-# Set Cache-Control Headers
+# ---- Cache-Control Headers ----
 <IfModule mod_headers.c>
-  <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|js|css|swf|woff2|woff|ttf)$">
-    Header set Cache-Control "max-age=31536000, public"
+
+  # Fonts aur images: lamba cache (rarely change)
+  <FilesMatch "\.(ico|jpg|jpeg|png|gif|webp|woff2|woff|ttf)$">
+    Header set Cache-Control "max-age=2592000, public"
   </FilesMatch>
+
+  # App bundle (assets/index.js, assets/index.css) — filename fixed hai aur
+  # har deploy par content badalta hai, isliye hamesha server se revalidate karo.
+  # (Offline support service worker handle karta hai; HTTP cache stale na rahe.)
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Service worker — KABHI cache na ho, taaki har naya deploy turant detect ho.
+  # Ise js/css block ke baad rakha hai taaki yahi rule sw.js par final lage.
+  <FilesMatch "sw\.js$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+  </FilesMatch>
+
+  # index.html / manifest — hamesha fresh, taaki naye asset references mile.
+  <FilesMatch "\.(html|webmanifest)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "^manifest\.json$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
 </IfModule>

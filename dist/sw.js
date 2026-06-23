@@ -1,6 +1,8 @@
 // sw.js - Service Worker for offline PWA support
 
-const CACHE_NAME = 'prajapati-ekta-v57';
+// 1782209952645 build ke samay (copy-api.js dwara) unique timestamp se replace hota hai.
+// Isse har deploy par CACHE_NAME badalta hai -> activate event purana cache delete kar deta hai.
+const CACHE_NAME = 'prajapati-ekta-1782209952645';
 const ASSETS = [
     './',
     './index.html',

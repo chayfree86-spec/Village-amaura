@@ -36,3 +36,16 @@ if (fs.existsSync('clear_opcache.php')) {
     fs.copyFileSync('clear_opcache.php', path.join('dist', 'clear_opcache.php'));
     console.log('Copied clear_opcache.php to dist/clear_opcache.php');
 }
+
+// Stamp a unique build id into the service worker so that every deploy is
+// detected by the browser as an update — purana cache apne aap clear ho jata hai.
+const swPath = path.join('dist', 'sw.js');
+if (fs.existsSync(swPath)) {
+    const buildId = Date.now().toString();
+    let sw = fs.readFileSync(swPath, 'utf8');
+    sw = sw.replace(/__BUILD_ID__/g, buildId);
+    fs.writeFileSync(swPath, sw);
+    console.log(`Stamped service worker with build id: ${buildId}`);
+} else {
+    console.warn('Warning: dist/sw.js not found — service worker not stamped.');
+}
