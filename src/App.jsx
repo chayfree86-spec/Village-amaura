@@ -772,6 +772,36 @@ export default function App() {
     });
   };
 
+  // 10b. Clear App Cache & Force Update (sabhi users ke liye)
+  // Service worker + sabhi caches hata kar fresh reload karta hai,
+  // taaki naya deploy turant dikhe (purana local cache na chale).
+  const [clearingCache, setClearingCache] = useState(false);
+  const handleClearAppCache = async () => {
+    if (clearingCache) return;
+    if (!window.confirm("ऐप का कैश साफ़ करके नया अपडेट लोड करें? ऐप दोबारा लोड होगा।")) return;
+
+    setClearingCache(true);
+    try {
+      // 1. Sabhi service workers unregister karo
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      // 2. Sabhi caches delete karo
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch (err) {
+      console.error("Cache clear error:", err);
+    } finally {
+      // 3. Cache-busting query ke saath fresh reload
+      const url = new URL(window.location.href);
+      url.searchParams.set('_', Date.now().toString());
+      window.location.replace(url.toString());
+    }
+  };
+
   // 11. Add Member (Settings Form)
   const handleAddMemberSubmit = async (e) => {
     e.preventDefault();
@@ -2769,6 +2799,35 @@ export default function App() {
                       </form>
                     </div>
                   )}
+
+                  {/* Clear Cache / App Update */}
+                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30">
+                    <h3 className="text-sm font-semibold text-slate-700 mb-2 pb-2 border-b border-lightGray flex items-center gap-2">
+                      <span className="material-icons-outlined text-riverBlue">cached</span>
+                      ऐप अपडेट / कैश साफ़ करें (App Update)
+                    </h3>
+                    <p className="text-[11px] text-slate-400 font-medium mb-3 leading-relaxed">
+                      अगर नया अपडेट दिखाई नहीं दे रहा है, तो नीचे बटन दबाकर पुराना कैश हटाएं और ऐप को ताज़ा लोड करें।
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleClearAppCache}
+                      disabled={clearingCache}
+                      className="w-full bg-riverBlue text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-60"
+                    >
+                      {clearingCache ? (
+                        <>
+                          <span className="material-icons-outlined text-sm animate-spin">sync</span>
+                          <span>साफ़ हो रहा है...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-icons-outlined text-sm">cached</span>
+                          <span>कैश साफ़ करें और अपडेट करें</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
 
                 </div>
               </div>
