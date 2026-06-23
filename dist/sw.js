@@ -1,6 +1,6 @@
 // sw.js - Service Worker for offline PWA support
 
-const CACHE_NAME = 'prajapati-ekta-v55';
+const CACHE_NAME = 'prajapati-ekta-v56';
 const ASSETS = [
     './',
     './index.html',
