@@ -693,6 +693,10 @@ export default function App() {
   // 9. Toggle System Lock Edit Mode (Admin control)
   const handleToggleSystemEditMode = (isLocked) => {
     if (!currentUser || currentUser.is_admin !== 1) return;
+
+    // Optimistic update — flip the toggle immediately for instant feedback
+    setAppData(prev => ({ ...prev, edit_locked: isLocked }));
+
     fetch(`${API_BASE}?action=toggle_edit_mode`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -704,12 +708,17 @@ export default function App() {
         fetchLiveData(true);
         triggerAlert(`सिस्टम एडिट मोड सफलता पूर्वक ${isLocked ? "लॉक" : "अनलॉक"} किया गया।`);
       } else {
+        // Revert optimistic change on failure
+        setAppData(prev => ({ ...prev, edit_locked: !isLocked }));
         triggerAlert(data.error || "संपादन मोड बदलने में विफल।", "error");
         fetchLiveData(false);
       }
     })
     .catch(err => {
       console.error(err);
+      // Revert optimistic change on network error
+      setAppData(prev => ({ ...prev, edit_locked: !isLocked }));
+      triggerAlert("सर्वर से जुड़ने में समस्या हुई।", "error");
       fetchLiveData(false);
     });
   };
