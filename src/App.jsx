@@ -726,20 +726,48 @@ export default function App() {
   // 10. Toggle Member Access (Admin control)
   const handleToggleMemberAccess = (memberId, status) => {
     if (!currentUser || currentUser.is_admin !== 1) return;
+
+    const newStatus = status ? 1 : 0;
+
+    // Optimistic update — flip the toggle immediately in both the open
+    // member modal (selectedMember) and the members list (appData.members).
+    setSelectedMember(prev => (prev && prev.id === memberId ? { ...prev, status: newStatus } : prev));
+    setAppData(prev => ({
+      ...prev,
+      members: prev.members.map(m => (m.id === memberId ? { ...m, status: newStatus } : m))
+    }));
+
     fetch(`${API_BASE}?action=toggle_member`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ member_id: memberId, status: status ? 1 : 0, user_mobile: currentUser.mobile })
+      body: JSON.stringify({ member_id: memberId, status: newStatus, user_mobile: currentUser.mobile })
     })
     .then(res => res.json())
     .then(data => {
-      if (!data.success) {
+      if (data.success) {
+        fetchLiveData(true);
+      } else {
+        // Revert optimistic change on failure
+        const oldStatus = newStatus ? 0 : 1;
+        setSelectedMember(prev => (prev && prev.id === memberId ? { ...prev, status: oldStatus } : prev));
+        setAppData(prev => ({
+          ...prev,
+          members: prev.members.map(m => (m.id === memberId ? { ...m, status: oldStatus } : m))
+        }));
         triggerAlert(data.error || "स्टेटस बदलने में विफल।", "error");
+        fetchLiveData(false);
       }
-      fetchLiveData(true);
     })
     .catch(err => {
       console.error(err);
+      // Revert optimistic change on network error
+      const oldStatus = newStatus ? 0 : 1;
+      setSelectedMember(prev => (prev && prev.id === memberId ? { ...prev, status: oldStatus } : prev));
+      setAppData(prev => ({
+        ...prev,
+        members: prev.members.map(m => (m.id === memberId ? { ...m, status: oldStatus } : m))
+      }));
+      triggerAlert("सर्वर से जुड़ने में समस्या हुई।", "error");
       fetchLiveData(false);
     });
   };
