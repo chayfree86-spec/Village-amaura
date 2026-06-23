@@ -31,6 +31,10 @@ export default function App() {
   // { pending: kya koi toggle confirm hona baaki hai, value: expected value }
   const lockSyncRef = useRef({ pending: false, value: null });
 
+  // Member status toggle ke liye guard: { [memberId]: expectedStatus }
+  // Jab tak server confirm na kar de, stale poll member status ko revert na kare.
+  const memberSyncRef = useRef({});
+
   const [currentActivePage, setCurrentActivePage] = useState('page-dashboard');
   const [reportFilters, setReportFilters] = useState({ year: 'all', month: 'all', type: 'all' });
   const [searchQuery, setSearchQuery] = useState('');
@@ -210,13 +214,29 @@ export default function App() {
             effectiveLock = lockSyncRef.current.value; // purana response, ignore
           }
         }
+        // Member status ko bhi stale/out-of-order polling se bachao.
+        let effectiveMembers = data.members;
+        const pendingMembers = memberSyncRef.current;
+        if (pendingMembers && Object.keys(pendingMembers).length > 0) {
+          effectiveMembers = data.members.map(m => {
+            if (Object.prototype.hasOwnProperty.call(pendingMembers, m.id)) {
+              if (m.status === pendingMembers[m.id]) {
+                delete pendingMembers[m.id]; // server ne confirm kar diya
+                return m;
+              }
+              return { ...m, status: pendingMembers[m.id] }; // purana response, ignore
+            }
+            return m;
+          });
+        }
+
         setAppData({
           dashboard: data.dashboard,
           edit_locked: effectiveLock,
           feed: data.feed,
           contributions: data.contributions,
           expenses: data.expenses,
-          members: data.members
+          members: effectiveMembers
         });
       }
     } catch (err) {
@@ -749,6 +769,10 @@ export default function App() {
 
     const newStatus = status ? 1 : 0;
 
+    // Toggle ko "pending" mark karo taaki polling iske dauraan stale value se
+    // member status ko revert na kare (warna reopen par purana status dikhega).
+    memberSyncRef.current[memberId] = newStatus;
+
     // Optimistic update — flip the toggle immediately in both the open
     // member modal (selectedMember) and the members list (appData.members).
     setSelectedMember(prev => (prev && prev.id === memberId ? { ...prev, status: newStatus } : prev));
@@ -768,6 +792,7 @@ export default function App() {
         fetchLiveData(true);
       } else {
         // Revert optimistic change on failure
+        delete memberSyncRef.current[memberId];
         const oldStatus = newStatus ? 0 : 1;
         setSelectedMember(prev => (prev && prev.id === memberId ? { ...prev, status: oldStatus } : prev));
         setAppData(prev => ({
@@ -781,6 +806,7 @@ export default function App() {
     .catch(err => {
       console.error(err);
       // Revert optimistic change on network error
+      delete memberSyncRef.current[memberId];
       const oldStatus = newStatus ? 0 : 1;
       setSelectedMember(prev => (prev && prev.id === memberId ? { ...prev, status: oldStatus } : prev));
       setAppData(prev => ({
