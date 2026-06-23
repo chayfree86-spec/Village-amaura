@@ -27,6 +27,10 @@ export default function App() {
     members: []
   });
 
+  // edit_locked toggle ko stale polling responses se bachane ke liye guard.
+  // { pending: kya koi toggle confirm hona baaki hai, value: expected value }
+  const lockSyncRef = useRef({ pending: false, value: null });
+
   const [currentActivePage, setCurrentActivePage] = useState('page-dashboard');
   const [reportFilters, setReportFilters] = useState({ year: 'all', month: 'all', type: 'all' });
   const [searchQuery, setSearchQuery] = useState('');
@@ -195,9 +199,20 @@ export default function App() {
       const res = await fetch(`${API_BASE}?action=get_data`);
       const data = await res.json();
       if (data.success) {
+        // edit_locked ko stale/out-of-order polling se overwrite hone se bachao.
+        // Agar koi toggle pending hai, to server value ko tabhi maano jab wo
+        // expected value se match kare; warna optimistic value banaye rakho.
+        let effectiveLock = data.edit_locked;
+        if (lockSyncRef.current.pending) {
+          if (data.edit_locked === lockSyncRef.current.value) {
+            lockSyncRef.current.pending = false; // server ne confirm kar diya
+          } else {
+            effectiveLock = lockSyncRef.current.value; // purana response, ignore
+          }
+        }
         setAppData({
           dashboard: data.dashboard,
-          edit_locked: data.edit_locked,
+          edit_locked: effectiveLock,
           feed: data.feed,
           contributions: data.contributions,
           expenses: data.expenses,
@@ -694,7 +709,9 @@ export default function App() {
   const handleToggleSystemEditMode = (isLocked) => {
     if (!currentUser || currentUser.is_admin !== 1) return;
 
-    // Optimistic update — flip the toggle immediately for instant feedback
+    // Toggle ko "pending" mark karo taaki polling iske dauraan stale value
+    // se ise revert na kar de. Saath hi optimistic update for instant feedback.
+    lockSyncRef.current = { pending: true, value: isLocked };
     setAppData(prev => ({ ...prev, edit_locked: isLocked }));
 
     fetch(`${API_BASE}?action=toggle_edit_mode`, {
@@ -705,10 +722,12 @@ export default function App() {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
+        // pending tab tak rahega jab tak fetchLiveData server-confirm na kar de
         fetchLiveData(true);
         triggerAlert(`सिस्टम एडिट मोड सफलता पूर्वक ${isLocked ? "लॉक" : "अनलॉक"} किया गया।`);
       } else {
         // Revert optimistic change on failure
+        lockSyncRef.current = { pending: false, value: null };
         setAppData(prev => ({ ...prev, edit_locked: !isLocked }));
         triggerAlert(data.error || "संपादन मोड बदलने में विफल।", "error");
         fetchLiveData(false);
@@ -717,6 +736,7 @@ export default function App() {
     .catch(err => {
       console.error(err);
       // Revert optimistic change on network error
+      lockSyncRef.current = { pending: false, value: null };
       setAppData(prev => ({ ...prev, edit_locked: !isLocked }));
       triggerAlert("सर्वर से जुड़ने में समस्या हुई।", "error");
       fetchLiveData(false);
