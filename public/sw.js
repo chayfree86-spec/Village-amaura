@@ -4,11 +4,6 @@
 // Isse har deploy par CACHE_NAME badalta hai -> activate event purana cache delete kar deta hai.
 const CACHE_NAME = 'prajapati-ekta-__BUILD_ID__';
 const ASSETS = [
-    './',
-    './index.html',
-    './assets/index.css',
-    './assets/index.js',
-    './manifest.json',
     './logo.png',
     './pwa-icon.png'
 ];
@@ -53,13 +48,13 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // 2. For static assets (fonts, images, icons, local CSS/JS), use Stale-While-Revalidate
+    // 2. For static assets (fonts, images, icons), use Stale-While-Revalidate
     const isStaticAsset = 
         ASSETS.includes(url.pathname) ||
         url.hostname.includes('fonts.googleapis.com') ||
         url.hostname.includes('fonts.gstatic.com') ||
         url.hostname.includes('cdnjs.cloudflare.com') ||
-        url.pathname.match(/\.(html|css|js|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|otf)$/);
+        url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|otf)$/);
 
     if (isStaticAsset) {
         e.respondWith(
