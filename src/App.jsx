@@ -200,7 +200,7 @@ export default function App() {
   const fetchLiveData = async (showIndicator = false) => {
     if (showIndicator) setIsSyncing(true);
     try {
-      const res = await fetch(`${API_BASE}?action=get_data`);
+      const res = await fetch(`${API_BASE}?action=get_data&_=${Date.now()}`);
       const data = await res.json();
       if (data.success) {
         // edit_locked ko stale/out-of-order polling se overwrite hone se bachao.
@@ -251,6 +251,34 @@ export default function App() {
     fetchLiveData(true);
     const interval = setInterval(() => fetchLiveData(false), 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Sync immediately on Visibility Change, Focus, Online, or Pageshow
+  useEffect(() => {
+    const handleSyncTrigger = () => {
+      if (document.visibilityState === 'visible' || navigator.onLine) {
+        fetchLiveData(false); // fetch fresh data in background
+
+        // Also check for Service Worker updates to get new frontend code if available
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.update().catch(err => console.log('SW update check failed:', err));
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleSyncTrigger);
+    window.addEventListener('focus', handleSyncTrigger);
+    window.addEventListener('online', handleSyncTrigger);
+    window.addEventListener('pageshow', handleSyncTrigger);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleSyncTrigger);
+      window.removeEventListener('focus', handleSyncTrigger);
+      window.removeEventListener('online', handleSyncTrigger);
+      window.removeEventListener('pageshow', handleSyncTrigger);
+    };
   }, []);
 
   // Sync Desktop Top Bar Date/Time

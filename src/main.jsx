@@ -12,13 +12,22 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 // Register Service Worker for PWA (auto-update: naya deploy apne aap load hoga)
 /* global __SW_VERSION__ */
 if ('serviceWorker' in navigator) {
-  // Jaise hi naya service worker control le, page ko ek baar auto-reload karo.
-  // 'refreshing' guard reload-loop se bachata hai.
+  // Jaise hi naya service worker control le, caches clear karke fresh reload karo.
   let refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
+  navigator.serviceWorker.addEventListener('controllerchange', async () => {
     if (refreshing) return;
     refreshing = true;
-    window.location.reload();
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch (e) {
+      console.error('Failed to clear cache on SW update:', e);
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.set('_update', Date.now().toString());
+    window.location.replace(url.toString());
   });
 
   window.addEventListener('load', () => {
