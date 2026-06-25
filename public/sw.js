@@ -1,95 +1,33 @@
-// sw.js - Service Worker for offline PWA support
+// sw.js - Service Worker for unregistering and clearing old caches
 
-// __BUILD_ID__ build ke samay (copy-api.js dwara) unique timestamp se replace hota hai.
-// Isse har deploy par CACHE_NAME badalta hai -> activate event purana cache delete kar deta hai.
-const CACHE_NAME = 'prajapati-ekta-__BUILD_ID__';
-const ASSETS = [
-    './logo.png',
-    './pwa-icon.png'
-];
-
-// Install Service Worker and cache resources
 self.addEventListener('install', (e) => {
-    self.skipWaiting(); // Force active immediately
-    e.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
-        })
-    );
+    // Force active immediately
+    self.skipWaiting();
 });
 
-// Activate Service Worker and clean up old caches
 self.addEventListener('activate', (e) => {
     e.waitUntil(
         caches.keys().then((keys) => {
-            return Promise.all(
-                keys.map((key) => {
-                    if (key !== CACHE_NAME) {
-                        return caches.delete(key);
-                    }
-                })
-            );
+            // Delete all caches
+            return Promise.all(keys.map(key => caches.delete(key)));
         }).then(() => {
-            return self.clients.claim(); // Take control of all pages immediately
+            // Get all controlled window clients
+            return self.clients.matchAll({ type: 'window' });
+        }).then((clients) => {
+            // Reload all window clients to load fresh content from the server
+            for (let client of clients) {
+                if (client.url) {
+                    client.navigate(client.url).catch(err => console.error('Failed to navigate client:', err));
+                }
+            }
+        }).then(() => {
+            // Unregister this service worker
+            return self.registration.unregister();
+        }).then(() => {
+            console.log('Service Worker successfully unregistered and caches cleared.');
+        }).catch((err) => {
+            console.error('Error during SW activation/unregistration:', err);
         })
     );
 });
 
-// Fetch assets: Fonts, images, icons, and scripts are cached. API data is always live.
-self.addEventListener('fetch', (e) => {
-    // Only handle GET requests
-    if (e.request.method !== 'GET') return;
-    
-    const url = new URL(e.request.url);
-    
-    // 1. API Data calls MUST be live (Network Only)
-    if (url.pathname.includes('api.php') || url.searchParams.has('action')) {
-        e.respondWith(fetch(e.request));
-        return;
-    }
-
-    // 2. For static assets (fonts, images, icons), use Stale-While-Revalidate
-    const isStaticAsset = 
-        ASSETS.includes(url.pathname) ||
-        url.hostname.includes('fonts.googleapis.com') ||
-        url.hostname.includes('fonts.gstatic.com') ||
-        url.hostname.includes('cdnjs.cloudflare.com') ||
-        url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|otf)$/);
-
-    if (isStaticAsset) {
-        e.respondWith(
-            caches.match(e.request).then((cachedResponse) => {
-                const fetchPromise = fetch(e.request).then((networkResponse) => {
-                    if (networkResponse && networkResponse.status === 200 && (networkResponse.type === 'basic' || networkResponse.type === 'cors')) {
-                        const responseToCache = networkResponse.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(e.request, responseToCache);
-                        });
-                    }
-                    return networkResponse;
-                }).catch(() => {
-                    // Fallback to cached response if network fails
-                    return cachedResponse;
-                });
-                
-                // Return cached response instantly if available, otherwise wait for network
-                return cachedResponse || fetchPromise;
-            })
-        );
-    } else {
-        // Default Network First for other requests
-        e.respondWith(
-            fetch(e.request).then((networkResponse) => {
-                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(e.request, responseToCache);
-                    });
-                }
-                return networkResponse;
-            }).catch(() => {
-                return caches.match(e.request);
-            })
-        );
-    }
-});

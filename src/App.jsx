@@ -258,13 +258,6 @@ export default function App() {
     const handleSyncTrigger = () => {
       if (document.visibilityState === 'visible' || navigator.onLine) {
         fetchLiveData(false); // fetch fresh data in background
-
-        // Also check for Service Worker updates to get new frontend code if available
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.ready.then(reg => {
-            reg.update().catch(err => console.log('SW update check failed:', err));
-          });
-        }
       }
     };
 
@@ -2736,8 +2729,8 @@ export default function App() {
                         <span className="font-semibold text-slate-700">21 जून 2026</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>ऑफलाइन सपोर्ट status:</span>
-                        <span className="font-semibold text-natureGreen">सक्रिय (Service Worker)</span>
+                        <span>डेटा स्टेटस:</span>
+                        <span className="font-semibold text-natureGreen">हमेशा लाइव (Fresh Data)</span>
                       </div>
                       <div className="pt-2 border-t border-slate-100 flex justify-between gap-4">
                         <button
