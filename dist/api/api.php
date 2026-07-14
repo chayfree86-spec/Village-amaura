@@ -59,7 +59,7 @@ switch ($action) {
         $total_goods = (float)($res['total'] ?? 0.0);
 
         // Total Collection
-        $total_collection = $total_cash;
+        $total_collection = $total_cash + $total_goods;
 
         // Total Expense
         $res = $db->query("SELECT SUM(amount) as total FROM expenses")->fetch();
@@ -154,7 +154,7 @@ switch ($action) {
             $mg_row = $m_goods_res->fetch();
             $row['goods_total'] = (float)($mg_row['total'] ?? 0.0);
             
-            $row['overall_total'] = $row['cash_total'];
+            $row['overall_total'] = $row['cash_total'] + $row['goods_total'];
 
             $members[] = $row;
         }
