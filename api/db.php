@@ -14,7 +14,14 @@ $db_name = 'u748421121_praj_ekta';
 
 try {
     // Connect to MySQL server first using PDO
-    $db = new PDO("mysql:host=$host", $db_user, $db_pass);
+    try {
+        $db = new PDO("mysql:host=$host", $db_user, $db_pass);
+    } catch (PDOException $e) {
+        // Fallback to local root connection
+        $db_user = 'root';
+        $db_pass = '';
+        $db = new PDO("mysql:host=$host", $db_user, $db_pass);
+    }
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Create database if not exists
@@ -61,6 +68,26 @@ try {
         `total_value` DECIMAL(12, 2) DEFAULT NULL,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+    // Add columns if contributions table already exists (migrations)
+    try {
+        $db->exec("ALTER TABLE `contributions` ADD COLUMN `type` ENUM('cash', 'goods') NOT NULL DEFAULT 'cash' AFTER `mobile`");
+    } catch (PDOException $e) {}
+    try {
+        $db->exec("ALTER TABLE `contributions` ADD COLUMN `payment_mode` ENUM('cash', 'upi', 'bank') DEFAULT NULL AFTER `amount`");
+    } catch (PDOException $e) {}
+    try {
+        $db->exec("ALTER TABLE `contributions` ADD COLUMN `item_name` VARCHAR(100) DEFAULT NULL AFTER `payment_mode`");
+    } catch (PDOException $e) {}
+    try {
+        $db->exec("ALTER TABLE `contributions` ADD COLUMN `quantity` DECIMAL(12, 2) DEFAULT NULL AFTER `item_name`");
+    } catch (PDOException $e) {}
+    try {
+        $db->exec("ALTER TABLE `contributions` ADD COLUMN `rate` DECIMAL(12, 2) DEFAULT NULL AFTER `quantity`");
+    } catch (PDOException $e) {}
+    try {
+        $db->exec("ALTER TABLE `contributions` ADD COLUMN `total_value` DECIMAL(12, 2) DEFAULT NULL AFTER `rate`");
+    } catch (PDOException $e) {}
 
     // 3. Expenses table
     $db->exec("CREATE TABLE IF NOT EXISTS `expenses` (
