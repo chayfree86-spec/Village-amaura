@@ -774,7 +774,7 @@ export default function App() {
         .then(data => {
           if (data.success) {
             triggerAlert(data.message);
-            setModals(prev => ({ ...prev, memberDetail: false }));
+            setCurrentActivePage('page-members');
             setSelectedMember(null);
             fetchLiveData(true);
           } else {
@@ -982,7 +982,7 @@ export default function App() {
       const data = await res.json();
       if (data.success) {
         triggerAlert(data.message);
-        setModals(prev => ({ ...prev, memberDetail: false }));
+        setCurrentActivePage('page-members');
         setSelectedMember(null);
         // If editing own info
         if (selectedMember.id === currentUser.id) {
@@ -1679,6 +1679,7 @@ export default function App() {
               {currentActivePage === 'page-members' && 'सदस्य (Members)'}
               {currentActivePage === 'page-reports' && 'रिपोर्ट (Reports)'}
               {currentActivePage === 'page-settings' && 'सेटिंग्स (Settings)'}
+              {currentActivePage === 'page-member-detail' && 'Member Profile'}
             </h2>
             <p className="text-[11px] text-slate-450 font-medium mt-0.5">🌿 प्रजापति एकता ग्रुप में आपका स्वागत है</p>
           </div>
@@ -1933,7 +1934,7 @@ export default function App() {
                                         <button
                                           onClick={() => {
                                             setSelectedMember(matchedMember);
-                                            setModals(prev => ({ ...prev, memberDetail: true }));
+                                            setCurrentActivePage('page-member-detail');
                                           }}
                                           className="hover:text-riverBlue hover:underline text-left font-semibold text-riverBlue inline-flex items-center gap-0.5"
                                           title="सदस्य विवरण देखें"
@@ -1969,7 +1970,7 @@ export default function App() {
                                         <button
                                           onClick={() => {
                                             setSelectedMember(matchedMember);
-                                            setModals(prev => ({ ...prev, memberDetail: true }));
+                                            setCurrentActivePage('page-member-detail');
                                           }}
                                           className="text-xs text-riverBlue hover:underline font-semibold inline-flex items-center gap-1 hover:text-riverBlue/85"
                                         >
@@ -2048,7 +2049,7 @@ export default function App() {
                               onClick={() => {
                                 if (isContribution && matchedMember) {
                                   setSelectedMember(matchedMember);
-                                  setModals(prev => ({ ...prev, memberDetail: true }));
+                                  setCurrentActivePage('page-member-detail');
                                 }
                               }}
                               className={`p-3.5 rounded-2xl border transition-all duration-200 ${
@@ -2204,7 +2205,7 @@ export default function App() {
                               key={m.id}
                               onClick={() => {
                                 setSelectedMember(m);
-                                setModals(prev => ({ ...prev, memberDetail: true }));
+                                setCurrentActivePage('page-member-detail');
                               }}
                               className="hover:bg-lightGray/35 transition-colors cursor-pointer"
                             >
@@ -2288,7 +2289,7 @@ export default function App() {
                           key={m.id}
                           onClick={() => {
                             setSelectedMember(m);
-                            setModals(prev => ({ ...prev, memberDetail: true }));
+                            setCurrentActivePage('page-member-detail');
                           }}
                           className={`p-4 rounded-2xl cursor-pointer flex flex-col transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg ${
                             m.is_admin === 1
@@ -2544,7 +2545,7 @@ export default function App() {
                           onClick={() => {
                             if (isContribution && matchedMember) {
                               setSelectedMember(matchedMember);
-                              setModals(prev => ({ ...prev, memberDetail: true }));
+                              setCurrentActivePage('page-member-detail');
                             }
                           }}
                           className={`p-3.5 rounded-2xl border flex justify-between items-center transition-all hover:translate-x-[4px] hover:shadow-sm ${
@@ -3011,6 +3012,200 @@ export default function App() {
                 </div>
               </div>
 
+            </section>
+          )}
+
+          {/* PAGE: MEMBER DETAIL */}
+          {currentActivePage === 'page-member-detail' && selectedMember && (
+            <section className="page-view active animate-ripple pb-16 md:pb-6">
+              <div className="bg-white p-5 rounded-2xl shadow-sm border border-sandBeige/30 space-y-6">
+                {/* Header with Back Button */}
+                <div className="flex items-center justify-between pb-3 border-b border-lightGray">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setCurrentActivePage('page-members');
+                        setSelectedMember(null);
+                      }}
+                      className="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-riverBlue transition-colors cursor-pointer"
+                      title="Back to members"
+                    >
+                      <span className="material-icons-outlined text-[24px]">arrow_back</span>
+                    </button>
+                    <div>
+                      <h3 className="text-lg text-riverBlue font-bold flex items-center gap-1.5 leading-none">
+                        👤 {selectedMember.name}
+                      </h3>
+                      <span className="text-[10px] text-slate-400 font-bold mt-1 block uppercase tracking-wider">
+                        {selectedMember.is_admin ? 'Admin' : 'Member'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total Summaries */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-riverBlue/5 p-4 rounded-xl border border-riverBlue/10">
+                    <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Cash Contribution</span>
+                    <span className="text-lg font-extrabold text-riverBlue mt-1 block">₹ {(Number(selectedMember.cash_total) || 0).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="bg-natureGreen/5 p-4 rounded-xl border border-natureGreen/10">
+                    <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Goods Value</span>
+                    <span className="text-lg font-extrabold text-natureGreen mt-1 block">₹ {(Number(selectedMember.goods_total) || 0).toLocaleString('en-IN')}</span>
+                  </div>
+                </div>
+
+                {/* Admin Controls */}
+                {currentUser && currentUser.is_admin === 1 && (
+                  <div className="p-4 bg-lightGray rounded-xl border border-sandBeige/30">
+                    <form onSubmit={handleAdminUpdateMemberSubmit} className="space-y-4">
+                      <h5 className="text-xs font-bold text-riverBlue flex items-center gap-1.5 border-b border-sandBeige/20 pb-1.5 uppercase tracking-wider">
+                        <span className="material-icons-outlined text-base">manage_accounts</span>
+                        Admin Controls
+                      </h5>
+                      
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[11px] font-semibold text-slate-600">Member Name</label>
+                        <input
+                          type="text"
+                          value={mDetEditName}
+                          onChange={(e) => setMDetEditName(e.target.value)}
+                          className="w-full border border-sandBeige/70 rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none bg-white"
+                        />
+                      </div>
+                      
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[11px] font-semibold text-slate-600">Mobile Number</label>
+                        <input
+                          type="tel"
+                          value={mDetEditMobile}
+                          onChange={(e) => setMDetEditMobile(e.target.value)}
+                          pattern="[0-9]{10}"
+                          className="w-full border border-sandBeige/70 rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none bg-white"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between border-t border-sandBeige/20 pt-3">
+                        <div>
+                          <span className="text-xs font-semibold text-slate-700 block">Login Permission</span>
+                          <span className="text-[10px] text-slate-450 block">Enable or disable member login access.</span>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={selectedMember.status === 1}
+                            disabled={selectedMember.id === currentUser.id}
+                            onChange={(e) => handleToggleMemberAccess(selectedMember.id, e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-riverBlue"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="flex gap-2 pt-2 border-t border-sandBeige/20">
+                        <button type="submit" className="bg-riverBlue text-white rounded-xl px-4 py-2.5 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm flex-1 flex items-center justify-center cursor-pointer">
+                          <span className="transform translate-y-[1.5px]">Save Info</span>
+                        </button>
+                        {selectedMember.id !== currentUser.id && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteMember(selectedMember.id)}
+                            className="bg-softRed hover:bg-softRed/90 text-white rounded-xl px-4 py-2.5 text-xs font-semibold transition-colors shadow-sm flex-shrink-0 flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <span className="material-icons-outlined text-sm">delete</span>
+                            <span className="transform translate-y-[1.5px]">Delete</span>
+                          </button>
+                        )}
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* History List */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                    <span>📜</span> Contribution History
+                  </h4>
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                    {selectedMemberHistory.length === 0 ? (
+                      <div className="text-center text-slate-400 py-6 text-xs bg-slate-50 rounded-xl border border-dashed border-sandBeige/20">No contribution history found</div>
+                    ) : (
+                      selectedMemberHistory.map((c) => (
+                        <div key={c.id} className="flex justify-between items-start text-xs p-3.5 bg-slate-50 rounded-xl border border-sandBeige/20 hover:border-riverBlue/25 transition-all">
+                          <div className="min-w-0 flex-1">
+                            <span className="font-semibold text-slate-800 block truncate text-[13px]">
+                              {c.type === 'cash' ? '💵 Cash Contribution' : `🏗️ Goods: ${c.item_name}`}
+                            </span>
+                            
+                            {/* Details badges */}
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              {c.type === 'cash' ? (
+                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-650 bg-slate-200/60 px-2 py-0.5 rounded-full">
+                                  Mode: {c.payment_mode === 'upi' ? 'UPI' : c.payment_mode === 'bank' ? 'Bank' : 'Cash'}
+                                </span>
+                              ) : (
+                                <>
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-800 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
+                                    Qty: {c.quantity}
+                                  </span>
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-indigo-800 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
+                                    Rate: ₹{c.rate}
+                                  </span>
+                                </>
+                              )}
+                              <span className="inline-flex items-center gap-0.5 text-[9px] text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-full font-medium">
+                                Date: {formatDateDisplay(c.date)}
+                              </span>
+                            </div>
+                            
+                            {c.remark && (
+                              <span className="text-[10px] text-slate-400 block mt-2 leading-normal italic">
+                                Remark: {c.remark}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="text-right flex-shrink-0 ml-3 flex flex-col items-end justify-between min-h-[44px]">
+                            <span className="font-extrabold text-sm block tracking-tight text-natureGreen">
+                              {c.type === 'cash' ? `+₹${c.amount.toLocaleString('en-IN')}` : `+₹${c.total_value.toLocaleString('en-IN')}`}
+                            </span>
+                            {currentUser && currentUser.is_admin === 1 && (
+                              <div className="flex justify-end gap-1.5 mt-2.5">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openEditContribution(c);
+                                  }}
+                                  className="w-6.5 h-6.5 rounded-full border border-slate-200/50 bg-white hover:bg-riverBlue/5 hover:border-riverBlue/30 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-all cursor-pointer shadow-sm animate-ripple"
+                                  title="Edit"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[11.5px] h-[11.5px]">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                  </svg>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteEntry(c.id, 'contribution');
+                                  }}
+                                  className="w-6.5 h-6.5 rounded-full border border-slate-200/50 bg-white hover:bg-softRed/5 hover:border-softRed/30 text-slate-500 hover:text-softRed flex items-center justify-center transition-all cursor-pointer shadow-sm animate-ripple"
+                                  title="Delete"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[11.5px] h-[11.5px]">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
             </section>
           )}
 
@@ -3601,185 +3796,7 @@ export default function App() {
         </div>
       )}
 
-      {/* 5. Member Detail Modal */}
-      {modals.memberDetail && selectedMember && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto animate-ripple relative">
-            <button
-              onClick={() => {
-                setModals(prev => ({ ...prev, memberDetail: false }));
-                setSelectedMember(null);
-              }}
-              className="absolute right-4 top-4 text-slate-400 hover:text-slate-655"
-            >
-              <span className="material-icons-outlined">close</span>
-            </button>
-            
-            <h3 className="text-[17px] text-riverBlue font-semibold mb-4 pb-2 border-b border-lightGray flex items-center gap-1.5">
-              👤 {selectedMember.name} ({selectedMember.is_admin ? 'एडमिन' : 'सदस्य'})
-            </h3>
 
-            {/* Total Summaries */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-riverBlue/5 p-3.5 rounded-xl border border-riverBlue/10">
-                <span className="text-[10px] font-semibold text-slate-600 block">💵 कुल नकद दान</span>
-                <span className="text-base font-bold text-riverBlue">₹ {(Number(selectedMember.cash_total) || 0).toLocaleString('en-IN')}</span>
-              </div>
-              <div className="bg-natureGreen/5 p-3.5 rounded-xl border border-natureGreen/10">
-                <span className="text-[10px] font-semibold text-slate-600 block">🏗️ कुल सामग्री मूल्य</span>
-                <span className="text-base font-bold text-natureGreen">₹ {(Number(selectedMember.goods_total) || 0).toLocaleString('en-IN')}</span>
-              </div>
-            </div>
-
-            {/* Admin Controls inside Detail Modal */}
-            {currentUser && currentUser.is_admin === 1 && (
-              <div className="mb-4 p-4 bg-lightGray rounded-xl border border-sandBeige/30 animate-ripple">
-                <form onSubmit={handleAdminUpdateMemberSubmit} className="space-y-4">
-                  <h5 className="text-xs font-semibold text-riverBlue flex items-center gap-1.5 border-b border-sandBeige/20 pb-1.5 uppercase tracking-wider">
-                    <span className="material-icons-outlined text-base">manage_accounts</span>
-                    एडमिन नियंत्रण (Admin Controls)
-                  </h5>
-                  
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-slate-600">सदस्य का नाम (Name)</label>
-                    <input
-                      type="text"
-                      value={mDetEditName}
-                      onChange={(e) => setMDetEditName(e.target.value)}
-                      className="w-full border border-sandBeige/70 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none bg-white"
-                    />
-                  </div>
-                  
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-slate-600">मोबाइल नंबर (Mobile)</label>
-                    <input
-                      type="tel"
-                      value={mDetEditMobile}
-                      onChange={(e) => setMDetEditMobile(e.target.value)}
-                      pattern="[0-9]{10}"
-                      className="w-full border border-sandBeige/70 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-riverBlue/30 outline-none bg-white"
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between border-t border-sandBeige/20 pt-3">
-                    <div>
-                      <span className="text-xs font-semibold text-slate-700 block">लॉगिन अनुमति</span>
-                      <span className="text-[10px] text-slate-450 block">लॉगिन सुविधा चालू/बंद करें।</span>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedMember.status === 1}
-                        disabled={selectedMember.id === currentUser.id}
-                        onChange={(e) => handleToggleMemberAccess(selectedMember.id, e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-riverBlue"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex gap-2 pt-2 border-t border-sandBeige/20">
-                    <button type="submit" className="bg-riverBlue text-white rounded-xl px-4 py-2 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm flex-1 flex items-center justify-center">
-                      <span className="transform translate-y-[1.5px]">विवरण सहेजें (Save Info)</span>
-                    </button>
-                    {selectedMember.id !== currentUser.id && (
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteMember(selectedMember.id)}
-                        className="bg-softRed hover:bg-softRed/90 text-white rounded-xl px-4 py-2 text-xs font-semibold transition-colors shadow-sm flex-shrink-0 flex items-center justify-center gap-1"
-                      >
-                        <span className="material-icons-outlined text-sm">delete</span>
-                        <span className="transform translate-y-[1.5px]">Delete</span>
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* History List */}
-            <h4 className="text-xs font-bold text-slate-700 mb-2.5 uppercase tracking-wider">📜 योगदान इतिहास (Contribution History)</h4>
-            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-              {selectedMemberHistory.length === 0 ? (
-                <div className="text-center text-slate-400 py-4 text-xs">कोई योगदान इतिहास नहीं मिला</div>
-              ) : (
-                selectedMemberHistory.map((c) => (
-                  <div key={c.id} className="flex justify-between items-start text-xs p-3 bg-slate-50 rounded-xl border border-sandBeige/20 transition-all hover:border-riverBlue/25">
-                    <div className="min-w-0 flex-1">
-                      <span className="font-semibold text-slate-800 block truncate text-[12.5px]">
-                        {c.type === 'cash' ? '💵 नकद योगदान' : `🏗️ सामग्री: ${c.item_name}`}
-                      </span>
-                      
-                      {/* Details badges */}
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {c.type === 'cash' ? (
-                          <span className="inline-flex items-center gap-0.5 text-[8.5px] font-semibold text-slate-650 bg-slate-200/60 px-2 py-0.5 rounded-full">
-                            पेमेंट: {c.payment_mode === 'upi' ? 'UPI' : c.payment_mode === 'bank' ? 'बैंक' : 'नकद'}
-                          </span>
-                        ) : (
-                          <>
-                            <span className="inline-flex items-center gap-0.5 text-[8.5px] font-semibold text-blue-800 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
-                              📦 मात्रा: {c.quantity}
-                            </span>
-                            <span className="inline-flex items-center gap-0.5 text-[8.5px] font-semibold text-indigo-800 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
-                              🏷️ दर: ₹{c.rate}
-                            </span>
-                          </>
-                        )}
-                        <span className="inline-flex items-center gap-0.5 text-[8.5px] text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-full font-medium">
-                          📅 {formatDateDisplay(c.date)}
-                        </span>
-                      </div>
-                      
-                      {c.remark && (
-                        <span className="text-[9.5px] text-slate-400 block mt-1 leading-normal italic">
-                          टिप्पणी: {c.remark}
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="text-right flex-shrink-0 ml-3 flex flex-col items-end justify-between min-h-[40px]">
-                      <span className="font-extrabold text-[13.5px] block tracking-tight text-natureGreen">
-                        {c.type === 'cash' ? `+₹${c.amount.toLocaleString('en-IN')}` : `+₹${c.total_value.toLocaleString('en-IN')}`}
-                      </span>
-                      {currentUser && currentUser.is_admin === 1 && (
-                        <div className="flex justify-end gap-1 mt-2">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditContribution(c);
-                            }}
-                            className="w-6 h-6 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-riverBlue/5 hover:border-riverBlue/30 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-all cursor-pointer shadow-sm"
-                            title="Edit"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[11px] h-[11px]">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                            </svg>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteEntry(c.id, 'contribution');
-                            }}
-                            className="w-6 h-6 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-softRed/5 hover:border-softRed/30 text-slate-500 hover:text-softRed flex items-center justify-center transition-all cursor-pointer shadow-sm"
-                            title="Delete"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[11px] h-[11px]">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 6. Bill Image Lightbox Modal */}
       {modals.billLightbox && lightboxImgSrc && (
