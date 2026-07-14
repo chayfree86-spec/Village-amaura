@@ -59,7 +59,9 @@ export default function App() {
     message: '',
     type: 'info',
     title: '',
-    callback: null
+    callback: null,
+    showCancel: false,
+    cancelCallback: null
   });
 
   // Modal display states
@@ -171,7 +173,7 @@ export default function App() {
     return dateStr;
   };
 
-  const triggerAlert = (message, type = 'info', title = '', callback = null) => {
+  const triggerAlert = (message, type = 'info', title = '', callback = null, showCancel = false, cancelCallback = null) => {
     const msgStr = String(message);
     const msgLower = msgStr.toLowerCase();
     let detectedType = type;
@@ -185,6 +187,7 @@ export default function App() {
     let defaultTitle = '';
     if (detectedType === 'success') defaultTitle = 'सफलता (Success)';
     else if (detectedType === 'error') defaultTitle = 'त्रुटि (Error)';
+    else if (detectedType === 'warning') defaultTitle = 'चेतावनी (Warning)';
     else defaultTitle = 'सूचना (Notification)';
 
     setCustomAlert({
@@ -192,7 +195,9 @@ export default function App() {
       message: msgStr,
       type: detectedType,
       title: title || defaultTitle,
-      callback
+      callback,
+      showCancel,
+      cancelCallback
     });
   };
 
@@ -719,31 +724,70 @@ export default function App() {
       triggerAlert("कृपया प्रविष्टि हटाने के लिए लॉगिन करें।", "error");
       return;
     }
-    if (window.confirm("क्या आप वाकई इस प्रविष्टि को हटाना चाहते हैं?")) {
-      fetch(`${API_BASE}?action=delete_entry`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, type, user_mobile: currentUser.mobile })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          triggerAlert(data.message);
-          // If deleted inside member details, we might need to refresh selectedMember summary as well
-          if (selectedMember) {
-            const updated = appData.members.find(m => m.id === selectedMember.id);
-            if (updated) setSelectedMember(updated);
+    triggerAlert(
+      "Are you sure you want to delete this transaction?",
+      "warning",
+      "Confirm Delete",
+      () => {
+        fetch(`${API_BASE}?action=delete_entry`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, type, user_mobile: currentUser.mobile })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            triggerAlert(data.message);
+            // If deleted inside member details, we might need to refresh selectedMember summary as well
+            if (selectedMember) {
+              const updated = appData.members.find(m => m.id === selectedMember.id);
+              if (updated) setSelectedMember(updated);
+            }
+            fetchLiveData(true);
+          } else {
+            triggerAlert(data.error || "Error deleting entry.", "error");
           }
-          fetchLiveData(true);
-        } else {
-          triggerAlert(data.error || "हटाने में त्रुटि हुई।", "error");
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        triggerAlert("सर्वर से जुड़ने में समस्या हुई।", "error");
-      });
-    }
+        })
+        .catch(err => {
+          console.error(err);
+          triggerAlert("Connection error.", "error");
+        });
+      },
+      true
+    );
+  };
+
+  // 8b. Delete Member
+  const handleDeleteMember = (memberId) => {
+    if (!currentUser || currentUser.is_admin !== 1) return;
+    triggerAlert(
+      "Are you sure you want to delete this member? All their login access will be removed.",
+      "warning",
+      "Confirm Delete",
+      () => {
+        fetch(`${API_BASE}?action=delete_member`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ member_id: memberId, user_mobile: currentUser.mobile })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            triggerAlert(data.message);
+            setModals(prev => ({ ...prev, memberDetail: false }));
+            setSelectedMember(null);
+            fetchLiveData(true);
+          } else {
+            triggerAlert(data.error || "Error deleting member.", "error");
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          triggerAlert("Connection error.", "error");
+        });
+      },
+      true
+    );
   };
 
   // 9. Toggle System Lock Edit Mode (Admin control)
@@ -1920,33 +1964,68 @@ export default function App() {
                                     )}
                                   </td>
                                   <td className="py-3 px-4 text-center">
-                                    {isContribution && matchedMember && (
-                                      <button
-                                        onClick={() => {
-                                          setSelectedMember(matchedMember);
-                                          setModals(prev => ({ ...prev, memberDetail: true }));
-                                        }}
-                                        className="text-xs text-riverBlue hover:underline font-semibold inline-flex items-center gap-1 hover:text-riverBlue/85"
-                                      >
-                                        <span className="material-icons-outlined text-sm">person</span>
-                                        सदस्य प्रोफ़ाइल
-                                      </button>
-                                    )}
-                                    {!isContribution && item.bill_image && (
-                                      <button
-                                        onClick={() => {
-                                          setLightboxImgSrc(item.bill_image);
-                                          setModals(prev => ({ ...prev, billLightbox: true }));
-                                        }}
-                                        className="text-xs text-riverBlue hover:underline font-semibold inline-flex items-center gap-1 hover:text-riverBlue/85"
-                                      >
-                                        <span className="material-icons-outlined text-sm">image</span>
-                                        रसीद देखें
-                                      </button>
-                                    )}
-                                    {!isContribution && !item.bill_image && (
-                                      <span className="text-xs text-slate-400 italic">रसीद नहीं है</span>
-                                    )}
+                                    <div className="flex items-center justify-center gap-2">
+                                      {isContribution && matchedMember && (
+                                        <button
+                                          onClick={() => {
+                                            setSelectedMember(matchedMember);
+                                            setModals(prev => ({ ...prev, memberDetail: true }));
+                                          }}
+                                          className="text-xs text-riverBlue hover:underline font-semibold inline-flex items-center gap-1 hover:text-riverBlue/85"
+                                        >
+                                          <span className="material-icons-outlined text-sm">person</span>
+                                          सदस्य प्रोफ़ाइल
+                                        </button>
+                                      )}
+                                      {!isContribution && item.bill_image && (
+                                        <button
+                                          onClick={() => {
+                                            setLightboxImgSrc(item.bill_image);
+                                            setModals(prev => ({ ...prev, billLightbox: true }));
+                                          }}
+                                          className="text-xs text-riverBlue hover:underline font-semibold inline-flex items-center gap-1 hover:text-riverBlue/85"
+                                        >
+                                          <span className="material-icons-outlined text-sm">image</span>
+                                          रसीद देखें
+                                        </button>
+                                      )}
+                                      {!isContribution && !item.bill_image && (
+                                        <span className="text-xs text-slate-400 italic">रसीद नहीं है</span>
+                                      )}
+                                      {currentUser && currentUser.is_admin === 1 && (
+                                        <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 pl-2">
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const fullItem = isContribution 
+                                                ? appData.contributions.find(c => c.id === item.id) 
+                                                : appData.expenses.find(exp => exp.id === item.id);
+                                              if (fullItem) {
+                                                isContribution ? openEditContribution(fullItem) : openEditExpenseModal(fullItem);
+                                              }
+                                            }}
+                                            className="w-7 h-7 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-riverBlue/5 hover:border-riverBlue/30 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                                            title="Edit"
+                                          >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[13px] h-[13px]">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                            </svg>
+                                          </button>
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleDeleteEntry(item.id, isContribution ? 'contribution' : 'expense');
+                                            }}
+                                            className="w-7 h-7 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-softRed/5 hover:border-softRed/30 text-slate-500 hover:text-softRed flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                                            title="Delete"
+                                          >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[13px] h-[13px]">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
                                   </td>
                                 </tr>
                               );
@@ -2024,7 +2103,7 @@ export default function App() {
                                   </div>
                                 )}
                               </div>
-                              <div className="text-right flex-shrink-0">
+                              <div className="text-right flex-shrink-0 flex flex-col items-end justify-between h-full min-h-[45px]">
                                 <span className={`font-extrabold text-[15px] block tracking-tight ${isContribution ? 'text-natureGreen' : 'text-softRed'}`}>
                                   {isContribution ? (
                                     item.type === 'cash' ? `+₹${item.amount.toLocaleString('en-IN')}` : `+₹${item.total_value.toLocaleString('en-IN')}`
@@ -2032,6 +2111,39 @@ export default function App() {
                                     `-₹${item.amount.toLocaleString('en-IN')}`
                                   )}
                                 </span>
+                                {currentUser && currentUser.is_admin === 1 && (
+                                  <div className="flex justify-end gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const fullItem = isContribution 
+                                          ? appData.contributions.find(c => c.id === item.id) 
+                                          : appData.expenses.find(exp => exp.id === item.id);
+                                        if (fullItem) {
+                                          isContribution ? openEditContribution(fullItem) : openEditExpenseModal(fullItem);
+                                        }
+                                      }}
+                                      className="w-7 h-7 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-riverBlue/5 hover:border-riverBlue/30 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-all cursor-pointer shadow-sm animate-ripple"
+                                      title="Edit"
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[13px] h-[13px]">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                      </svg>
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteEntry(item.id, isContribution ? 'contribution' : 'expense');
+                                      }}
+                                      className="w-7 h-7 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-softRed/5 hover:border-softRed/30 text-slate-500 hover:text-softRed flex items-center justify-center transition-all cursor-pointer shadow-sm animate-ripple"
+                                      title="Delete"
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[13px] h-[13px]">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           );
@@ -3566,10 +3678,20 @@ export default function App() {
                     </label>
                   </div>
                   
-                  <div className="flex justify-end pt-2 border-t border-sandBeige/20">
-                    <button type="submit" className="bg-riverBlue text-white rounded-xl px-4 py-2 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm w-full flex items-center justify-center">
+                  <div className="flex gap-2 pt-2 border-t border-sandBeige/20">
+                    <button type="submit" className="bg-riverBlue text-white rounded-xl px-4 py-2 text-xs font-semibold hover:bg-riverBlue/95 transition-colors shadow-sm flex-1 flex items-center justify-center">
                       <span className="transform translate-y-[1.5px]">विवरण सहेजें (Save Info)</span>
                     </button>
+                    {selectedMember.id !== currentUser.id && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMember(selectedMember.id)}
+                        className="bg-softRed hover:bg-softRed/90 text-white rounded-xl px-4 py-2 text-xs font-semibold transition-colors shadow-sm flex-shrink-0 flex items-center justify-center gap-1"
+                      >
+                        <span className="material-icons-outlined text-sm">delete</span>
+                        <span className="transform translate-y-[1.5px]">Delete</span>
+                      </button>
+                    )}
                   </div>
                 </form>
               </div>
@@ -3616,10 +3738,40 @@ export default function App() {
                       )}
                     </div>
                     
-                    <div className="text-right flex-shrink-0 ml-3">
+                    <div className="text-right flex-shrink-0 ml-3 flex flex-col items-end justify-between min-h-[40px]">
                       <span className="font-extrabold text-[13.5px] block tracking-tight text-natureGreen">
                         {c.type === 'cash' ? `+₹${c.amount.toLocaleString('en-IN')}` : `+₹${c.total_value.toLocaleString('en-IN')}`}
                       </span>
+                      {currentUser && currentUser.is_admin === 1 && (
+                        <div className="flex justify-end gap-1 mt-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditContribution(c);
+                            }}
+                            className="w-6 h-6 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-riverBlue/5 hover:border-riverBlue/30 text-slate-500 hover:text-riverBlue flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                            title="Edit"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[11px] h-[11px]">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteEntry(c.id, 'contribution');
+                            }}
+                            className="w-6 h-6 rounded-full border border-slate-200/50 bg-slate-50/50 hover:bg-softRed/5 hover:border-softRed/30 text-slate-500 hover:text-softRed flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                            title="Delete"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" className="w-[11px] h-[11px]">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
@@ -3724,28 +3876,58 @@ export default function App() {
           <div className="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl text-center border border-sandBeige/25 transform scale-100 opacity-100 transition-all duration-300">
             <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 border shadow-sm ${
               customAlert.type === 'success' ? 'bg-[#E8F5E9] border-[#A5D6A7]' :
-              customAlert.type === 'error' ? 'bg-[#FFEBEE] border-[#FFCDD2]' : 'bg-[#E3F2FD] border-[#90CAF9]'
+              customAlert.type === 'error' ? 'bg-[#FFEBEE] border-[#FFCDD2]' :
+              customAlert.type === 'warning' ? 'bg-[#FFF3E0] border-[#FFE0B2]' : 'bg-[#E3F2FD] border-[#90CAF9]'
             }`}>
               {customAlert.type === 'success' && <span className="material-icons-outlined text-3xl text-natureGreen">check_circle</span>}
               {customAlert.type === 'error' && <span className="material-icons-outlined text-3xl text-softRed">error_outline</span>}
+              {customAlert.type === 'warning' && <span className="material-icons-outlined text-3xl text-amber-500">warning</span>}
               {customAlert.type === 'info' && <span className="material-icons-outlined text-3xl text-riverBlue">info</span>}
             </div>
             
             <h3 className="text-base font-semibold text-slate-800 mb-1.5">{customAlert.title}</h3>
             <p className="text-[12.5px] text-slate-500 mb-5 leading-relaxed">{customAlert.message}</p>
             
-            <button
-              onClick={() => {
-                setCustomAlert(prev => ({ ...prev, show: false }));
-                if (customAlert.callback) customAlert.callback();
-              }}
-              className={`w-full text-white rounded-xl py-2.5 text-xs font-semibold transition-all shadow-md focus:outline-none ${
-                customAlert.type === 'success' ? 'bg-[#2E7D32] hover:bg-[#2E7D32]/90' :
-                customAlert.type === 'error' ? 'bg-[#E53935] hover:bg-[#E53935]/90' : 'bg-[#1E5AA8] hover:bg-[#1E5AA8]/90'
-              }`}
-            >
-              ठीक है (OK)
-            </button>
+            {customAlert.showCancel ? (
+              <div className="flex gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCustomAlert(prev => ({ ...prev, show: false }));
+                    if (customAlert.cancelCallback) customAlert.cancelCallback();
+                  }}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl py-2.5 text-xs font-semibold transition-all focus:outline-none"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCustomAlert(prev => ({ ...prev, show: false }));
+                    if (customAlert.callback) customAlert.callback();
+                  }}
+                  className={`flex-1 text-white rounded-xl py-2.5 text-xs font-semibold transition-all shadow-md focus:outline-none ${
+                    customAlert.type === 'warning' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-riverBlue hover:bg-riverBlue/95'
+                  }`}
+                  style={customAlert.type === 'warning' ? { backgroundColor: '#d97706' } : {}}
+                >
+                  Confirm
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setCustomAlert(prev => ({ ...prev, show: false }));
+                  if (customAlert.callback) customAlert.callback();
+                }}
+                className={`w-full text-white rounded-xl py-2.5 text-xs font-semibold transition-all shadow-md focus:outline-none ${
+                  customAlert.type === 'success' ? 'bg-[#2E7D32] hover:bg-[#2E7D32]/90' :
+                  customAlert.type === 'error' ? 'bg-[#E53935] hover:bg-[#E53935]/90' : 'bg-[#1E5AA8] hover:bg-[#1E5AA8]/90'
+                }`}
+              >
+                ठीक है (OK)
+              </button>
+            )}
           </div>
         </div>
       )}

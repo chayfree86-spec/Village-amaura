@@ -547,6 +547,39 @@ switch ($action) {
         }
         break;
 
+    case 'delete_member':
+        $data = get_json_input();
+        $user_mobile = trim($data['user_mobile'] ?? '');
+        $member_id = (int)($data['member_id'] ?? 0);
+
+        // Verify admin
+        $user = check_auth($db, $user_mobile);
+        if (!$user || !$user['is_admin']) {
+            echo json_encode(["success" => false, "error" => "यह क्रिया करने के लिए आपके पास एडमिन अधिकार होने चाहिए।"]);
+            exit;
+        }
+
+        if ($member_id <= 0) {
+            echo json_encode(["success" => false, "error" => "अमान्य सदस्य।"]);
+            exit;
+        }
+
+        // Prevent self deletion
+        if ($member_id == $user['id']) {
+            echo json_encode(["success" => false, "error" => "आप खुद को डिलीट नहीं कर सकते।"]);
+            exit;
+        }
+
+        $stmt = $db->prepare("DELETE FROM members WHERE id = ?");
+        $success = $stmt->execute([$member_id]);
+        if ($success) {
+            echo json_encode(["success" => true, "message" => "सदस्य को सफलतापूर्वक हटा दिया गया है।"]);
+        } else {
+            $err = $db->errorInfo();
+            echo json_encode(["success" => false, "error" => "सदस्य को हटाने में विफल: " . ($err[2] ?? '')]);
+        }
+        break;
+
     case 'toggle_member':
         $data = get_json_input();
         $user_mobile = trim($data['user_mobile'] ?? '');
